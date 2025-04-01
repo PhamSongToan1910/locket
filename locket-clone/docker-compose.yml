@@ -1,7 +1,7 @@
 services:
   app:
     build: .
-    image: 'locket-clone:lastest'
+    image: 'locket-clone:latest'
     env_file: ./.env
     ports:
       - "${SPRING_LOCAL_PORT}:${SPRING_DOCKER_PORT}"
