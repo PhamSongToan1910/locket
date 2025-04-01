@@ -1,0 +1,37 @@
+version: "3.8"
+
+services:
+  mongo_db:
+    image: 'mongo:8.0.6'
+    container_name: mongo_db
+    restart: always
+    env_file: ./.env
+    ports:
+      - "${MONGODB_LOCAL_PORT}:${MONGODB_DOCKER_PORT}"
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_INITDB_ROOT_USERNAME}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_INITDB_ROOT_PASSWORD}
+    volumes:
+      - ./mongo-data:/data/db
+    networks:
+      - locket-clone
+
+  app:
+    build: .
+    image: 'locket-clone:lastest'
+    env_file: ./.env
+    ports:
+      - "${SPRING_LOCAL_PORT}:${SPRING_DOCKER_PORT}"
+    networks:
+      - locket-clone
+    depends_on:
+      - mongo_db
+    environment:
+      SPRING_APPLICATION_JSON: '{
+                  "spring.data.mongodb.uri": "mongodb://mongo_db:27017/Locket-clone"
+                }'
+
+networks:
+  locket-clone:
+    driver: bridge
+
