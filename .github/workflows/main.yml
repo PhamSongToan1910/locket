@@ -63,6 +63,7 @@ jobs:
 
             docker ps
             docker-compose up -d --build
+            docker ps
             echo "Containers started successfully."
           EOF
           echo "Deployment completed successfully."
