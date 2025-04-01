@@ -7,6 +7,6 @@ services:
       - "${SPRING_LOCAL_PORT}:${SPRING_DOCKER_PORT}"
     environment:
       SPRING_APPLICATION_JSON: '{
-                  "spring.data.mongodb.uri": "mongodb://ec2-user@13.239.54.49:27017/Locket-clone"
+                  "spring.data.mongodb.uri": "mongodb://13.239.54.49:27017/Locket-clone"
                 }'
 
