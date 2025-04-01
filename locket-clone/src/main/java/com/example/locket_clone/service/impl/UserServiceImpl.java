@@ -27,10 +27,9 @@ public class UserServiceImpl implements UserService {
     @Override
     public void insertUser(AddUserRequest user) {
         User userInsert = ModelMapperUtils.toObject(user, User.class);
-//        Query query = new Query(Criteria.where(Role.NAME).is("user"));
-//        Role role = roleRepository.findOne(query, Role.class);
-//        userInsert.getAuthorities().add(role.getId().toString());
-        userInsert.setPassword(passwordEncoder.encode(user.getPassword()));
+        Query query = new Query(Criteria.where(Role.NAME).is("user"));
+        Role role = roleRepository.findOne(query, Role.class);
+        userInsert.getAuthorities().add(role.getId().toString());
         userRepository.save(userInsert);
     }
 

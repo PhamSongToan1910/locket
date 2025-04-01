@@ -3,8 +3,13 @@ package com.example.locket_clone.controller;
 
 import com.example.locket_clone.config.security.JWTToken;
 import com.example.locket_clone.config.security.TokenProvider;
+import com.example.locket_clone.entities.User;
+import com.example.locket_clone.entities.request.AddUserRequest;
 import com.example.locket_clone.entities.request.LoginVM;
+import com.example.locket_clone.entities.response.LoginResponse;
 import com.example.locket_clone.entities.response.ResponseData;
+import com.example.locket_clone.service.UserService;
+import com.example.locket_clone.utils.Constant.Constant;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -24,20 +29,39 @@ import org.springframework.web.bind.annotation.RestController;
 public class AuthController {
     TokenProvider tokenProvider;
     AuthenticationManagerBuilder authenticationManagerBuilder;
+    UserService userService;
 
     @PostMapping("/login")
-    public ResponseData<JWTToken> authorize(@RequestBody LoginVM loginVM) {
-        UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(
-                loginVM.getUsername(),
-                loginVM.getPassword());
+    public ResponseData<LoginResponse> authorize(@RequestBody LoginVM loginVM) {
+        User user = userService.findUserByEmail(loginVM.getUsername());
+        if(user != null){
+            UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(
+                    loginVM.getUsername(),
+                    loginVM.getPassword());
 
-        Authentication authentication = authenticationManagerBuilder.getObject().authenticate(authenticationToken);
-        System.out.println("authen: " +  authentication.getPrincipal());
-        SecurityContextHolder.getContext().setAuthentication(authentication);
-        String jwt = tokenProvider.createToken(authentication);
-        String refreshToken = tokenProvider.createRefreshToken(authentication);
+            Authentication authentication = authenticationManagerBuilder.getObject().authenticate(authenticationToken);
+            SecurityContextHolder.getContext().setAuthentication(authentication);
+            String jwt = tokenProvider.createToken(authentication);
+            String refreshToken = tokenProvider.createRefreshToken(authentication);
+            if(user.getFullName() == null) {
+                return new ResponseData<>(new LoginResponse(jwt, refreshToken, Constant.TYPE_LOGIN.FULLNAME_NOT_COMPLETE));
+            } else if(user.getUsername() == null) {
+                return new ResponseData<>(new LoginResponse(jwt, refreshToken, Constant.TYPE_LOGIN.USERNAME_NOT_COMPLETE));
+            }
+            return new ResponseData<>(new LoginResponse(jwt, refreshToken, Constant.TYPE_LOGIN.ALL_COMPLETE));
 
-        return new ResponseData<>(new JWTToken(jwt, refreshToken));
+        } else {
+            userService.insertUser(new AddUserRequest(loginVM.getUsername()));
+            UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(
+                    loginVM.getUsername(),
+                    loginVM.getPassword());
+
+            Authentication authentication = authenticationManagerBuilder.getObject().authenticate(authenticationToken);
+            SecurityContextHolder.getContext().setAuthentication(authentication);
+            String jwt = tokenProvider.createToken(authentication);
+            String refreshToken = tokenProvider.createRefreshToken(authentication);
+            return new ResponseData<>(new LoginResponse(jwt, refreshToken, Constant.TYPE_LOGIN.FULLNAME_NOT_COMPLETE));
+        }
     }
 
     @PostMapping("/logout")

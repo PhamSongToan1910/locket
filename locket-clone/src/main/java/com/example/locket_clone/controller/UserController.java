@@ -26,7 +26,7 @@ public class UserController {
     }
 
     @GetMapping("/find-by-username/{username}")
-    public ResponseData<User> findByUsername(@PathVariable String username) {
+    public ResponseData<User> findByUsername(@PathVariable("username") String username) {
         User user = userService.findUserByUsername(username);
         if(Objects.nonNull(user)) {
             return new ResponseData<>(200, user.getUsername());
@@ -35,7 +35,7 @@ public class UserController {
     }
 
     @GetMapping("/find-by-email/{email}")
-    public ResponseData<User> findByEmail(@PathVariable String email) {
+    public ResponseData<User> findByEmail(@PathVariable("email") String email) {
         User user = userService.findUserByEmail(email);
         if(Objects.nonNull(user)) {
             return new ResponseData<>(200, user.getEmail());

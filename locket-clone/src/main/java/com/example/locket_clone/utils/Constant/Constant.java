@@ -13,4 +13,10 @@ public class Constant {
         public static final String COMMENT_COLLECTION = "comment";
 
     }
+
+    public class TYPE_LOGIN {
+        public static final int FULLNAME_NOT_COMPLETE = 1;
+        public static final int USERNAME_NOT_COMPLETE = 2;
+        public static final int ALL_COMPLETE = 3;
+    }
 }

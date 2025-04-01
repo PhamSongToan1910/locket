@@ -45,6 +45,7 @@ public class TokenProvider {
         String authorities = authentication.getAuthorities().stream().map(GrantedAuthority::getAuthority).collect(Collectors.joining(","));
         Claims claims = Jwts.claims().setSubject(authentication.getName());
         claims.put(AUTHORITIES_KEY, authorities);
+        Claims.
         //todo put another claims
 
         Date now = new Date();
