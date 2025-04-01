@@ -36,7 +36,7 @@ jobs:
             # Kiểm tra thư mục có phải Git repo không
             if [ ! -d "/home/ec2-user/app/.git" ]; then
               rm -rf /home/ec2-user/app  # Xóa thư mục nếu có lỗi trước đó
-                git clone git@github.com:PhamSongToan1910/locket.git /home/ec2-user/app
+                git clone https://github.com/PhamSongToan1910/locket.git /home/ec2-user/app
             fi
       
           cd /home/ec2-user/app
