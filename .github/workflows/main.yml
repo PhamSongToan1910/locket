@@ -28,15 +28,19 @@ jobs:
             sudo curl -L "https://github.com/docker/compose/releases/latest/download/docker-compose-linux-x86_64" -o /usr/local/bin/docker-compose
             sudo chmod +x /usr/local/bin/docker-compose
             export PATH=$PATH:/usr/local/bin
-            
+
+            # Thêm SSH Key vào agent
+            eval "$(ssh-agent -s)"
+            ssh-add ~/.ssh/id_rsa
+
             # Kiểm tra thư mục có phải Git repo không
             if [ ! -d "/home/ec2-user/app/.git" ]; then
               rm -rf /home/ec2-user/app  # Xóa thư mục nếu có lỗi trước đó
-              git clone git@github.com:PhamSongToan1910/locket.git /home/ec2-user/app
+                git clone git@github.com:your-username/your-repo.git /home/ec2-user/app
             fi
-            
-            cd /home/ec2-user/app
-            git pull origin main
-            docker-compose down
-            docker-compose up -d --build
+      
+          cd /home/ec2-user/app
+          git pull origin main
+          docker-compose down
+          docker-compose up -d --build
           EOF
