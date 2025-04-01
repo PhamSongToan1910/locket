@@ -29,9 +29,6 @@ jobs:
             sudo chmod +x /usr/local/bin/docker-compose
             export PATH=$PATH:/usr/local/bin
 
-            # Thêm SSH Key vào agent
-            eval "$(ssh-agent -s)"
-            ssh-add ~/.ssh/id_rsa
 
             # Kiểm tra thư mục có phải Git repo không
             if [ ! -d "/home/ec2-user/app/.git" ]; then
