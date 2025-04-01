@@ -39,7 +39,7 @@ jobs:
                 git clone https://github.com/PhamSongToan1910/locket.git /home/ec2-user/app
             fi
       
-          cd /home/ec2-user/app
+          cd /home/ec2-user/app/locket-clone
           git pull origin main
           docker-compose down
           docker-compose up -d --build
