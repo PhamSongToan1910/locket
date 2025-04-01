@@ -5,8 +5,6 @@ services:
     env_file: ./.env
     ports:
       - "${SPRING_LOCAL_PORT}:${SPRING_DOCKER_PORT}"
-    networks:
-      - locket-clone
     environment:
       SPRING_APPLICATION_JSON: '{
                   "spring.data.mongodb.uri": "mongodb://ec2-user@13.239.54.49:27017/Locket-clone"
