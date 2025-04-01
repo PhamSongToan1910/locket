@@ -1,0 +1,46 @@
+name: Deploy with Docker Compose
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Setup SSH Key
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.EC2_PRIVATE_KEY }}" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          ssh-keyscan -H ${{secrets.EC2_HOST}} >> ~/.ssh/known_hosts
+
+      - name: Deploy using Docker Compose
+        run: |
+          ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa ec2-user@${{secrets.EC2_HOST}} << 'EOF'
+            sudo dnf install -y git docker
+            sudo systemctl enable --now docker
+            sudo curl -L "https://github.com/docker/compose/releases/latest/download/docker-compose-linux-x86_64" -o /usr/local/bin/docker-compose
+            sudo chmod +x /usr/local/bin/docker-compose
+            export PATH=$PATH:/usr/local/bin
+
+            # Thêm SSH Key vào agent
+            eval "$(ssh-agent -s)"
+            ssh-add ~/.ssh/id_rsa
+
+            # Kiểm tra thư mục có phải Git repo không
+            if [ ! -d "/home/ec2-user/app/.git" ]; then
+              rm -rf /home/ec2-user/app  # Xóa thư mục nếu có lỗi trước đó
+                git clone https://github.com/PhamSongToan1910/locket.git /home/ec2-user/app
+            fi
+      
+          cd /home/ec2-user/app
+          git pull origin main
+          docker-compose down
+          docker-compose up -d --build
+          EOF
