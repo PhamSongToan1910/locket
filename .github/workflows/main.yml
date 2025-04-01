@@ -15,13 +15,12 @@ jobs:
 
       - name: Setup SSH Key
         run: |
-          echo "Setting up SSH Key..."
           mkdir -p ~/.ssh
           echo "${{ secrets.EC2_PRIVATE_KEY }}" > ~/.ssh/id_rsa
           chmod 600 ~/.ssh/id_rsa
-          ssh-keyscan -H ${{secrets.EC2_HOST}} >> ~/.ssh/known_hosts
-          echo "SSH Key setup completed."
-
+          ssh-keyscan -H ${{ secrets.EC2_HOST }} >> ~/.ssh/known_hosts
+        shell: bash
+  
       - name: Deploy using Docker Compose
         run: |
           echo "Connecting to EC2 instance..."
