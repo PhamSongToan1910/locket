@@ -60,6 +60,8 @@ jobs:
             echo "Old containers stopped and removed."
 
             echo "Rebuilding and starting containers..."
+
+            docker ps
             docker-compose up -d --build
             echo "Containers started successfully."
           EOF
