@@ -22,7 +22,13 @@ jobs:
 
       - name: Deploy using Docker Compose
         run: |
-          ssh -i ~/.ssh/id_rsa ec2-user@${{secrets.EC2_HOST}} << 'EOF'
+          ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa ec2-user@${{secrets.EC2_HOST}} << 'EOF'
+            sudo dnf install -y git docker
+            sudo systemctl enable --now docker
+            sudo curl -L "https://github.com/docker/compose/releases/latest/download/docker-compose-linux-x86_64" -o /usr/local/bin/docker-compose
+            sudo chmod +x /usr/local/bin/docker-compose
+            export PATH=$PATH:/usr/local/bin
+            mkdir -p /home/ec2-user/app
             cd /home/ec2-user/app
             git pull origin main
             docker-compose down
