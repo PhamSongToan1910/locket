@@ -38,6 +38,7 @@ jobs:
       
           cd /home/ec2-user/app/locket-clone
           git pull origin main
+          mvn clean install -DksipTests
           docker-compose down
           docker-compose up -d --build
           EOF
