@@ -54,7 +54,7 @@ public class AuthController {
 
         } else {
             User userInsert = userService.insertUser(new AddUserRequest(loginVM.getUsername()));
-            Set<SimpleGrantedAuthority> authorities = roleService.convertRolesToSimpleGrantedAuthorities(user.getAuthorities());
+            Set<SimpleGrantedAuthority> authorities = roleService.convertRolesToSimpleGrantedAuthorities(userInsert.getAuthorities());
             UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(
                     loginVM.getUsername(),
                     null,
