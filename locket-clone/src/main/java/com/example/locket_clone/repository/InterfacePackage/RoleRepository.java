@@ -1,7 +1,8 @@
 package com.example.locket_clone.repository.InterfacePackage;
 
 import com.example.locket_clone.entities.Role;
-import com.example.locket_clone.repository.Repository;
+import org.springframework.data.mongodb.repository.MongoRepository;
 
-public interface RoleRepository extends Repository<Role> {
+public interface RoleRepository extends MongoRepository<Role, String>, RoleCustomRepository {
+    Role findByName(String name);
 }

@@ -15,8 +15,11 @@ public class Constant {
     }
 
     public class TYPE_LOGIN {
-        public static final int FULLNAME_NOT_COMPLETE = 1;
-        public static final int USERNAME_NOT_COMPLETE = 2;
-        public static final int ALL_COMPLETE = 3;
+        public static final int NOT_COMPLETE = 3;
+        public static final int ALL_COMPLETE = 0;
+    }
+
+    public class ROLE {
+        public static final String USER_ROLE = "user";
     }
 }

@@ -10,5 +10,5 @@ import lombok.NoArgsConstructor;
 public class LoginResponse {
     private String access_token;
     private String refresh_token;
-    private int type_user;
+    private boolean is_complete;
 }

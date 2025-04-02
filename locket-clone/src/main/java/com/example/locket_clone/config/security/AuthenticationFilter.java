@@ -1,5 +1,7 @@
 package com.example.locket_clone.config.security;
 
+import com.example.locket_clone.entities.User;
+import com.example.locket_clone.service.UserService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.ServletRequest;
@@ -19,6 +21,7 @@ import java.io.IOException;
 public class AuthenticationFilter extends GenericFilterBean {
     public static final String AUTHORIZATION_HEADER = "Authorization";
     private final TokenProvider tokenProvider;
+    private final UserService userService;
 
     @Override
     public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain) throws IOException, ServletException {

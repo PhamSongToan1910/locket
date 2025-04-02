@@ -1,7 +1,11 @@
 package com.example.locket_clone.controller;
 
+import com.example.locket_clone.config.CurrentUser;
+import com.example.locket_clone.config.security.CustomUserDetail;
+import com.example.locket_clone.config.security.TokenProvider;
 import com.example.locket_clone.entities.User;
 import com.example.locket_clone.entities.request.AddUserRequest;
+import com.example.locket_clone.entities.request.UpdateUserInfoRequest;
 import com.example.locket_clone.entities.response.ResponseData;
 import com.example.locket_clone.service.UserService;
 import lombok.AccessLevel;
@@ -19,9 +23,9 @@ public class UserController {
 
     UserService userService;
 
-    @PostMapping("/register")
-    public ResponseData<String> register(@RequestBody AddUserRequest userRequest) {
-        userService.insertUser(userRequest);
+    @PostMapping("/update-user-infor")
+    public ResponseData<String> updateUserInfor(@CurrentUser CustomUserDetail customUserDetail, @RequestBody UpdateUserInfoRequest updateUserInfoRequest) {
+        userService.updateUser(updateUserInfoRequest, customUserDetail.getId());
         return new ResponseData<>(200, "success");
     }
 

@@ -1,22 +1,26 @@
 package com.example.locket_clone.config.security;
 
+import com.example.locket_clone.entities.User;
+import com.example.locket_clone.repository.InterfacePackage.UserRepository;
+import com.example.locket_clone.service.UserService;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import jakarta.annotation.PostConstruct;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.userdetails.User;
 import org.springframework.stereotype.Component;
 
 import java.util.Arrays;
 import java.util.Base64;
 import java.util.Collection;
 import java.util.Date;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Component
@@ -31,8 +35,12 @@ public class TokenProvider {
     Long refreshTokenValidityInSeconds;
 
     private static final String AUTHORITIES_KEY = "auth";
+    private static final String USER_ID_KEY = "userId";
 
     long tokenValidityInMilliseconds;
+
+    @Autowired
+    private UserService userService;
 
     @PostConstruct
     protected void init(){
@@ -41,11 +49,11 @@ public class TokenProvider {
 
     }
 
-    public String createToken(Authentication authentication) {
+    public String createToken(Authentication authentication, String userId) {
         String authorities = authentication.getAuthorities().stream().map(GrantedAuthority::getAuthority).collect(Collectors.joining(","));
         Claims claims = Jwts.claims().setSubject(authentication.getName());
         claims.put(AUTHORITIES_KEY, authorities);
-        Claims.
+        claims.put(USER_ID_KEY, userId);
         //todo put another claims
 
         Date now = new Date();
@@ -58,10 +66,11 @@ public class TokenProvider {
                 .compact();
     }
 
-    public String createRefreshToken(Authentication authentication) {
+    public String createRefreshToken(Authentication authentication, String userId) {
         String authorities = authentication.getAuthorities().stream().map(GrantedAuthority::getAuthority).collect(Collectors.joining(","));
         Claims claims = Jwts.claims().setSubject(authentication.getName());
         claims.put(AUTHORITIES_KEY, authorities);
+        claims.put(USER_ID_KEY, userId);
         //todo put another claims
 
         Date now = new Date();
@@ -85,8 +94,20 @@ public class TokenProvider {
                 .filter(auth -> !auth.trim().isEmpty())
                 .map(SimpleGrantedAuthority::new)
                 .toList();
-        User principal = new User(claims.getSubject(), "", authorities);
+
+        String userId = claims.get(USER_ID_KEY).toString();
+        User user = userService.findUserById(userId);
+        CustomUserDetail principal = new CustomUserDetail(user, (Set<SimpleGrantedAuthority>) authorities);
         return new UsernamePasswordAuthenticationToken(principal, token, authorities);
+    }
+
+    public String getUserIdByToken(String token) {
+        Claims claims = Jwts.parser()
+                .setSigningKey(tokenSecretKey)
+                .parseClaimsJws(token)
+                .getBody();
+
+        return claims.get(USER_ID_KEY).toString();
     }
 
     public boolean validateToken(String token) {

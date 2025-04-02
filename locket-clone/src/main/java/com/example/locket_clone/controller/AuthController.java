@@ -41,26 +41,24 @@ public class AuthController {
 
             Authentication authentication = authenticationManagerBuilder.getObject().authenticate(authenticationToken);
             SecurityContextHolder.getContext().setAuthentication(authentication);
-            String jwt = tokenProvider.createToken(authentication);
-            String refreshToken = tokenProvider.createRefreshToken(authentication);
+            String jwt = tokenProvider.createToken(authentication, user.getId().toString());
+            String refreshToken = tokenProvider.createRefreshToken(authentication, user.getId().toString());
             if(user.getFullName() == null) {
-                return new ResponseData<>(new LoginResponse(jwt, refreshToken, Constant.TYPE_LOGIN.FULLNAME_NOT_COMPLETE));
-            } else if(user.getUsername() == null) {
-                return new ResponseData<>(new LoginResponse(jwt, refreshToken, Constant.TYPE_LOGIN.USERNAME_NOT_COMPLETE));
+                return new ResponseData<>(new LoginResponse(jwt, refreshToken, false));
             }
-            return new ResponseData<>(new LoginResponse(jwt, refreshToken, Constant.TYPE_LOGIN.ALL_COMPLETE));
+            return new ResponseData<>(new LoginResponse(jwt, refreshToken, true));
 
         } else {
-            userService.insertUser(new AddUserRequest(loginVM.getUsername()));
+            String userId = userService.insertUser(new AddUserRequest(loginVM.getUsername()));
             UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(
                     loginVM.getUsername(),
                     loginVM.getPassword());
 
             Authentication authentication = authenticationManagerBuilder.getObject().authenticate(authenticationToken);
             SecurityContextHolder.getContext().setAuthentication(authentication);
-            String jwt = tokenProvider.createToken(authentication);
-            String refreshToken = tokenProvider.createRefreshToken(authentication);
-            return new ResponseData<>(new LoginResponse(jwt, refreshToken, Constant.TYPE_LOGIN.FULLNAME_NOT_COMPLETE));
+            String jwt = tokenProvider.createToken(authentication, userId);
+            String refreshToken = tokenProvider.createRefreshToken(authentication, userId);
+            return new ResponseData<>(new LoginResponse(jwt, refreshToken, false));
         }
     }
 

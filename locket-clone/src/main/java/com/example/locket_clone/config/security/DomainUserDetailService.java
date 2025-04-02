@@ -14,6 +14,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Component;
 
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -27,15 +28,15 @@ public class DomainUserDetailService implements UserDetailsService {
     RoleRepository roleRepository;
 
     @Override
-    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        User userEntity = userRepository.findByEmail(username);
-        if(userEntity != null) {
-            return getUserDetails(userEntity);
+    public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
+        Optional<User> userEntity = userRepository.findByEmail(email);
+        if(userEntity.isPresent()) {
+            return getUserDetails(userEntity.get());
         }
-        throw new UsernameNotFoundException("username: "+ username + " not found!!!");
+        throw new UsernameNotFoundException("username: "+ email + " not found!!!");
     }
 
-    private UserDetails getUserDetails(User userEntity) {
+    private CustomUserDetail getUserDetails(User userEntity) {
         Set<SimpleGrantedAuthority> authorities = userEntity.getAuthorities()
                 .stream()
                 .map((id) -> {
@@ -47,14 +48,14 @@ public class DomainUserDetailService implements UserDetailsService {
                 })
                 .map(SimpleGrantedAuthority::new)
                 .collect(Collectors.toSet());
-        return new org.springframework.security.core.userdetails.User(
-                userEntity.getUsername(),
-                userEntity.getPassword(),
-                authorities
-        );
+        return new CustomUserDetail(userEntity, authorities);
     }
 
     private String stringToRole(String id) throws Exception {
-        return roleRepository.findById(id, Role.class).getName();
+        Role role = roleRepository.findById(id).orElse(null);
+        if(role != null) {
+            return role.getName();
+        }
+        throw new Exception();
     }
 }
