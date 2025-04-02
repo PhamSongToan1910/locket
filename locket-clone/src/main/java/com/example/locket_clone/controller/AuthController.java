@@ -1,26 +1,28 @@
 package com.example.locket_clone.controller;
 
 
-import com.example.locket_clone.config.security.JWTToken;
 import com.example.locket_clone.config.security.TokenProvider;
 import com.example.locket_clone.entities.User;
 import com.example.locket_clone.entities.request.AddUserRequest;
 import com.example.locket_clone.entities.request.LoginVM;
 import com.example.locket_clone.entities.response.LoginResponse;
 import com.example.locket_clone.entities.response.ResponseData;
+import com.example.locket_clone.service.RoleService;
 import com.example.locket_clone.service.UserService;
-import com.example.locket_clone.utils.Constant.Constant;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.Set;
 
 @RestController
 @RequestMapping("/api/locket-clone/auth")
@@ -30,16 +32,17 @@ public class AuthController {
     TokenProvider tokenProvider;
     AuthenticationManagerBuilder authenticationManagerBuilder;
     UserService userService;
+    RoleService roleService;
 
     @PostMapping("/login")
     public ResponseData<LoginResponse> authorize(@RequestBody LoginVM loginVM) {
         User user = userService.findUserByEmail(loginVM.getUsername());
-        System.out.println("user: " + user);
         if(user != null){
+            Set<SimpleGrantedAuthority> authorities = roleService.convertRolesToSimpleGrantedAuthorities(user.getAuthorities());
             UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(
                     loginVM.getUsername(),
-                    null);
-            System.out.println("authenticationToken: " + authenticationToken);
+                    null,
+                    authorities);
             Authentication authentication = authenticationManagerBuilder.getObject().authenticate(authenticationToken);
             SecurityContextHolder.getContext().setAuthentication(authentication);
             String jwt = tokenProvider.createToken(authentication, user.getId().toString());
@@ -50,15 +53,17 @@ public class AuthController {
             return new ResponseData<>(new LoginResponse(jwt, refreshToken, true));
 
         } else {
-            String userId = userService.insertUser(new AddUserRequest(loginVM.getUsername()));
+            User userInsert = userService.insertUser(new AddUserRequest(loginVM.getUsername()));
+            Set<SimpleGrantedAuthority> authorities = roleService.convertRolesToSimpleGrantedAuthorities(user.getAuthorities());
             UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(
                     loginVM.getUsername(),
-                    null);
+                    null,
+                    authorities);
 
             Authentication authentication = authenticationManagerBuilder.getObject().authenticate(authenticationToken);
             SecurityContextHolder.getContext().setAuthentication(authentication);
-            String jwt = tokenProvider.createToken(authentication, userId);
-            String refreshToken = tokenProvider.createRefreshToken(authentication, userId);
+            String jwt = tokenProvider.createToken(authentication, userInsert.getId().toString());
+            String refreshToken = tokenProvider.createRefreshToken(authentication, userInsert.getId().toString());
             return new ResponseData<>(new LoginResponse(jwt, refreshToken, false));
         }
     }

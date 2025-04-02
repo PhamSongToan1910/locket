@@ -5,7 +5,7 @@ import com.example.locket_clone.entities.request.AddUserRequest;
 import com.example.locket_clone.entities.request.UpdateUserInfoRequest;
 
 public interface UserService {
-    String insertUser(AddUserRequest user);
+    User insertUser(AddUserRequest user);
 
     User findUserByEmail(String email);
 
