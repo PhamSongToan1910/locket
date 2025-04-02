@@ -27,15 +27,6 @@ jobs:
         run: |
           echo "Connecting to EC2 instance..."
           ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa ec2-user@${{secrets.EC2_HOST}} << 'EOF'
-            echo "Starting installation of required packages..."
-            sudo dnf install -y git docker
-            sudo systemctl enable --now docker
-            echo "Docker and Git installed successfully."
-            echo "Downloading Docker Compose..."
-            sudo curl -L "https://github.com/docker/compose/releases/latest/download/docker-compose-linux-x86_64" -o /usr/local/bin/docker-compose
-            sudo chmod +x /usr/local/bin/docker-compose
-            export PATH=$PATH:/usr/local/bin
-            echo "Docker Compose installed successfully."
             echo "Checking if the app directory is a Git repository..."
             # Kiểm tra thư mục có phải Git repo không
             if [ ! -d "/home/ec2-user/app/.git" ]; then
@@ -49,9 +40,9 @@ jobs:
             git pull origin main
             git status
             echo "Git pull completed."
-            echo "Building the application using Maven..."
-            mvn clean install -DskipTests
-            echo "Build completed successfully."
+            # echo "Building the application using Maven..."
+            # mvn clean install -DskipTests
+            # echo "Build completed successfully."
             echo "Stopping and removing old containers..."
             docker-compose down
             echo "Old containers stopped and removed."
