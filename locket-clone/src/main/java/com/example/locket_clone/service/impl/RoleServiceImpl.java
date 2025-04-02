@@ -21,7 +21,7 @@ public class RoleServiceImpl implements RoleService {
 
     @Override
     public Set<SimpleGrantedAuthority> convertRolesToSimpleGrantedAuthorities(Set<String> roles) {
-        return roles.stream().map(id -> roleRepository.findById(id).orElse(null)).filter(Objects::nonNull).map(role -> new SimpleGrantedAuthority(role.getName()))
+        return roles.stream().map(roleRepository::findByName).filter(Objects::nonNull).map(role -> new SimpleGrantedAuthority(role.getName()))
                 .collect(Collectors.toSet());
     }
 }
