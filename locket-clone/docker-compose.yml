@@ -15,11 +15,19 @@ services:
   app:
     build: .
     image: 'locket-clone:latest'
+    container_name: locket_clone
+    restart: always
     env_file: ./.env
     ports:
       - "${SPRING_LOCAL_PORT}:${SPRING_DOCKER_PORT}"
     environment:
-      SPRING_APPLICATION_JSON: '{
-                  "spring.data.mongodb.uri": "mongodb://admin:songtoan1910@13.239.54.49:27017/locket-clone?authSource=admin"
-                }'
+      SPRING_APPLICATION_JSON: |
+        {
+          "spring.data.mongodb.uri": "mongodb://${MONGO_INITDB_ROOT_USERNAME}:${MONGO_INITDB_ROOT_PASSWORD}@mongo_db:27017/locket-clone?authSource=admin"
+        }
+    depends_on:
+      - mongo
 
+volumes:
+  mongo_data:
+    driver: local
