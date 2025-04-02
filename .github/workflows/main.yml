@@ -12,6 +12,8 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
+        with:
+          ref: main  # Chỉ lấy branch 'main'
 
       - name: Setup SSH Key
         run: |
