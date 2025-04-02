@@ -40,9 +40,9 @@ jobs:
             git pull origin main
             git status
             echo "Git pull completed."
-            # echo "Building the application using Maven..."
-            # mvn clean install -DskipTests
-            # echo "Build completed successfully."
+            echo "Building the application using Maven..."
+            mvn clean install -DskipTests
+            echo "Build completed successfully."
             echo "Stopping and removing old containers..."
             docker-compose down
             echo "Old containers stopped and removed."
