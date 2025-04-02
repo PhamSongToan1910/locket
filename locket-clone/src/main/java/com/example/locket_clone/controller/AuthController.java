@@ -39,14 +39,13 @@ public class AuthController {
         User user = userService.findUserByEmail(loginVM.getUsername());
         if(user != null){
             Set<SimpleGrantedAuthority> authorities = roleService.convertRolesToSimpleGrantedAuthorities(user.getAuthorities());
-            UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(
+            Authentication authenticationToken = new UsernamePasswordAuthenticationToken(
                     loginVM.getUsername(),
                     null,
                     authorities);
-            Authentication authentication = authenticationManagerBuilder.getObject().authenticate(authenticationToken);
-            SecurityContextHolder.getContext().setAuthentication(authentication);
-            String jwt = tokenProvider.createToken(authentication, user.getId().toString());
-            String refreshToken = tokenProvider.createRefreshToken(authentication, user.getId().toString());
+            SecurityContextHolder.getContext().setAuthentication(authenticationToken);
+            String jwt = tokenProvider.createToken(authenticationToken, user.getId().toString());
+            String refreshToken = tokenProvider.createRefreshToken(authenticationToken, user.getId().toString());
             if(user.getFullName() == null) {
                 return new ResponseData<>(new LoginResponse(jwt, refreshToken, false));
             }
@@ -55,15 +54,14 @@ public class AuthController {
         } else {
             User userInsert = userService.insertUser(new AddUserRequest(loginVM.getUsername()));
             Set<SimpleGrantedAuthority> authorities = roleService.convertRolesToSimpleGrantedAuthorities(userInsert.getAuthorities());
-            UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(
+            Authentication authenticationToken = new UsernamePasswordAuthenticationToken(
                     loginVM.getUsername(),
                     null,
                     authorities);
 
-            Authentication authentication = authenticationManagerBuilder.getObject().authenticate(authenticationToken);
-            SecurityContextHolder.getContext().setAuthentication(authentication);
-            String jwt = tokenProvider.createToken(authentication, userInsert.getId().toString());
-            String refreshToken = tokenProvider.createRefreshToken(authentication, userInsert.getId().toString());
+            SecurityContextHolder.getContext().setAuthentication(authenticationToken);
+            String jwt = tokenProvider.createToken(authenticationToken, userInsert.getId().toString());
+            String refreshToken = tokenProvider.createRefreshToken(authenticationToken, userInsert.getId().toString());
             return new ResponseData<>(new LoginResponse(jwt, refreshToken, false));
         }
     }
