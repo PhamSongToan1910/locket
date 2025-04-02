@@ -1,4 +1,17 @@
 services:
+  mongo:
+    image: 'mongo:latest'
+    container_name: mongo_db
+    restart: always
+    env_file: ./.env
+    ports:
+      - "${MONGODB_LOCAL_PORT}:${MONGODB_DOCKER_PORT}"
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_INITDB_ROOT_USERNAME}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_INITDB_ROOT_PASSWORD}
+    volumes:
+      - mongo_data:/data/db
+
   app:
     build: .
     image: 'locket-clone:latest'
