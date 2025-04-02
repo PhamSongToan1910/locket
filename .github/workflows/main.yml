@@ -55,7 +55,7 @@ jobs:
             echo "Rebuilding and starting containers..."
             docker ps
             docker-compose build --no-cache
-            docker-compose up
+            docker-compose up -d
             docker ps
             echo "Containers started successfully."
           EOF
