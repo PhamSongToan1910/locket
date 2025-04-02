@@ -47,6 +47,7 @@ jobs:
             echo "Navigating to app directory and pulling the latest code..."
             cd /home/ec2-user/app/locket-clone
             git pull origin main
+            git status
             echo "Git pull completed."
             echo "Building the application using Maven..."
             mvn clean install -DskipTests
