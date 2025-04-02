@@ -34,6 +34,7 @@ public class AuthController {
     @PostMapping("/login")
     public ResponseData<LoginResponse> authorize(@RequestBody LoginVM loginVM) {
         User user = userService.findUserByEmail(loginVM.getUsername());
+        System.out.println("user: " + user);
         if(user != null){
             UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(
                     loginVM.getUsername(),
