@@ -30,8 +30,8 @@ public class UserServiceImpl implements UserService {
     @Override
     public String insertUser(AddUserRequest user) {
         User userInsert = ModelMapperUtils.toObject(user, User.class);
-        Role role = roleRepository.findByName(Constant.ROLE.USER_ROLE);
-        userInsert.getAuthorities().add(role.getId().toString());
+//        Role role = roleRepository.findByName(Constant.ROLE.USER_ROLE);
+//        userInsert.getAuthorities().add(role.getId().toString());
         return userRepository.save(userInsert).getId().toString();
     }
 
