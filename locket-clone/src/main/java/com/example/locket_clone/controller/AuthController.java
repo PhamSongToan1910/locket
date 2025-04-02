@@ -37,7 +37,7 @@ public class AuthController {
         if(user != null){
             UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(
                     loginVM.getUsername(),
-                    loginVM.getPassword());
+                    null);
 
             Authentication authentication = authenticationManagerBuilder.getObject().authenticate(authenticationToken);
             SecurityContextHolder.getContext().setAuthentication(authentication);
@@ -52,7 +52,7 @@ public class AuthController {
             String userId = userService.insertUser(new AddUserRequest(loginVM.getUsername()));
             UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(
                     loginVM.getUsername(),
-                    loginVM.getPassword());
+                    null);
 
             Authentication authentication = authenticationManagerBuilder.getObject().authenticate(authenticationToken);
             SecurityContextHolder.getContext().setAuthentication(authentication);
