@@ -16,7 +16,7 @@ public class MongoConfig {
     @Value("${spring.data.mongodb.uri}")
     private String connectionUri;
 
-    private String databaseName = "Locket_clone";
+    private String databaseName = "locket-clone";
 
     @Bean
     public MongoDatabaseFactory mongoDbFactory() {

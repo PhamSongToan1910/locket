@@ -1,6 +1,10 @@
 spring:
   application:
     name: locket-clone
+  data:
+    mongodb:
+      uri: mongodb://localhost:27017/locket-clone
+
 
 server:
   port: 8080
