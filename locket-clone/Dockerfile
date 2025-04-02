@@ -1,4 +1,4 @@
 FROM amazoncorretto:17
-COPY target/locket-clone-0.0.1-SNAPSHOT.jar app.jar
+COPY target/*.jar locket-clone-0.0.1-SNAPSHOT.jar
 EXPOSE 8080
 ENTRYPOINT ["java", "-jar", "locket-clone-0.0.1-SNAPSHOT.jar"]

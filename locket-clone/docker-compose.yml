@@ -18,6 +18,10 @@ services:
     container_name: locket_clone
     restart: always
     env_file: ./.env
+    volumes:
+      - ./target:/app/target
+    working_dir: /app
+    entrypoint: [ "java", "-jar", "/app/target/locket-clone-0.0.1-SNAPSHOT.jar" ]
     ports:
       - "${SPRING_LOCAL_PORT}:${SPRING_DOCKER_PORT}"
     environment:
