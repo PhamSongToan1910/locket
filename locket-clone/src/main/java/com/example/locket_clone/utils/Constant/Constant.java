@@ -23,10 +23,4 @@ public class Constant {
     public class ROLE {
         public static final String USER_ROLE = "user";
     }
-
-    public class TYPE_REQUEST_ADD_FRIEND{
-        public static final int PENDING = 0;
-        public static final int ACCEPT = 1;
-        public static final int REJECT = 2;
-    }
 }
