@@ -3,7 +3,7 @@ spring:
     name: locket-clone
   data:
     mongodb:
-      uri: mongodb://localhost:27017/locket-clone
+      uri: mongodb://admin:songtoan1910@54.253.220.194:27017/locket-clone?authSource=admin
 
 
 server:

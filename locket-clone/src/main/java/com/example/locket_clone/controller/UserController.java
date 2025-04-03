@@ -3,11 +3,17 @@ package com.example.locket_clone.controller;
 import com.example.locket_clone.config.CurrentUser;
 import com.example.locket_clone.config.security.CustomUserDetail;
 import com.example.locket_clone.config.security.TokenProvider;
+import com.example.locket_clone.entities.SendRequestFriend;
 import com.example.locket_clone.entities.User;
+import com.example.locket_clone.entities.UserFriends;
+import com.example.locket_clone.entities.request.AddFriendRequest;
 import com.example.locket_clone.entities.request.AddUserRequest;
 import com.example.locket_clone.entities.request.UpdateUserInfoRequest;
 import com.example.locket_clone.entities.response.ResponseData;
+import com.example.locket_clone.service.SendRequestFriendService;
+import com.example.locket_clone.service.UserFriendsService;
 import com.example.locket_clone.service.UserService;
+import com.example.locket_clone.utils.Constant.Constant;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -22,6 +28,8 @@ import java.util.Objects;
 public class UserController {
 
     UserService userService;
+    UserFriendsService userFriendsService;
+    SendRequestFriendService sendRequestFriendService;
 
     @PostMapping("/update-user-infor")
     public ResponseData<String> updateUserInfor(@CurrentUser CustomUserDetail customUserDetail, @RequestBody UpdateUserInfoRequest updateUserInfoRequest) {
@@ -45,5 +53,39 @@ public class UserController {
             return new ResponseData<>(200, user.getEmail());
         }
         return new ResponseData<>(404, "not found");
+    }
+
+    @PostMapping("/send-request-add-friend")
+    public ResponseData<UserFriends> addFriend(@CurrentUser CustomUserDetail customUserDetail, @RequestBody AddFriendRequest addFriendRequest) {
+        String userId = customUserDetail.getId();
+        String friendId = addFriendRequest.getFriendId();
+        userFriendsService.addFriend(userId, friendId);
+        sendRequestFriendService.sendRequestFriend(new SendRequestFriend(userId, friendId));
+        return new ResponseData<>(200, "success");
+    }
+
+    @PostMapping("/accept-request-add-friend")
+    public ResponseData<UserFriends> acceptFriend(@CurrentUser CustomUserDetail customUserDetail, @RequestBody AddFriendRequest addFriendRequest) {
+        String userId = customUserDetail.getId();
+        String friendId = addFriendRequest.getFriendId();
+        sendRequestFriendService.acceptRequestFriend(userId, friendId);
+        userFriendsService.addFriend(userId, friendId);
+        return new ResponseData<>(200, "success");
+    }
+
+    @PostMapping("/reject-request-add-friend")
+    public ResponseData<UserFriends> declineFriend(@CurrentUser CustomUserDetail customUserDetail, @RequestBody AddFriendRequest addFriendRequest) {
+        String userId = customUserDetail.getId();
+        String friendId = addFriendRequest.getFriendId();
+        sendRequestFriendService.declineRequestFriend(userId, friendId);
+        userFriendsService.removeFriend(userId, friendId);
+        return new ResponseData<>(200, "success");
+    }
+
+    @GetMapping("/get-number-friends")
+    public ResponseData<Integer> getNumberFriends(@CurrentUser CustomUserDetail customUserDetail) {
+        String userId = customUserDetail.getId();
+        Integer number = userFriendsService.getNumberFriends(userId);
+        return new ResponseData<>(200, "success", number);
     }
 }
