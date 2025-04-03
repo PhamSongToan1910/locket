@@ -9,6 +9,7 @@ import com.example.locket_clone.entities.UserFriends;
 import com.example.locket_clone.entities.request.AddFriendRequest;
 import com.example.locket_clone.entities.request.AddUserRequest;
 import com.example.locket_clone.entities.request.UpdateUserInfoRequest;
+import com.example.locket_clone.entities.request.UpdateUserInforV2Request;
 import com.example.locket_clone.entities.response.ResponseData;
 import com.example.locket_clone.service.SendRequestFriendService;
 import com.example.locket_clone.service.UserFriendsService;
@@ -17,7 +18,9 @@ import com.example.locket_clone.utils.Constant.Constant;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.Objects;
 
@@ -87,5 +90,17 @@ public class UserController {
         String userId = customUserDetail.getId();
         Integer number = userFriendsService.getNumberFriends(userId);
         return new ResponseData<>(200, "success", number);
+    }
+
+    @PutMapping("/update-user-v2")
+    public ResponseData<String> updateUserInforV2(@CurrentUser CustomUserDetail customUserDetail, @RequestBody UpdateUserInforV2Request updateUserInfoRequest) {
+        userService.updateUserV2(updateUserInfoRequest, customUserDetail.getId());
+        return new ResponseData<>(200, "success");
+    }
+
+    @PostMapping(value = "/update-avt", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseData<String> updateAvt(@CurrentUser CustomUserDetail customUserDetail, @RequestParam("file") MultipartFile file) {
+        String userId = customUserDetail.getId();
+
     }
 }

@@ -4,6 +4,7 @@ import com.example.locket_clone.entities.Role;
 import com.example.locket_clone.entities.User;
 import com.example.locket_clone.entities.request.AddUserRequest;
 import com.example.locket_clone.entities.request.UpdateUserInfoRequest;
+import com.example.locket_clone.entities.request.UpdateUserInforV2Request;
 import com.example.locket_clone.repository.InterfacePackage.RoleRepository;
 import com.example.locket_clone.repository.InterfacePackage.UserRepository;
 import com.example.locket_clone.service.UserService;
@@ -13,10 +14,6 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.bson.types.ObjectId;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.mongodb.core.query.Criteria;
-import org.springframework.data.mongodb.core.query.Query;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -57,5 +54,24 @@ public class UserServiceImpl implements UserService {
         userInsert.setId(new ObjectId(userId));
         userRepository.save(userInsert);
         return true;
+    }
+
+    @Override
+    public Boolean updateUserV2(UpdateUserInforV2Request updateUserInforV2, String userId) {
+        User updateUser = ModelMapperUtils.toObject(updateUserInforV2, User.class);
+        updateUser.setId(new ObjectId(userId));
+        userRepository.save(updateUser);
+        return true;
+    }
+
+    @Override
+    public Boolean updateAvt(String userId, String avtPath) {
+        User findUser = userRepository.findById(userId).orElse(null);
+        if(findUser != null) {
+            findUser.setAvt(avtPath);
+            userRepository.save(findUser);
+            return true;
+        }
+        return false;
     }
 }
