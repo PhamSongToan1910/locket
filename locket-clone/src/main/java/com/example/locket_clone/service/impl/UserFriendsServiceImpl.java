@@ -9,6 +9,8 @@ import lombok.experimental.FieldDefaults;
 import org.springframework.stereotype.Repository;
 import org.springframework.util.StringUtils;
 
+import java.util.Objects;
+
 @Repository
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
@@ -19,14 +21,18 @@ public class UserFriendsServiceImpl implements UserFriendsService {
     @Override
     public void addFriend(String userId, String friendId) {
         UserFriends userFriends = userFriendsRepository.findByUserId(userId);
+        if(Objects.isNull(userFriends)) {
+            userFriends = new UserFriends();
+            userFriends.setUserId(userId);
+        }
         userFriends.getFriendIds().add(friendId);
         userFriendsRepository.save(userFriends);
     }
 
     @Override
-    public void removeFriend(String userId, String friendId) {
-        UserFriends userFriends = userFriendsRepository.findByUserId(userId);
-        userFriends.getFriendIds().remove(friendId);
+    public void removeSendRequestFriend(String userId, String friendId) {
+        UserFriends userFriends = userFriendsRepository.findByUserId(friendId);
+        userFriends.getFriendIds().remove(userId);
         userFriendsRepository.save(userFriends);
     }
 

@@ -16,6 +16,7 @@ import com.example.locket_clone.service.SendRequestFriendService;
 import com.example.locket_clone.service.UserFriendsService;
 import com.example.locket_clone.service.UserService;
 import com.example.locket_clone.utils.Constant.Constant;
+import com.example.locket_clone.utils.ModelMapper.ModelMapperUtils;
 import com.example.locket_clone.utils.s3Utils.S3Service;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -25,8 +26,10 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 
 @RestController
 @RequestMapping("/api/locket-clone/user")
@@ -86,7 +89,7 @@ public class UserController {
         String userId = customUserDetail.getId();
         String friendId = addFriendRequest.getFriendId();
         sendRequestFriendService.declineRequestFriend(userId, friendId);
-        userFriendsService.removeFriend(userId, friendId);
+        userFriendsService.removeSendRequestFriend(userId, friendId);
         return new ResponseData<>(200, "success");
     }
 
@@ -111,9 +114,37 @@ public class UserController {
         return new ResponseData<>(200, "success");
     }
 
-//    @GetMapping("/get-all-friends")
-//    public ResponseData<List<GetFriendResponse>> getAllFriends(@CurrentUser CustomUserDetail customUserDetail) {
-//        UserFriends userFriends = userFriendsService.getAllFriends(customUserDetail.getId());
-//
-//    }
+    @GetMapping("/get-all-friends")
+    public ResponseData<List<GetFriendResponse>> getAllFriends(@CurrentUser CustomUserDetail customUserDetail) {
+        System.out.println("user_id: " + customUserDetail.getId());
+        UserFriends userFriends = userFriendsService.getAllFriends(customUserDetail.getId());
+        userFriends.getFriendIds().forEach(System.out::println);
+        Set<String> sendRequestFriend = sendRequestFriendService.getFriendsRequestByUserId(customUserDetail.getId());
+        List<GetFriendResponse> response = userFriends.getFriendIds().stream()
+                .filter(id -> !sendRequestFriend.contains(id))
+                .map(userService::findUserById)
+                .filter(Objects::nonNull)
+                .map(user -> {
+                    GetFriendResponse responseObj = new GetFriendResponse();
+                    ModelMapperUtils.toObject(user, responseObj);
+                    return responseObj;
+                })
+                .toList();
+        return new ResponseData<>(200, "success", response);
+    }
+
+    @GetMapping("/get-send-request-friends")
+    public ResponseData<List<GetFriendResponse>> getSendRequestFriends(@CurrentUser CustomUserDetail customUserDetail) {
+        Set<String> sendRequestFriend = sendRequestFriendService.getFriendsRequestByUserId(customUserDetail.getId());
+        List<GetFriendResponse> response = sendRequestFriend.stream()
+                .map(userService::findUserById)
+                .filter(Objects::nonNull)
+                .map(user -> {
+                    GetFriendResponse responseObj = new GetFriendResponse();
+                    ModelMapperUtils.toObject(user, responseObj);
+                    return responseObj;
+                })
+                .toList();
+        return new ResponseData<>(200, "success", response);
+    }
 }

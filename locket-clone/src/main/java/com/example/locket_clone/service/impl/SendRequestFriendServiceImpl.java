@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.HashSet;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 
 @Service
@@ -22,19 +23,20 @@ public class SendRequestFriendServiceImpl implements SendRequestFriendService {
 
     @Override
     public void sendRequestFriend(SendRequestFriend sendRequestFriend) {
-        sendRequestFriendRepository.save(sendRequestFriend);
+        SendRequestFriend sendRequestFriendCheck = sendRequestFriendRepository.findOneByUserIdAndFriendId(sendRequestFriend.getUserId(), sendRequestFriend.getFriendId());
+        if(Objects.isNull(sendRequestFriendCheck)) {
+            sendRequestFriendRepository.save(sendRequestFriend);
+        }
     }
 
     @Override
     public void acceptRequestFriend(String userId, String friendId) {
-        SendRequestFriend acceptRequestFriend = sendRequestFriendRepository.findOneByUserIdAndFriendId(userId, friendId);
-        sendRequestFriendRepository.delete(acceptRequestFriend);
+        sendRequestFriendRepository.deleteByUserIdAndFriendId(friendId, userId);
     }
 
     @Override
     public void declineRequestFriend(String userId, String friendId) {
-        SendRequestFriend acceptRequestFriend = sendRequestFriendRepository.findOneByUserIdAndFriendId(userId, friendId);
-        sendRequestFriendRepository.delete(acceptRequestFriend);
+        sendRequestFriendRepository.deleteByUserIdAndFriendId(friendId, userId);
     }
 
     @Override

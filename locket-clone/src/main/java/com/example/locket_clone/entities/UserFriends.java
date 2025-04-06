@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -24,5 +25,5 @@ public class UserFriends extends BaseEntity {
     private String userId;
 
     @Field(FRIEND_IDS)
-    private Set<String> friendIds;
+    private Set<String> friendIds = new HashSet<>();
 }
