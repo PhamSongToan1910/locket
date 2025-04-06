@@ -2,10 +2,12 @@ package com.example.locket_clone.controller;
 
 import com.example.locket_clone.config.CurrentUser;
 import com.example.locket_clone.config.security.CustomUserDetail;
+import com.example.locket_clone.config.security.TokenProvider;
 import com.example.locket_clone.entities.SendRequestFriend;
 import com.example.locket_clone.entities.User;
 import com.example.locket_clone.entities.UserFriends;
 import com.example.locket_clone.entities.request.AddFriendRequest;
+import com.example.locket_clone.entities.request.AddUserRequest;
 import com.example.locket_clone.entities.request.UpdateUserInfoRequest;
 import com.example.locket_clone.entities.request.UpdateUserInforV2Request;
 import com.example.locket_clone.entities.response.GetFriendResponse;
@@ -13,6 +15,7 @@ import com.example.locket_clone.entities.response.ResponseData;
 import com.example.locket_clone.service.SendRequestFriendService;
 import com.example.locket_clone.service.UserFriendsService;
 import com.example.locket_clone.service.UserService;
+import com.example.locket_clone.utils.Constant.Constant;
 import com.example.locket_clone.utils.s3Utils.S3Service;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -108,9 +111,9 @@ public class UserController {
         return new ResponseData<>(200, "success");
     }
 
-    @GetMapping("/get-all-friends")
-    public ResponseData<List<GetFriendResponse>> getAllFriends(@CurrentUser CustomUserDetail customUserDetail) {
-        UserFriends userFriends = userFriendsService.getAllFriends(customUserDetail.getId());
-
-    }
+//    @GetMapping("/get-all-friends")
+//    public ResponseData<List<GetFriendResponse>> getAllFriends(@CurrentUser CustomUserDetail customUserDetail) {
+//        UserFriends userFriends = userFriendsService.getAllFriends(customUserDetail.getId());
+//
+//    }
 }
