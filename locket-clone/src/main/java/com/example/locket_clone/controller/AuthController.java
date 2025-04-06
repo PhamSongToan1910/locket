@@ -49,7 +49,8 @@ public class AuthController {
             SecurityContextHolder.getContext().setAuthentication(authenticationToken);
             String jwt = tokenProvider.createToken(authenticationToken, user.getId().toString());
             String refreshToken = tokenProvider.createRefreshToken(authenticationToken, user.getId().toString());
-            if(StringUtils.isEmpty(user.getFullName()) || Objects.isNull(user.getFullName())) {
+            System.out.println("User: " + user.getFullName());
+            if(!StringUtils.hasText(user.getFullName())) {
                 return new ResponseData<>(new LoginResponse(jwt, refreshToken, false));
             }
             return new ResponseData<>(new LoginResponse(jwt, refreshToken, true));

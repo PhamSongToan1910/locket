@@ -6,6 +6,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
+import org.springframework.util.StringUtils;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -59,6 +60,9 @@ public class User extends BaseEntity {
     private String playerId;
 
     public String getFullName() {
-        return this.firstName + " " + this.lastName;
+        if(StringUtils.hasLength(this.firstName) && StringUtils.hasLength(this.lastName)) {
+            return this.firstName + " " + this.lastName;
+        }
+        return null;
     }
 }
