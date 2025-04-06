@@ -1,6 +1,7 @@
 package com.example.locket_clone.controller;
 
 
+import com.ctc.wstx.util.StringUtil;
 import com.example.locket_clone.config.security.TokenProvider;
 import com.example.locket_clone.entities.User;
 import com.example.locket_clone.entities.request.AddUserRequest;
@@ -17,11 +18,13 @@ import org.springframework.security.config.annotation.authentication.builders.Au
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.Objects;
 import java.util.Set;
 
 @RestController
@@ -46,7 +49,7 @@ public class AuthController {
             SecurityContextHolder.getContext().setAuthentication(authenticationToken);
             String jwt = tokenProvider.createToken(authenticationToken, user.getId().toString());
             String refreshToken = tokenProvider.createRefreshToken(authenticationToken, user.getId().toString());
-            if(user.getFullName() == null) {
+            if(StringUtils.isEmpty(user.getFullName()) || Objects.isNull(user.getFullName())) {
                 return new ResponseData<>(new LoginResponse(jwt, refreshToken, false));
             }
             return new ResponseData<>(new LoginResponse(jwt, refreshToken, true));
