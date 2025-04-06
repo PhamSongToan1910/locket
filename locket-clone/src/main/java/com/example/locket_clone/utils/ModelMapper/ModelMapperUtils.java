@@ -8,22 +8,21 @@ public class ModelMapperUtils {
 
     static {
         MODEL_MAPPER.getConfiguration()
-                .setMatchingStrategy(MatchingStrategies.STRICT);
+                .setMatchingStrategy(MatchingStrategies.STRICT)
+                .setSkipNullEnabled(true);
     }
 
     public ModelMapperUtils() {
     }
 
-    public static <T> T toObject(Object obj, Class<T> type) {
-        T t = null;
+    public static <T> void toObject(Object obj, T destination) {
         if (obj != null) {
             try {
-                t = MODEL_MAPPER.map(obj, type);
+                MODEL_MAPPER.map(obj, destination);
             } catch (Exception ex) {
                 System.out.println(ex);
             }
 
         }
-        return t;
     }
 }

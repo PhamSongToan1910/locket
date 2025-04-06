@@ -26,7 +26,8 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public User insertUser(AddUserRequest user) {
-        User userInsert = ModelMapperUtils.toObject(user, User.class);
+        User userInsert = new User();
+        ModelMapperUtils.toObject(user, userInsert);
         Role role = roleRepository.findByName(Constant.ROLE.USER_ROLE);
         userInsert.getAuthorities().add(role.getId().toString());
         userRepository.save(userInsert);
@@ -50,18 +51,24 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public Boolean updateUser(UpdateUserInfoRequest user, String userId) {
-        User userInsert = ModelMapperUtils.toObject(user, User.class);
-        userInsert.setId(new ObjectId(userId));
+        User userInsert = userRepository.findById(userId).orElse(null);
+        if(userInsert == null) {
+            return false;
+        }
+        ModelMapperUtils.toObject(user, userInsert);
         userRepository.save(userInsert);
         return true;
     }
 
     @Override
     public Boolean updateUserV2(UpdateUserInforV2Request updateUserInforV2, String userId) {
-        User updateUser = ModelMapperUtils.toObject(updateUserInforV2, User.class);
-        updateUser.setId(new ObjectId(userId));
-        userRepository.save(updateUser);
-        return true;
+        User updateUser = userRepository.findById(userId).orElse(null);
+        if(updateUser != null) {
+            ModelMapperUtils.toObject(updateUserInforV2, updateUser);
+            userRepository.save(updateUser);
+            return true;
+        }
+        return false;
     }
 
     @Override
