@@ -9,6 +9,10 @@ import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.springframework.stereotype.Service;
 
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
 @Service
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
@@ -32,4 +36,13 @@ public class SendRequestFriendServiceImpl implements SendRequestFriendService {
         SendRequestFriend acceptRequestFriend = sendRequestFriendRepository.findOneByUserIdAndFriendId(userId, friendId);
         sendRequestFriendRepository.delete(acceptRequestFriend);
     }
+
+    @Override
+    public Set<String> getFriendsRequestByUserId(String userId) {
+        List<SendRequestFriend> sendRequestFriendList = sendRequestFriendRepository.findByUserId(userId);
+        Set<String> friendsSet = new HashSet<>();
+        sendRequestFriendList.forEach(sendRequestFriend -> friendsSet.add(sendRequestFriend.getFriendId()));
+        return friendsSet;
+    }
+
 }

@@ -35,4 +35,9 @@ public class UserFriendsServiceImpl implements UserFriendsService {
         UserFriends userFriends = userFriendsRepository.findByUserId(userId);
         return userFriends.getFriendIds().size();
     }
+
+    @Override
+    public UserFriends getAllFriends(String userId) {
+        return userFriendsRepository.findByUserId(userId);
+    }
 }
