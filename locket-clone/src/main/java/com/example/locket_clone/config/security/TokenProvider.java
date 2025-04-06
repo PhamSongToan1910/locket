@@ -97,7 +97,8 @@ public class TokenProvider {
 
         String userId = claims.get(USER_ID_KEY).toString();
         User user = userService.findUserById(userId);
-        CustomUserDetail principal = new CustomUserDetail(user, (Set<SimpleGrantedAuthority>) authorities);
+        Set<SimpleGrantedAuthority> simpleGrantedAuthorities = authorities.stream().map(authority -> (SimpleGrantedAuthority) authority).collect(Collectors.toSet());
+        CustomUserDetail principal = new CustomUserDetail(user, simpleGrantedAuthorities);
         return new UsernamePasswordAuthenticationToken(principal, token, authorities);
     }
 
