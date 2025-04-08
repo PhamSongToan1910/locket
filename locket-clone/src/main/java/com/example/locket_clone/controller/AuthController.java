@@ -83,7 +83,7 @@ public class AuthController {
             String username = principal.toString();
             System.out.println("Username: " + username);
         }
-        return new ResponseData<>(200, "Logout success!!!");
+        return new ResponseData<>(ResponseCode.SUCCESS, "Logout success!!!");
     }
 
 }
