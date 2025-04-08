@@ -11,8 +11,9 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.springframework.stereotype.Repository;
-import org.springframework.util.StringUtils;
+import org.springframework.util.CollectionUtils;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
@@ -53,6 +54,9 @@ public class UserFriendsServiceImpl implements UserFriendsService {
     @Override
     public List<GetFriendResponse> getAllFriends(String userId) {
         UserFriends userFriends = userFriendsRepository.findByUserId(userId);
+        if(Objects.isNull(userFriends.getFriendIds()) || CollectionUtils.isEmpty(userFriends.getFriendIds())) {
+            return new ArrayList<>();
+        }
         Set<String> sendRequestFriend = sendRequestFriendService.getFriendsRequestByUserId(userId);
         return userFriends.getFriendIds().stream()
                 .filter(id -> !sendRequestFriend.contains(id))
