@@ -5,7 +5,9 @@ import com.ctc.wstx.util.StringUtil;
 import com.example.locket_clone.config.security.TokenProvider;
 import com.example.locket_clone.entities.User;
 import com.example.locket_clone.entities.request.AddUserRequest;
+import com.example.locket_clone.entities.request.GetNewTokenFromRefreshToken;
 import com.example.locket_clone.entities.request.LoginVM;
+import com.example.locket_clone.entities.response.GetNewTokenFromRefreshTokenResponse;
 import com.example.locket_clone.entities.response.LoginResponse;
 import com.example.locket_clone.entities.response.ResponseData;
 import com.example.locket_clone.service.RoleService;
@@ -86,4 +88,15 @@ public class AuthController {
         return new ResponseData<>(ResponseCode.SUCCESS, "Logout success!!!");
     }
 
+    @PostMapping("/get-new-token")
+    public ResponseData<GetNewTokenFromRefreshTokenResponse> getNewToken(@RequestBody GetNewTokenFromRefreshToken getNewTokenFromRefreshToken) {
+        if(!tokenProvider.validateToken(getNewTokenFromRefreshToken.getRefreshToken())) {
+            return new ResponseData<>(ResponseCode.UN_AUTHORIZED, "Unauthorized access");
+        }
+        String refreshToken = getNewTokenFromRefreshToken.getRefreshToken();
+        Authentication authenticationToken = tokenProvider.getAuthentication(refreshToken);
+        String userId = tokenProvider.getUserIdByToken(refreshToken);
+        String token = tokenProvider.createToken(authenticationToken, userId);
+        return new ResponseData<>(ResponseCode.SUCCESS, "success", new GetNewTokenFromRefreshTokenResponse(token));
+    }
 }

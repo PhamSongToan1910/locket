@@ -1,7 +1,7 @@
 package com.example.locket_clone.config.security;
 
-import com.example.locket_clone.entities.User;
 import com.example.locket_clone.service.UserService;
+import com.example.locket_clone.utils.Constant.ResponseCode;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.ServletRequest;
@@ -15,6 +15,8 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.filter.GenericFilterBean;
 
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.List;
 
 @Component
 @RequiredArgsConstructor
@@ -23,13 +25,22 @@ public class AuthenticationFilter extends GenericFilterBean {
     private final TokenProvider tokenProvider;
     private final UserService userService;
 
+    private final List<String> API_UN_AUTHEN = Arrays.asList("/api/locket-clone/auth/login",
+                                                            "/api/locket-clone/auth/get-new-token");
+
     @Override
     public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain) throws IOException, ServletException {
         HttpServletRequest httpServletRequest = (HttpServletRequest) servletRequest;
         String jwt = resolveToken(httpServletRequest);
+        System.out.println(httpServletRequest.getRequestURI());
         if (StringUtils.hasText(jwt) && this.tokenProvider.validateToken(jwt)) {
             Authentication authentication = this.tokenProvider.getAuthentication(jwt);
             SecurityContextHolder.getContext().setAuthentication(authentication);
+        } else if(!API_UN_AUTHEN.contains(httpServletRequest.getRequestURI())){
+            servletResponse.setContentType("application/json;charset=utf-8");
+            String jsonResponse = String.format("{\"statusCode\": %d, \"message\": \"Unauthorized access\"}", ResponseCode.UN_AUTHORIZED);
+            servletResponse.getWriter().write(jsonResponse);
+            return;
         }
         filterChain.doFilter(servletRequest, servletResponse);
     }

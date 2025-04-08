@@ -3,9 +3,7 @@ package com.example.locket_clone.config.security;
 import com.example.locket_clone.entities.User;
 import com.example.locket_clone.repository.InterfacePackage.UserRepository;
 import com.example.locket_clone.service.UserService;
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.*;
 import jakarta.annotation.PostConstruct;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -117,8 +115,14 @@ public class TokenProvider {
                     .setSigningKey(tokenSecretKey)
                     .parseClaimsJws(token);
             return true;
+        } catch (ExpiredJwtException e) {
+            log.error("Token đã hết hạn: {}", e.getMessage());
+        } catch (MalformedJwtException e) {
+            log.error("Token không hợp lệ: {}", e.getMessage());
+        } catch (SignatureException e) {
+            log.error("Chữ ký JWT không hợp lệ: {}", e.getMessage());
         } catch (IllegalArgumentException e) {
-            log.error("Token validation error {}", e.getMessage());
+            log.error("Token validation error: {}", e.getMessage());
         }
         return false;
     }

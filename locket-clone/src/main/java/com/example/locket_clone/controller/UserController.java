@@ -2,13 +2,10 @@ package com.example.locket_clone.controller;
 
 import com.example.locket_clone.config.CurrentUser;
 import com.example.locket_clone.config.security.CustomUserDetail;
-import com.example.locket_clone.config.security.TokenProvider;
 import com.example.locket_clone.entities.SendRequestFriend;
 import com.example.locket_clone.entities.User;
 import com.example.locket_clone.entities.UserFriends;
 import com.example.locket_clone.entities.request.AddFriendRequest;
-import com.example.locket_clone.entities.request.AddUserRequest;
-import com.example.locket_clone.entities.request.FindUserByUserNameRequest;
 import com.example.locket_clone.entities.request.UpdateUserInfoRequest;
 import com.example.locket_clone.entities.request.UpdateUserInforV2Request;
 import com.example.locket_clone.entities.response.FindUserByUserNameResponse;
@@ -17,7 +14,6 @@ import com.example.locket_clone.entities.response.ResponseData;
 import com.example.locket_clone.service.SendRequestFriendService;
 import com.example.locket_clone.service.UserFriendsService;
 import com.example.locket_clone.service.UserService;
-import com.example.locket_clone.utils.Constant.Constant;
 import com.example.locket_clone.utils.Constant.ResponseCode;
 import com.example.locket_clone.utils.ModelMapper.ModelMapperUtils;
 import com.example.locket_clone.utils.s3Utils.S3Service;
@@ -25,11 +21,11 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.springframework.http.MediaType;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
@@ -52,11 +48,11 @@ public class UserController {
     }
 
     @GetMapping("/find-by-username")
-    public ResponseData<FindUserByUserNameResponse> findByUsername(@RequestBody FindUserByUserNameRequest findUserByUserNameRequest) {
-        if(!findUserByUserNameRequest.validateRequest()) {
+    public ResponseData<FindUserByUserNameResponse> findByUsername(@RequestParam("username") String username) {
+        if(!StringUtils.hasLength(username)) {
             return new ResponseData<>(ResponseCode.WRONG_DATA_FORMAT, "Wrong request format");
         }
-        User user = userService.findUserByUsername(findUserByUserNameRequest.getUserName());
+        User user = userService.findUserByUsername(username);
         if(Objects.nonNull(user)) {
             FindUserByUserNameResponse findUserByUserNameResponse = new FindUserByUserNameResponse(true);
             return new ResponseData<>(findUserByUserNameResponse);

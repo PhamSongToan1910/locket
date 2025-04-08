@@ -33,7 +33,7 @@ public class SecurityConfiguration {
                 .sessionManagement(managementConfigure -> managementConfigure.sessionCreationPolicy(STATELESS))
                 .authorizeHttpRequests(authorizationRequests -> authorizationRequests
                         .requestMatchers("/api/locket-clone/auth/login",
-                                "/api/locket-clone/user/register").permitAll()
+                                "/api/locket-clone/auth/get-new-token").permitAll()
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(authenticationFilter, UsernamePasswordAuthenticationFilter.class);
