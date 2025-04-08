@@ -53,6 +53,9 @@ public class UserController {
 
     @GetMapping("/find-by-username")
     public ResponseData<FindUserByUserNameResponse> findByUsername(@RequestBody FindUserByUserNameRequest findUserByUserNameRequest) {
+        if(!findUserByUserNameRequest.validateRequest()) {
+            return new ResponseData<>(ResponseCode.WRONG_DATA_FORMAT, "Wrong request format");
+        }
         User user = userService.findUserByUsername(findUserByUserNameRequest.getUserName());
         if(Objects.nonNull(user)) {
             FindUserByUserNameResponse findUserByUserNameResponse = new FindUserByUserNameResponse(true);
