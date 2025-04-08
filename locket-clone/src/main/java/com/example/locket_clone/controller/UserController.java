@@ -119,7 +119,6 @@ public class UserController {
 
     @GetMapping("/get-all-friends")
     public ResponseData<List<GetFriendResponse>> getAllFriends(@CurrentUser CustomUserDetail customUserDetail) {
-        System.out.println("user_id: " + customUserDetail.getId());
         List<GetFriendResponse> response = userFriendsService.getAllFriends(customUserDetail.getId());
         return new ResponseData<>(ResponseCode.SUCCESS, "success", response);
     }

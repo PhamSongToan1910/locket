@@ -54,7 +54,7 @@ public class UserFriendsServiceImpl implements UserFriendsService {
     @Override
     public List<GetFriendResponse> getAllFriends(String userId) {
         UserFriends userFriends = userFriendsRepository.findByUserId(userId);
-        if(Objects.isNull(userFriends.getFriendIds()) || CollectionUtils.isEmpty(userFriends.getFriendIds())) {
+        if(Objects.isNull(userFriends) || CollectionUtils.isEmpty(userFriends.getFriendIds())) {
             return new ArrayList<>();
         }
         Set<String> sendRequestFriend = sendRequestFriendService.getFriendsRequestByUserId(userId);
