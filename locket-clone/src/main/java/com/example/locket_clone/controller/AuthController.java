@@ -10,6 +10,7 @@ import com.example.locket_clone.entities.response.LoginResponse;
 import com.example.locket_clone.entities.response.ResponseData;
 import com.example.locket_clone.service.RoleService;
 import com.example.locket_clone.service.UserService;
+import com.example.locket_clone.utils.Constant.ResponseCode;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -38,28 +39,30 @@ public class AuthController {
     RoleService roleService;
 
     @PostMapping("/login")
-    public ResponseData<LoginResponse> authorize(@RequestBody LoginVM loginVM) {
-        User user = userService.findUserByEmail(loginVM.getUsername());
+    public ResponseData<?> authorize(@RequestBody LoginVM loginVM) {
+        if(!loginVM.validateRequest()) {
+            return new ResponseData<>(ResponseCode.WRONG_DATA_FORMAT, "Wrong request format");
+        }
+        User user = userService.findUserByEmail(loginVM.getEmail());
         if(user != null){
             Set<SimpleGrantedAuthority> authorities = roleService.convertRolesToSimpleGrantedAuthorities(user.getAuthorities());
             Authentication authenticationToken = new UsernamePasswordAuthenticationToken(
-                    loginVM.getUsername(),
+                    loginVM.getEmail(),
                     null,
                     authorities);
             SecurityContextHolder.getContext().setAuthentication(authenticationToken);
             String jwt = tokenProvider.createToken(authenticationToken, user.getId().toString());
             String refreshToken = tokenProvider.createRefreshToken(authenticationToken, user.getId().toString());
-            System.out.println("User: " + user.getFullName());
             if(!StringUtils.hasText(user.getFullName())) {
                 return new ResponseData<>(new LoginResponse(jwt, refreshToken, false));
             }
             return new ResponseData<>(new LoginResponse(jwt, refreshToken, true));
 
         } else {
-            User userInsert = userService.insertUser(new AddUserRequest(loginVM.getUsername(), loginVM.getAvt()));
+            User userInsert = userService.insertUser(new AddUserRequest(loginVM.getEmail(), loginVM.getAvt()));
             Set<SimpleGrantedAuthority> authorities = roleService.convertRolesToSimpleGrantedAuthorities(userInsert.getAuthorities());
             Authentication authenticationToken = new UsernamePasswordAuthenticationToken(
-                    loginVM.getUsername(),
+                    loginVM.getEmail(),
                     null,
                     authorities);
 
