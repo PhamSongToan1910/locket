@@ -1,7 +1,7 @@
 package com.example.locket_clone.utils.Constant;
 
 public class Constant {
-    public class COLLECTION {
+    public static class COLLECTION {
         public static final String SEND_FRIEND_REQUEST_COLLECTION = "send_friend_request";
         public static final String FOLLOW_COLLECTION = "follow";
         public static final String USER_COLLECTION = "user";
@@ -15,7 +15,13 @@ public class Constant {
 
     }
 
-    public class ROLE {
+    public static class ROLE {
         public static final String USER_ROLE = "user";
+    }
+
+    public static class TYPE_ADD_POST {
+        public static final int PUBLIC = 1;
+        public static final int PROTECTED = 2;
+        public static final int ONLY_ME = 3;
     }
 }

@@ -124,19 +124,7 @@ public class UserController {
     @GetMapping("/get-all-friends")
     public ResponseData<List<GetFriendResponse>> getAllFriends(@CurrentUser CustomUserDetail customUserDetail) {
         System.out.println("user_id: " + customUserDetail.getId());
-        UserFriends userFriends = userFriendsService.getAllFriends(customUserDetail.getId());
-        userFriends.getFriendIds().forEach(System.out::println);
-        Set<String> sendRequestFriend = sendRequestFriendService.getFriendsRequestByUserId(customUserDetail.getId());
-        List<GetFriendResponse> response = userFriends.getFriendIds().stream()
-                .filter(id -> !sendRequestFriend.contains(id))
-                .map(userService::findUserById)
-                .filter(Objects::nonNull)
-                .map(user -> {
-                    GetFriendResponse responseObj = new GetFriendResponse();
-                    ModelMapperUtils.toObject(user, responseObj);
-                    return responseObj;
-                })
-                .toList();
+        List<GetFriendResponse> response = userFriendsService.getAllFriends(customUserDetail.getId());
         return new ResponseData<>(ResponseCode.SUCCESS, "success", response);
     }
 

@@ -1,15 +1,21 @@
 package com.example.locket_clone.service.impl;
 
 import com.example.locket_clone.entities.UserFriends;
+import com.example.locket_clone.entities.response.GetFriendResponse;
 import com.example.locket_clone.repository.InterfacePackage.UserFriendsRepository;
+import com.example.locket_clone.service.SendRequestFriendService;
 import com.example.locket_clone.service.UserFriendsService;
+import com.example.locket_clone.service.UserService;
+import com.example.locket_clone.utils.ModelMapper.ModelMapperUtils;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.springframework.stereotype.Repository;
 import org.springframework.util.StringUtils;
 
+import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 
 @Repository
 @RequiredArgsConstructor
@@ -17,6 +23,8 @@ import java.util.Objects;
 public class UserFriendsServiceImpl implements UserFriendsService {
 
     UserFriendsRepository userFriendsRepository;
+    SendRequestFriendService sendRequestFriendService;
+    UserService userService;
 
     @Override
     public void addFriend(String userId, String friendId) {
@@ -43,7 +51,19 @@ public class UserFriendsServiceImpl implements UserFriendsService {
     }
 
     @Override
-    public UserFriends getAllFriends(String userId) {
-        return userFriendsRepository.findByUserId(userId);
+    public List<GetFriendResponse> getAllFriends(String userId) {
+        UserFriends userFriends = userFriendsRepository.findByUserId(userId);
+        Set<String> sendRequestFriend = sendRequestFriendService.getFriendsRequestByUserId(userId);
+        return userFriends.getFriendIds().stream()
+                .filter(id -> !sendRequestFriend.contains(id))
+                .map(userService::findUserById)
+                .filter(Objects::nonNull)
+                .map(user -> {
+                    GetFriendResponse responseObj = new GetFriendResponse();
+                    ModelMapperUtils.toObject(user, responseObj);
+                    return responseObj;
+                })
+                .toList();
     }
+
 }
