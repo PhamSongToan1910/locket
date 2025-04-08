@@ -10,6 +10,7 @@ import com.example.locket_clone.entities.request.AddFriendRequest;
 import com.example.locket_clone.entities.request.AddUserRequest;
 import com.example.locket_clone.entities.request.UpdateUserInfoRequest;
 import com.example.locket_clone.entities.request.UpdateUserInforV2Request;
+import com.example.locket_clone.entities.response.FindUserByUserNameResponse;
 import com.example.locket_clone.entities.response.GetFriendResponse;
 import com.example.locket_clone.entities.response.ResponseData;
 import com.example.locket_clone.service.SendRequestFriendService;
@@ -49,12 +50,13 @@ public class UserController {
     }
 
     @GetMapping("/find-by-username/{username}")
-    public ResponseData<User> findByUsername(@PathVariable("username") String username) {
+    public ResponseData<FindUserByUserNameResponse> findByUsername(@PathVariable("username") String username) {
         User user = userService.findUserByUsername(username);
         if(Objects.nonNull(user)) {
-            return new ResponseData<>(200, user.getUsername());
+            FindUserByUserNameResponse findUserByUserNameResponse = new FindUserByUserNameResponse(true);
+            return new ResponseData<>(findUserByUserNameResponse);
         }
-        return new ResponseData<>(404, "not found");
+        return new ResponseData<>(new FindUserByUserNameResponse(false));
     }
 
     @GetMapping("/find-by-email/{email}")
