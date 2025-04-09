@@ -7,7 +7,9 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.ServletRequest;
 import jakarta.servlet.ServletResponse;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
@@ -31,12 +33,14 @@ public class AuthenticationFilter extends GenericFilterBean {
     @Override
     public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain) throws IOException, ServletException {
         HttpServletRequest httpServletRequest = (HttpServletRequest) servletRequest;
+        HttpServletResponse httpServletResponse = (HttpServletResponse) servletResponse;
         String jwt = resolveToken(httpServletRequest);
         if (StringUtils.hasText(jwt) && this.tokenProvider.validateToken(jwt)) {
             Authentication authentication = this.tokenProvider.getAuthentication(jwt);
             SecurityContextHolder.getContext().setAuthentication(authentication);
         } else if(!API_UN_AUTHEN.contains(httpServletRequest.getRequestURI())){
-            servletResponse.setContentType("application/json;charset=utf-8");
+            httpServletResponse.setStatus(HttpServletResponse.SC_FORBIDDEN);
+            httpServletResponse.setContentType("application/json;charset=utf-8");
             String jsonResponse = String.format("{\"statusCode\": %d, \"message\": \"Unauthorized access\"}", ResponseCode.UN_AUTHORIZED);
             servletResponse.getWriter().write(jsonResponse);
             return;

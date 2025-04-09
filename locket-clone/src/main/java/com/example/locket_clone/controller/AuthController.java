@@ -16,6 +16,8 @@ import com.example.locket_clone.utils.Constant.ResponseCode;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.core.Authentication;
@@ -89,14 +91,14 @@ public class AuthController {
     }
 
     @PostMapping("/get-new-token")
-    public ResponseData<GetNewTokenFromRefreshTokenResponse> getNewToken(@RequestBody GetNewTokenFromRefreshToken getNewTokenFromRefreshToken) {
+    public ResponseEntity<?> getNewToken(@RequestBody GetNewTokenFromRefreshToken getNewTokenFromRefreshToken) {
         if(!tokenProvider.validateToken(getNewTokenFromRefreshToken.getRefreshToken())) {
-            return new ResponseData<>(ResponseCode.UN_AUTHORIZED, "Refresh token is expired");
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(new ResponseData<>(ResponseCode.UN_AUTHORIZED, "Refresh token is expired"));
         }
         String refreshToken = getNewTokenFromRefreshToken.getRefreshToken();
         Authentication authenticationToken = tokenProvider.getAuthentication(refreshToken);
         String userId = tokenProvider.getUserIdByToken(refreshToken);
         String token = tokenProvider.createToken(authenticationToken, userId);
-        return new ResponseData<>(ResponseCode.SUCCESS, "success", new GetNewTokenFromRefreshTokenResponse(token));
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(new ResponseData<>(ResponseCode.SUCCESS, "success", new GetNewTokenFromRefreshTokenResponse(token)));
     }
 }
