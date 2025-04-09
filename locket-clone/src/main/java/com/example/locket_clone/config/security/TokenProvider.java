@@ -36,6 +36,7 @@ public class TokenProvider {
     private static final String USER_ID_KEY = "userId";
 
     long tokenValidityInMilliseconds;
+    long refreshTokenValidityInMilliseconds;
 
     @Autowired
     private UserService userService;
@@ -44,7 +45,7 @@ public class TokenProvider {
     protected void init(){
         this.tokenSecretKey = Base64.getEncoder().encodeToString(tokenSecretKey.getBytes());
         this.tokenValidityInMilliseconds = 1000 * tokenValidityInSeconds;
-
+        this.refreshTokenValidityInMilliseconds = 1000 * refreshTokenValidityInSeconds;
     }
 
     public String createToken(Authentication authentication, String userId) {
@@ -72,7 +73,7 @@ public class TokenProvider {
         //todo put another claims
 
         Date now = new Date();
-        Date validity = new Date(now.getTime() + refreshTokenValidityInSeconds);
+        Date validity = new Date(now.getTime() + refreshTokenValidityInMilliseconds);
         return Jwts.builder()
                 .setClaims(claims)
                 .setIssuedAt(now)
