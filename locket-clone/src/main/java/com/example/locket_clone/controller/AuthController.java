@@ -93,12 +93,12 @@ public class AuthController {
     @PostMapping("/get-new-token")
     public ResponseEntity<?> getNewToken(@RequestBody GetNewTokenFromRefreshToken getNewTokenFromRefreshToken) {
         if(!tokenProvider.validateToken(getNewTokenFromRefreshToken.getRefreshToken())) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(new ResponseData<>(ResponseCode.UN_AUTHORIZED, "Refresh token is expired"));
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new ResponseData<>(ResponseCode.UN_AUTHORIZED, "Refresh token is expired"));
         }
         String refreshToken = getNewTokenFromRefreshToken.getRefreshToken();
         Authentication authenticationToken = tokenProvider.getAuthentication(refreshToken);
         String userId = tokenProvider.getUserIdByToken(refreshToken);
         String token = tokenProvider.createToken(authenticationToken, userId);
-        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(new ResponseData<>(ResponseCode.SUCCESS, "success", new GetNewTokenFromRefreshTokenResponse(token)));
+        return ResponseEntity.status(HttpStatus.OK).body(new ResponseData<>(ResponseCode.SUCCESS, "success", new GetNewTokenFromRefreshTokenResponse(token)));
     }
 }

@@ -39,7 +39,7 @@ public class AuthenticationFilter extends GenericFilterBean {
             Authentication authentication = this.tokenProvider.getAuthentication(jwt);
             SecurityContextHolder.getContext().setAuthentication(authentication);
         } else if(!API_UN_AUTHEN.contains(httpServletRequest.getRequestURI())){
-            httpServletResponse.setStatus(HttpServletResponse.SC_FORBIDDEN);
+            httpServletResponse.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
             httpServletResponse.setContentType("application/json;charset=utf-8");
             String jsonResponse = String.format("{\"statusCode\": %d, \"message\": \"Unauthorized access\"}", ResponseCode.UN_AUTHORIZED);
             servletResponse.getWriter().write(jsonResponse);
