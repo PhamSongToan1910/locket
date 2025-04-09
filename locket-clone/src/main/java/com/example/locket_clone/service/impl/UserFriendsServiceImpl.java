@@ -39,6 +39,19 @@ public class UserFriendsServiceImpl implements UserFriendsService {
     }
 
     @Override
+    public boolean acceptFriend(String userId, String friendId) {
+        UserFriends userFriends = userFriendsRepository.findByUserId(friendId);
+        if(Objects.isNull(userFriends)) {
+            return false;
+        }
+        if(!userFriends.getFriendIds().contains(userId)) {
+            return false;
+        }
+        this.addFriend(userId, friendId);
+        return true;
+    }
+
+    @Override
     public void removeSendRequestFriend(String userId, String friendId) {
         UserFriends userFriends = userFriendsRepository.findByUserId(friendId);
         userFriends.getFriendIds().remove(userId);

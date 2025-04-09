@@ -83,7 +83,7 @@ public class UserController {
         String userId = customUserDetail.getId();
         String friendId = addFriendRequest.getFriendId();
         sendRequestFriendService.acceptRequestFriend(userId, friendId);
-        userFriendsService.addFriend(userId, friendId);
+        userFriendsService.acceptFriend(userId, friendId);
         return new ResponseData<>(ResponseCode.SUCCESS, "success");
     }
 
