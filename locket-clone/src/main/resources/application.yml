@@ -19,4 +19,4 @@ security:
 aws:
   s3:
     region: ap-southeast-2
-    bucketName: locket-clone-bucket
+    bucketName: my-memories-bucket-1

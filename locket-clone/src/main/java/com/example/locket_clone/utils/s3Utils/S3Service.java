@@ -32,6 +32,6 @@ public class S3Service {
 
         s3Client.putObject(putObjectRequest, RequestBody.fromBytes(file.getBytes()));
 
-        return cloudFrontDomain + fileName;
+        return "https://" + bucketName + ".s3.amazonaws.com/" + fileName;
     }
 }
