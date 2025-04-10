@@ -19,8 +19,6 @@ public class S3Service {
     @Value("${aws.s3.bucketName}")
     private String bucketName;
 
-    private String cloudFrontDomain = System.getenv("AWS_CLOUD_FRONT_DOMAIN");
-
     public String uploadFile(MultipartFile file) throws IOException {
         String fileName = UUID.randomUUID() + "-" + file.getOriginalFilename();
 
