@@ -36,7 +36,7 @@ public class PostController {
             return new ResponseData<>(ResponseCode.WRONG_DATA_FORMAT, "Wrong request format");
         }
         String imageURL = s3Service.uploadFile(multipartFile);
-        return new ResponseData<>(ResponseCode.SUCCESS, "unknown error", imageURL);
+        return new ResponseData<>(ResponseCode.SUCCESS, "success", imageURL);
     }
 
     @PostMapping("/add-post")
