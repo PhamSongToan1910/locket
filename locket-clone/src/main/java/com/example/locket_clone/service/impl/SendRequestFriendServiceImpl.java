@@ -69,4 +69,12 @@ public class SendRequestFriendServiceImpl implements SendRequestFriendService {
         return true;
     }
 
+    @Override
+    public Set<String> getFriendsRequestByFriendId(String userId) {
+        List<SendRequestFriend> sendRequestFriendList = sendRequestFriendRepository.findByFriendId(userId);
+        Set<String> friendsSet = new HashSet<>();
+        sendRequestFriendList.forEach(sendRequestFriend -> friendsSet.add(sendRequestFriend.getFriendId()));
+        return friendsSet;
+    }
+
 }

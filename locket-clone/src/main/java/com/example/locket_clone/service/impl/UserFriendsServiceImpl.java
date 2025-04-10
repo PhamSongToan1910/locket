@@ -11,6 +11,7 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.springframework.stereotype.Repository;
+import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
 
 import java.util.ArrayList;
@@ -98,6 +99,12 @@ public class UserFriendsServiceImpl implements UserFriendsService {
         userFriendsRepository.save(findByUserId);
         userFriendsRepository.save(findByFriendId);
         return true;
+    }
+
+    @Override
+    public Boolean checkIsFriend(String userId, String friendId) {
+        UserFriends userFriends = userFriendsRepository.findByUserId(userId);
+        return Objects.nonNull(userFriends) && userFriends.getFriendIds().contains(friendId);
     }
 
 }

@@ -5,6 +5,8 @@ import com.example.locket_clone.entities.User;
 import com.example.locket_clone.entities.request.AddUserRequest;
 import com.example.locket_clone.entities.request.UpdateUserInfoRequest;
 import com.example.locket_clone.entities.request.UpdateUserInforV2Request;
+import com.example.locket_clone.entities.response.GetFriendResponse;
+import com.example.locket_clone.entities.response.SearchFriendByUsernameResponse;
 import com.example.locket_clone.repository.InterfacePackage.RoleRepository;
 import com.example.locket_clone.repository.InterfacePackage.UserRepository;
 import com.example.locket_clone.service.UserService;
@@ -15,6 +17,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.bson.types.ObjectId;
 import org.springframework.stereotype.Service;
+
+import java.util.Objects;
 
 @Service
 @RequiredArgsConstructor
@@ -80,5 +84,16 @@ public class UserServiceImpl implements UserService {
             return true;
         }
         return false;
+    }
+
+    @Override
+    public SearchFriendByUsernameResponse searchByUsername(String username) {
+        User user = this.findUserByUsername(username);
+        if(Objects.nonNull(user)) {
+            SearchFriendByUsernameResponse searchFriendByUsernameResponse = new SearchFriendByUsernameResponse();
+            ModelMapperUtils.toObject(user, searchFriendByUsernameResponse);
+            return searchFriendByUsernameResponse;
+        }
+        return null;
     }
 }

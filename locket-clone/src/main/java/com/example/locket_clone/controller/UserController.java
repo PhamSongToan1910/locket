@@ -8,10 +8,7 @@ import com.example.locket_clone.entities.UserFriends;
 import com.example.locket_clone.entities.request.AddFriendRequest;
 import com.example.locket_clone.entities.request.UpdateUserInfoRequest;
 import com.example.locket_clone.entities.request.UpdateUserInforV2Request;
-import com.example.locket_clone.entities.response.FindUserByUserNameResponse;
-import com.example.locket_clone.entities.response.GetFriendResponse;
-import com.example.locket_clone.entities.response.GetUserInfoResponse;
-import com.example.locket_clone.entities.response.ResponseData;
+import com.example.locket_clone.entities.response.*;
 import com.example.locket_clone.service.SendRequestFriendService;
 import com.example.locket_clone.service.UserFriendsService;
 import com.example.locket_clone.service.UserService;
@@ -23,12 +20,12 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.springframework.http.MediaType;
-import org.springframework.security.core.parameters.P;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
@@ -193,5 +190,33 @@ public class UserController {
             return new ResponseData<>(ResponseCode.UNKNOWN_ERROR, "Cant unfriend");
         }
         return new ResponseData<>(ResponseCode.SUCCESS, "success");
+    }
+
+    @GetMapping("/search-by-username")
+    public ResponseData<?> searchByUsername(@CurrentUser CustomUserDetail customUserDetail, @RequestParam("username") String username) {
+        if(!StringUtils.hasLength(username)) {
+            return new ResponseData<>(ResponseCode.WRONG_DATA_FORMAT, "Wrong request format");
+        }
+        SearchFriendByUsernameResponse searchFriendByUsernameResponse = userService.searchByUsername(username);
+        if(Objects.isNull(searchFriendByUsernameResponse)) {
+            return new ResponseData<>(ResponseCode.SUCCESS, "success", new HashMap<>());
+        }
+        searchFriendByUsernameResponse.setFriend(userFriendsService.checkIsFriend(customUserDetail.getId(), searchFriendByUsernameResponse.getId()));
+        return new ResponseData<>(ResponseCode.SUCCESS, "success", searchFriendByUsernameResponse);
+    }
+
+    @GetMapping("/get-all-friend-requests")
+    public ResponseData<List<GetFriendResponse>> getAllFriendRequests(@CurrentUser CustomUserDetail customUserDetail) {
+        Set<String> sendRequestFriend = sendRequestFriendService.getFriendsRequestByFriendId(customUserDetail.getId());
+        List<GetFriendResponse> response = sendRequestFriend.stream()
+                .map(userService::findUserById)
+                .filter(Objects::nonNull)
+                .map(user -> {
+                    GetFriendResponse responseObj = new GetFriendResponse();
+                    ModelMapperUtils.toObject(user, responseObj);
+                    return responseObj;
+                })
+                .toList();
+        return new ResponseData<>(ResponseCode.SUCCESS, "success", response);
     }
 }
