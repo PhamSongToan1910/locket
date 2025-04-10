@@ -11,7 +11,7 @@ import org.springframework.data.mongodb.core.mapping.Field;
 @NoArgsConstructor
 @AllArgsConstructor
 @Document(Constant.COLLECTION.SEND_FRIEND_REQUEST_COLLECTION)
-public class SendRequestFriend {
+public class SendRequestFriend extends BaseEntity{
     public static final String USER_ID = "user_id";
     public static final String FRIEND_ID = "friend_id";
 

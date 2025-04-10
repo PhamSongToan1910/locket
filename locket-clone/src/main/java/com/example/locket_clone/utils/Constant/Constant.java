@@ -24,4 +24,9 @@ public class Constant {
         public static final int PROTECTED = 2;
         public static final int ONLY_ME = 3;
     }
+
+    public static class TYPE_USER {
+        public static final int DELETED = 1;
+        public static final int IS_NOT_DELETED = 0;
+    }
 }
