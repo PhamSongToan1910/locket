@@ -74,7 +74,10 @@ public class UserController {
         String userId = customUserDetail.getId();
         String friendId = addFriendRequest.getFriendId();
         userFriendsService.addFriend(userId, friendId);
-        sendRequestFriendService.sendRequestFriend(new SendRequestFriend(userId, friendId));
+        boolean result = sendRequestFriendService.sendRequestFriend(new SendRequestFriend(userId, friendId));
+        if(!result) {
+            return new ResponseData<>(ResponseCode.UNKNOWN_ERROR, "unknown error");
+        }
         return new ResponseData<>(ResponseCode.SUCCESS, "success");
     }
 
@@ -82,8 +85,14 @@ public class UserController {
     public ResponseData<UserFriends> acceptFriend(@CurrentUser CustomUserDetail customUserDetail, @RequestBody AddFriendRequest addFriendRequest) {
         String userId = customUserDetail.getId();
         String friendId = addFriendRequest.getFriendId();
-        sendRequestFriendService.acceptRequestFriend(userId, friendId);
-        userFriendsService.acceptFriend(userId, friendId);
+        boolean result = sendRequestFriendService.acceptRequestFriend(userId, friendId);
+        boolean acceptFriend = userFriendsService.acceptFriend(userId, friendId);
+        if(!result) {
+            return new ResponseData<>(ResponseCode.UNKNOWN_ERROR, "Cant find send request");
+        }
+        if(!acceptFriend) {
+            return new ResponseData<>(ResponseCode.UNKNOWN_ERROR, "Cant accept request");
+        }
         return new ResponseData<>(ResponseCode.SUCCESS, "success");
     }
 
@@ -91,7 +100,10 @@ public class UserController {
     public ResponseData<UserFriends> declineFriend(@CurrentUser CustomUserDetail customUserDetail, @RequestBody AddFriendRequest addFriendRequest) {
         String userId = customUserDetail.getId();
         String friendId = addFriendRequest.getFriendId();
-        sendRequestFriendService.declineRequestFriend(userId, friendId);
+        boolean result = sendRequestFriendService.declineRequestFriend(userId, friendId);
+        if(!result) {
+            return new ResponseData<>(ResponseCode.UNKNOWN_ERROR, "unknown error");
+        }
         userFriendsService.removeSendRequestFriend(userId, friendId);
         return new ResponseData<>(ResponseCode.SUCCESS, "success");
     }
@@ -136,5 +148,15 @@ public class UserController {
                 })
                 .toList();
         return new ResponseData<>(ResponseCode.SUCCESS, "success", response);
+    }
+
+    @DeleteMapping("/cancel-request-friend")
+    public ResponseData<?> cancelRequestFriend(@CurrentUser CustomUserDetail customUserDetail, @RequestParam("friend_id") String friendId) {
+        String userId = customUserDetail.getId();
+        boolean result = sendRequestFriendService.cancelRequestFriend(userId, friendId);
+        if(!result) {
+            return new ResponseData<>(ResponseCode.UNKNOWN_ERROR, "Cant find send request");
+        }
+        return new ResponseData<>(ResponseCode.SUCCESS, "success");
     }
 }

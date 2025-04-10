@@ -22,21 +22,33 @@ public class SendRequestFriendServiceImpl implements SendRequestFriendService {
     SendRequestFriendRepository sendRequestFriendRepository;
 
     @Override
-    public void sendRequestFriend(SendRequestFriend sendRequestFriend) {
+    public boolean sendRequestFriend(SendRequestFriend sendRequestFriend) {
         SendRequestFriend sendRequestFriendCheck = sendRequestFriendRepository.findOneByUserIdAndFriendId(sendRequestFriend.getUserId(), sendRequestFriend.getFriendId());
         if(Objects.isNull(sendRequestFriendCheck)) {
             sendRequestFriendRepository.save(sendRequestFriend);
+            return true;
         }
+        return false;
     }
 
     @Override
-    public void acceptRequestFriend(String userId, String friendId) {
-        sendRequestFriendRepository.deleteByUserIdAndFriendId(friendId, userId);
+    public boolean acceptRequestFriend(String userId, String friendId) {
+        SendRequestFriend sendRequestFriendCheck = sendRequestFriendRepository.findOneByUserIdAndFriendId(friendId, userId);
+        if(Objects.isNull(sendRequestFriendCheck)) {
+            return false;
+        }
+        sendRequestFriendRepository.delete(sendRequestFriendCheck);
+        return true;
     }
 
     @Override
-    public void declineRequestFriend(String userId, String friendId) {
-        sendRequestFriendRepository.deleteByUserIdAndFriendId(friendId, userId);
+    public boolean declineRequestFriend(String userId, String friendId) {
+        SendRequestFriend sendRequestFriendCheck = sendRequestFriendRepository.findOneByUserIdAndFriendId(friendId, userId);
+        if(Objects.isNull(sendRequestFriendCheck)) {
+            return false;
+        }
+        sendRequestFriendRepository.delete(sendRequestFriendCheck);
+        return true;
     }
 
     @Override
@@ -45,6 +57,16 @@ public class SendRequestFriendServiceImpl implements SendRequestFriendService {
         Set<String> friendsSet = new HashSet<>();
         sendRequestFriendList.forEach(sendRequestFriend -> friendsSet.add(sendRequestFriend.getFriendId()));
         return friendsSet;
+    }
+
+    @Override
+    public boolean cancelRequestFriend(String userId, String friendId) {
+        SendRequestFriend sendRequestFriendCheck = sendRequestFriendRepository.findOneByUserIdAndFriendId(userId, friendId);
+        if(Objects.isNull(sendRequestFriendCheck)) {
+            return false;
+        }
+        sendRequestFriendRepository.delete(sendRequestFriendCheck);
+        return true;
     }
 
 }
