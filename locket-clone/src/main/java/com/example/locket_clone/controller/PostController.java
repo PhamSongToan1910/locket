@@ -30,15 +30,23 @@ public class PostController {
     PostService postService;
     S3Service s3Service;
 
-    @PostMapping(value = "/add-post", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseData<?> addPost(@CurrentUser CustomUserDetail customUserDetail, @RequestParam("file") MultipartFile multipartFile, @RequestBody AddPostRequest addPostRequest) throws IOException {
-        if(multipartFile.getOriginalFilename() == null || multipartFile.getOriginalFilename().isEmpty() || !addPostRequest.validateRequest()){
+    @PostMapping(value = "/upload-image", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseData<String> addPost(@RequestParam("file") MultipartFile multipartFile) throws IOException {
+        if(multipartFile.getOriginalFilename() == null || multipartFile.getOriginalFilename().isEmpty()){
             return new ResponseData<>(ResponseCode.WRONG_DATA_FORMAT, "Wrong request format");
         }
         String imageURL = s3Service.uploadFile(multipartFile);
-        addPostRequest.setImageURL(imageURL);
-        boolean result = postService.addPost(addPostRequest, customUserDetail.getId());
-        if(result) {
+        return new ResponseData<>(ResponseCode.SUCCESS, "unknown error", imageURL);
+    }
+
+    @PostMapping("/add-post")
+    public ResponseData<?> addPost(@CurrentUser CustomUserDetail customUserDetail, @RequestBody AddPostRequest addPostRequest) {
+        if(!addPostRequest.validateRequest()) {
+            return new ResponseData<>(ResponseCode.WRONG_DATA_FORMAT, "Wrong request format");
+        }
+        String userId = customUserDetail.getId();
+        boolean success = postService.addPost(addPostRequest, userId);
+        if(success){
             return new ResponseData<>(ResponseCode.SUCCESS, "success");
         }
         return new ResponseData<>(ResponseCode.UNKNOWN_ERROR, "unknown error");

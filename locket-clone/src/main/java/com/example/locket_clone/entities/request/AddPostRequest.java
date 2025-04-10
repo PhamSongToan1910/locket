@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
@@ -29,11 +30,14 @@ public class AddPostRequest {
     private String imageURL;
 
     public boolean validateRequest() {
-        if(!StringUtils.hasLength(this.caption) || Objects.isNull(this.type)) {
+        if(!StringUtils.hasLength(this.caption) || Objects.isNull(this.type) || this.type > Constant.TYPE_ADD_POST.ONLY_ME) {
             return false;
         }
         if(this.type == Constant.TYPE_ADD_POST.PROTECTED) {
             return !CollectionUtils.isEmpty(friendIds);
+        }
+        if(this.type != Constant.TYPE_ADD_POST.PROTECTED) {
+            this.friendIds = new ArrayList<>();
         }
         return true;
     }
