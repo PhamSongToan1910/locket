@@ -11,4 +11,5 @@ public interface UserFriendsService {
     void removeSendRequestFriend(String userId, String friendId);
     int getNumberFriends(String userId);
     List<GetFriendResponse> getAllFriends(String userId);
+    boolean unFriend(String userId, String friendId);
 }

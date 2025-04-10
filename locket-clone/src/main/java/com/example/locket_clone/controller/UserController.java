@@ -184,4 +184,14 @@ public class UserController {
 
         return new ResponseData<>(ResponseCode.SUCCESS, "success", response);
     }
+
+    @DeleteMapping("/unfriend")
+    public ResponseData<?> unFriend(@CurrentUser CustomUserDetail customUserDetail, @RequestParam("friend_id") String friendId) {
+        String userId = customUserDetail.getId();
+        boolean result = userFriendsService.unFriend(userId, friendId);
+        if(!result) {
+            return new ResponseData<>(ResponseCode.UNKNOWN_ERROR, "Cant unfriend");
+        }
+        return new ResponseData<>(ResponseCode.SUCCESS, "success");
+    }
 }
