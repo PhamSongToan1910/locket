@@ -10,10 +10,10 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class GetUserInfoResponse {
     @JsonProperty("first_name")
-    private String firstname;
+    private String firstName;
 
     @JsonProperty("last_name")
-    private String lastname;
+    private String lastName;
 
     @JsonProperty("avt")
     private String avt;
