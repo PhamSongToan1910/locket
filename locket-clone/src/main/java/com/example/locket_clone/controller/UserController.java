@@ -174,7 +174,7 @@ public class UserController {
         if(!StringUtils.hasLength(user.getFullName()) || !StringUtils.hasLength(user.getUsername())) {
             response.setComplete(false);
         } else {
-            response.setComplete(false);
+            response.setComplete(true);
         }
         if(user.getIsDeleted()) {
             response.setStatus(Constant.TYPE_USER.DELETED);
