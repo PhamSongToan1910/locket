@@ -3,9 +3,11 @@ package com.example.locket_clone.controller;
 import com.example.locket_clone.config.CurrentUser;
 import com.example.locket_clone.config.security.CustomUserDetail;
 import com.example.locket_clone.entities.request.AddPostRequest;
+import com.example.locket_clone.entities.request.AddReactionPost;
 import com.example.locket_clone.entities.response.GetPostResponse;
 import com.example.locket_clone.entities.response.ResponseData;
 import com.example.locket_clone.service.PostService;
+import com.example.locket_clone.service.ReactionService;
 import com.example.locket_clone.utils.Constant.ResponseCode;
 import com.example.locket_clone.utils.s3Utils.S3Service;
 import lombok.AccessLevel;
@@ -33,6 +35,7 @@ public class PostController {
 
     PostService postService;
     S3Service s3Service;
+    ReactionService reactionService;
 
     @PostMapping(value = "/upload-image", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseData<String> addPost(@RequestParam("file") MultipartFile multipartFile) throws IOException {
@@ -63,5 +66,16 @@ public class PostController {
         Pageable pageable = PageRequest.of(page, size);
         List<GetPostResponse> responseList = postService.getPosts(customUserDetail.getId(), pageable);
         return new ResponseData<>(ResponseCode.SUCCESS, "success", responseList);
+    }
+
+    @PostMapping("/react-post")
+    public ResponseData<?> addReactionPost(@CurrentUser CustomUserDetail customUserDetail, @RequestBody AddReactionPost addReactionPost) {
+        addReactionPost.setUserId(customUserDetail.getId());
+        String reactionId = reactionService.addReaction(addReactionPost);
+        boolean result = postService.addReactionToPost(addReactionPost.getPostId(), reactionId);
+        if(result) {
+            return new ResponseData<>(ResponseCode.SUCCESS, "success");
+        }
+        return new ResponseData<>(ResponseCode.UNKNOWN_ERROR, "Cant find post");
     }
 }

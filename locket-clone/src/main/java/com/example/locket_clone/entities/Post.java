@@ -8,7 +8,9 @@ import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Data
 @NoArgsConstructor
@@ -28,7 +30,7 @@ public class Post extends BaseEntity {
     private String imageURL;
 
     @Field(REACTION_IDS)
-    private List<String> reactionIds = new ArrayList<>();
+    private Set<String> reactionIds = new HashSet<>();
 
     @Field(FRIEND_IDS)
     private List<String> friendIds = new ArrayList<>();

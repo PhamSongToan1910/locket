@@ -20,6 +20,7 @@ import org.springframework.util.CollectionUtils;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 @Service
 @RequiredArgsConstructor
@@ -73,5 +74,16 @@ public class PostServiceImpl implements PostService {
             responseList.add(getPostResponse);
         }
         return responseList;
+    }
+
+    @Override
+    public boolean addReactionToPost(String postId, String reactionId) {
+        Post post = postRepository.findById(postId).orElse(null);
+        if(Objects.isNull(post)) {
+            return false;
+        }
+        post.getReactionIds().add(reactionId);
+        postRepository.save(post);
+        return true;
     }
 }

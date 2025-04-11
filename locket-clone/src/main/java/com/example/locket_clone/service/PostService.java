@@ -9,4 +9,5 @@ import java.util.List;
 public interface PostService {
     boolean addPost(AddPostRequest addPostRequest, String userId);
     List<GetPostResponse> getPosts(String userId, Pageable pageable);
+    boolean addReactionToPost(String postId, String reactionId);
 }

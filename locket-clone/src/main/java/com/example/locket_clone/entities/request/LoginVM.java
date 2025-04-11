@@ -9,6 +9,7 @@ import java.util.Objects;
 public class LoginVM {
     @JsonProperty("email")
     private String email;
+    @JsonProperty("avt")
     private String avt;
 
     public boolean validateRequest() {

@@ -9,7 +9,7 @@ public class Constant {
         public static final String ROLE_COLLECTION = "authorities";
         public static final String RESOURCE_COLLECTION = "resource";
         public static final String POST_COLLECTION = "post";
-        public static final String REACT_COLLECTION = "react";
+        public static final String REACTION_COLLECTION = "reaction";
         public static final String COMMENT_COLLECTION = "comment";
         public static final String USER_FRIENDS_COLLECTION = "user_friends";
 
@@ -28,5 +28,12 @@ public class Constant {
     public static class TYPE_USER {
         public static final int DELETED = 1;
         public static final int IS_NOT_DELETED = 0;
+    }
+
+    public static class TYPE_REACTION {
+        public static final int TYM = 1;
+        public static final int FIRE = 2;
+        public static final int HAHA = 3;
+        public static final int CRY = 4;
     }
 }
