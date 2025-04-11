@@ -11,4 +11,5 @@ public interface SendRequestFriendService {
     Set<String> getFriendsRequestByUserId(String userId);
     Set<String> getFriendsRequestByFriendId(String userId);
     boolean cancelRequestFriend(String userId, String friendId);
+    boolean checkFriendRequest(String userId, String friendId);
 }

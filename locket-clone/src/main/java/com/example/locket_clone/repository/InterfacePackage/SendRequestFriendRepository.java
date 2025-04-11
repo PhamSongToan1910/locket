@@ -11,4 +11,5 @@ public interface SendRequestFriendRepository extends MongoRepository<SendRequest
     List<SendRequestFriend> findByUserId(String userId);
     void deleteByUserIdAndFriendId(String userId, String friendId);
     List<SendRequestFriend> findByFriendId(String friendId);
+    List<SendRequestFriend> findByUserIdOrFriendId(String userId, String friendId);
 }

@@ -70,6 +70,14 @@ public class SendRequestFriendServiceImpl implements SendRequestFriendService {
     }
 
     @Override
+    public boolean checkFriendRequest(String userId, String friendId) {
+        List<SendRequestFriend> sendRequestFriendList = sendRequestFriendRepository.findByUserIdOrFriendId(userId, friendId);
+        Set<String> friendsSet = new HashSet<>();
+        sendRequestFriendList.forEach(sendRequestFriend -> friendsSet.add(sendRequestFriend.getFriendId()));
+        return friendsSet.contains(friendId) || friendsSet.contains(userId);
+    }
+
+    @Override
     public Set<String> getFriendsRequestByFriendId(String userId) {
         List<SendRequestFriend> sendRequestFriendList = sendRequestFriendRepository.findByFriendId(userId);
         Set<String> friendsSet = new HashSet<>();

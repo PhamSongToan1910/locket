@@ -23,7 +23,4 @@ public class SearchFriendByUsernameResponse {
 
     @JsonProperty("avt")
     private String avt;
-
-    @JsonProperty("is_friend")
-    private boolean isFriend;
 }

@@ -201,7 +201,10 @@ public class UserController {
         if(Objects.isNull(searchFriendByUsernameResponse)) {
             return new ResponseData<>(ResponseCode.SUCCESS, "success", new HashMap<>());
         }
-        searchFriendByUsernameResponse.setFriend(userFriendsService.checkIsFriend(customUserDetail.getId(), searchFriendByUsernameResponse.getId()));
+        String friend_id = searchFriendByUsernameResponse.getId();
+        if(userFriendsService.checkIsFriend(customUserDetail.getId(), friend_id) || userFriendsService.checkIsFriend(friend_id, customUserDetail.getId())) {
+            return new ResponseData<>(ResponseCode.SUCCESS, "success", new HashMap<>());
+        }
         return new ResponseData<>(ResponseCode.SUCCESS, "success", searchFriendByUsernameResponse);
     }
 
