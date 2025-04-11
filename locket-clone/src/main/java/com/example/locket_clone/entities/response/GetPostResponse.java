@@ -17,7 +17,7 @@ public class GetPostResponse {
     private String userId;
 
     @JsonProperty("url")
-    private String url;
+    private String imageURL;
 
     @JsonProperty("caption")
     private String caption;

@@ -15,11 +15,11 @@ import java.util.List;
 @AllArgsConstructor
 @Document(Constant.COLLECTION.POST_COLLECTION)
 public class Post extends BaseEntity {
-    private static final String USER_ID = "user_id";
-    private static final String IMAGE_URL = "image_url";
-    private static final String REACTION_IDS = "reaction_ids";
-    private static final String CAPTION = "caption";
-    private static final String FRIEND_IDS = "friend_ids";
+    public static final String USER_ID = "user_id";
+    public static final String IMAGE_URL = "image_url";
+    public static final String REACTION_IDS = "reaction_ids";
+    public static final String CAPTION = "caption";
+    public static final String FRIEND_IDS = "friend_ids";
 
     @Field(USER_ID)
     private String userId;
