@@ -202,7 +202,7 @@ public class UserController {
             return new ResponseData<>(ResponseCode.SUCCESS, "success", new HashMap<>());
         }
         String friend_id = searchFriendByUsernameResponse.getId();
-        if(userFriendsService.checkIsFriend(customUserDetail.getId(), friend_id) || userFriendsService.checkIsFriend(friend_id, customUserDetail.getId())) {
+        if(userFriendsService.checkIsFriend(customUserDetail.getId(), friend_id) || userFriendsService.checkIsFriend(friend_id, customUserDetail.getId()) || friend_id.equals(customUserDetail.getId())) {
             return new ResponseData<>(ResponseCode.SUCCESS, "success", new HashMap<>());
         }
         return new ResponseData<>(ResponseCode.SUCCESS, "success", searchFriendByUsernameResponse);
