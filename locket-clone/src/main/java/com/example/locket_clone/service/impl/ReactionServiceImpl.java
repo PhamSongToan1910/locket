@@ -22,7 +22,7 @@ public class ReactionServiceImpl implements ReactionService {
         Reaction reaction = reactionRepository.findReactionByUserIdAndPostId(addReactionPost.getUserId(), addReactionPost.getPostId());
         if (reaction != null) {
             if(reaction.getIcons().size() >= 4) {
-                reaction.getIcons().remove(reaction.getIcons().getLast());
+                reaction.getIcons().remove(reaction.getIcons().getFirst());
                 reaction.getIcons().add(addReactionPost.getReactType());
             } else {
                 reaction.getIcons().add(addReactionPost.getReactType());
