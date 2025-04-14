@@ -34,4 +34,10 @@ public class Constant {
         public static final int HAHA = 3;
         public static final int CRY = 4;
     }
+
+    public static class TYPE_GET_POST {
+        public static final int PUBLIC = 0;
+        public static final int FRIEND_DETAIL = 1;
+        public static final int ME = 2;
+    }
 }

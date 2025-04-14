@@ -27,4 +27,21 @@ public class PostRepositoryImpl implements CustomPostRepository {
         query.with(pageable);
         return mongoTemplate.find(query, Post.class);
     }
+
+    @Override
+    public List<Post> getPostByFriendId(String userId, String friendId, Pageable pageable) {
+        Query query= new Query(Criteria.where(Post.USER_ID).is(friendId));
+        query.addCriteria(Criteria.where(Post.FRIEND_IDS).in(userId));
+        query.addCriteria(Criteria.where(Post.IS_DELETE).is(false));
+        query.with(pageable);
+        return mongoTemplate.find(query, Post.class);
+    }
+
+    @Override
+    public List<Post> getMyPosts(String userId, Pageable pageable) {
+        Query query = new Query(Criteria.where(Post.USER_ID).is(userId));
+        query.addCriteria(Criteria.where(Post.IS_DELETE).is(false));
+        query.with(pageable);
+        return mongoTemplate.find(query, Post.class);
+    }
 }

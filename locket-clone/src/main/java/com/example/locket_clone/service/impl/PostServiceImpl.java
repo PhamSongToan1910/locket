@@ -3,6 +3,7 @@ package com.example.locket_clone.service.impl;
 import com.example.locket_clone.entities.Post;
 import com.example.locket_clone.entities.User;
 import com.example.locket_clone.entities.request.AddPostRequest;
+import com.example.locket_clone.entities.request.GetPostsRequest;
 import com.example.locket_clone.entities.response.GetFriendResponse;
 import com.example.locket_clone.entities.response.GetPostResponse;
 import com.example.locket_clone.repository.InterfacePackage.PostRepository;
@@ -52,29 +53,18 @@ public class PostServiceImpl implements PostService {
     }
 
     @Override
-    public List<GetPostResponse> getPosts(String userId, Pageable pageable) {
-        List<Post> getAllPosts = postRepository.GetAllPosts(userId, pageable);
-        List<GetPostResponse> responseList = new ArrayList<>();
-        for (Post post : getAllPosts) {
-            GetPostResponse getPostResponse = new GetPostResponse();
-            ModelMapperUtils.toObject(post, getPostResponse);
-            if(post.getUserId().equals(userId)) {
-                getPostResponse.setFriendPost(false);
-                if(CollectionUtils.isEmpty(post.getReactionIds())) {
-                    getPostResponse.setFriendReaction(false);
-                } else {
-                    getPostResponse.setFriendReaction(true);
-                }
-            } else {
-                getPostResponse.setFriendPost(true);
-                User ownerPost = userService.findUserById(post.getUserId());
-                if(ownerPost != null) {
-                    getPostResponse.setFriendAvt(ownerPost.getAvt());
-                }
+    public List<GetPostResponse> getPosts(String userId, GetPostsRequest getPostsRequest, Pageable pageable) {
+        switch (getPostsRequest.getType()) {
+            case Constant.TYPE_GET_POST.FRIEND_DETAIL -> {
+                return getPostByUserId(userId, getPostsRequest, pageable);
             }
-            responseList.add(getPostResponse);
+            case Constant.TYPE_GET_POST.ME -> {
+                return getMyPost(userId, pageable);
+            }
+            default -> {
+                return getAllPosts(userId, getPostsRequest, pageable);
+            }
         }
-        return responseList;
     }
 
     @Override
@@ -100,5 +90,63 @@ public class PostServiceImpl implements PostService {
         post.getFriendIds().remove(userId);
         postRepository.save(post);
         return true;
+    }
+
+    private List<GetPostResponse> getAllPosts(String userId, GetPostsRequest getPostsRequest, Pageable pageable) {
+        List<Post> getAllPosts = postRepository.GetAllPosts(userId, pageable);
+        List<GetPostResponse> responseList = new ArrayList<>();
+        for (Post post : getAllPosts) {
+            GetPostResponse getPostResponse = new GetPostResponse();
+            ModelMapperUtils.toObject(post, getPostResponse);
+            if(post.getUserId().equals(userId)) {
+                getPostResponse.setFriendPost(false);
+                if(CollectionUtils.isEmpty(post.getReactionIds())) {
+                    getPostResponse.setFriendReaction(false);
+                } else {
+                    getPostResponse.setFriendReaction(true);
+                }
+            } else {
+                getPostResponse.setFriendPost(true);
+                User ownerPost = userService.findUserById(post.getUserId());
+                if(ownerPost != null) {
+                    getPostResponse.setFriendAvt(ownerPost.getAvt());
+                }
+            }
+            responseList.add(getPostResponse);
+        }
+        return responseList;
+    }
+
+    private List<GetPostResponse> getPostByUserId(String userId, GetPostsRequest getPostsRequest, Pageable pageable) {
+        List<Post> listPostsFriendid = postRepository.getPostByFriendId(userId, getPostsRequest.getFriendId(), pageable);
+        List<GetPostResponse> responseList = new ArrayList<>();
+        for (Post post : listPostsFriendid) {
+            GetPostResponse getPostResponse = new GetPostResponse();
+            ModelMapperUtils.toObject(post, getPostResponse);
+            getPostResponse.setFriendPost(true);
+            User ownerPost = userService.findUserById(post.getUserId());
+            if(ownerPost != null) {
+                getPostResponse.setFriendAvt(ownerPost.getAvt());
+            }
+            responseList.add(getPostResponse);
+        }
+        return responseList;
+    }
+
+    private List<GetPostResponse> getMyPost(String userId, Pageable pageable) {
+        List<Post> listMyPosts = postRepository.getMyPosts(userId, pageable);
+        List<GetPostResponse> responseList = new ArrayList<>();
+        for (Post post : listMyPosts) {
+            GetPostResponse getPostResponse = new GetPostResponse();
+            ModelMapperUtils.toObject(post, getPostResponse);
+            getPostResponse.setFriendPost(false);
+            if(CollectionUtils.isEmpty(post.getReactionIds())) {
+                getPostResponse.setFriendReaction(false);
+            } else {
+                getPostResponse.setFriendReaction(true);
+            }
+            responseList.add(getPostResponse);
+        }
+        return responseList;
     }
 }
