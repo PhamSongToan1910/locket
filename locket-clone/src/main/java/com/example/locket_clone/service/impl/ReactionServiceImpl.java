@@ -30,7 +30,7 @@ public class ReactionServiceImpl implements ReactionService {
             return reaction.getId().toString();
         }
         Reaction newReaction = new Reaction();
-        ModelMapperUtils.toObject(newReaction, addReactionPost);
+        ModelMapperUtils.toObject(addReactionPost, newReaction);
         newReaction.getIcons().add(addReactionPost.getReactType());
         return reactionRepository.save(newReaction).getId().toString();
     }

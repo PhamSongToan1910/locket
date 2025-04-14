@@ -86,6 +86,9 @@ public class PostController {
         if(!post.getFriendIds().contains(customUserDetail.getId())) {
             return new ResponseData<>(ResponseCode.WRONG_DATA_FORMAT, "User cant read this post");
         }
+        if(post.getUserId().equals(customUserDetail.getId())) {
+            return new ResponseData<>(ResponseCode.WRONG_DATA_FORMAT, "User cant reaction my own post");
+        }
         addReactionPost.setUserId(customUserDetail.getId());
         String reactionId = reactionService.addReaction(addReactionPost);
         boolean result = postService.addReactionToPost(post, reactionId);
