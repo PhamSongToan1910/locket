@@ -3,14 +3,18 @@ package com.example.locket_clone.controller;
 import com.example.locket_clone.config.CurrentUser;
 import com.example.locket_clone.config.security.CustomUserDetail;
 import com.example.locket_clone.entities.Post;
+import com.example.locket_clone.entities.Reaction;
+import com.example.locket_clone.entities.User;
 import com.example.locket_clone.entities.request.AddPostRequest;
 import com.example.locket_clone.entities.request.AddReactionPost;
 import com.example.locket_clone.entities.request.GetPostsRequest;
 import com.example.locket_clone.entities.response.GetPostResponse;
+import com.example.locket_clone.entities.response.GetReactionResponse;
 import com.example.locket_clone.entities.response.ResponseData;
 import com.example.locket_clone.service.PostService;
 import com.example.locket_clone.service.ReactionService;
 import com.example.locket_clone.service.ReportPostService;
+import com.example.locket_clone.service.UserService;
 import com.example.locket_clone.utils.Constant.ResponseCode;
 import com.example.locket_clone.utils.fileUtils.FileUtils;
 import com.example.locket_clone.utils.s3Utils.S3Service;
@@ -32,6 +36,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 
 @RestController
 @RequiredArgsConstructor
@@ -43,6 +48,7 @@ public class PostController {
     S3Service s3Service;
     ReactionService reactionService;
     ReportPostService reportPostService;
+    UserService  userService;
 
     @PostMapping(value = "/upload-image", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseData<String> addPost(@RequestParam("file") MultipartFile multipartFile) throws IOException {
@@ -130,6 +136,30 @@ public class PostController {
             return new ResponseData<>(ResponseCode.UNKNOWN_ERROR, "Hide post failed");
         }
         return new ResponseData<>(ResponseCode.SUCCESS, "success");
+    }
+
+    @GetMapping("/list-reaction")
+    public ResponseData<List<GetReactionResponse>> listReaction(@RequestParam("post_id") String postId) {
+        Post post = postService.findbyId(postId);
+        if(Objects.isNull(post)) {
+            return new ResponseData<>(ResponseCode.WRONG_DATA_FORMAT, "Cant find post");
+        }
+        Set<String> setReactionIds = post.getReactionIds();
+        List<Reaction> listReactions = reactionService.getReactions(setReactionIds);
+        List<GetReactionResponse> response = listReactions.stream().map(reaction -> {
+            User user = userService.findUserById(reaction.getUserId());
+            try {
+                GetReactionResponse getReactionResponse = new GetReactionResponse();
+                getReactionResponse.setFirstname(user.getFirstName());
+                getReactionResponse.setAvt(user.getAvt());
+                getReactionResponse.setReactions(reaction.getIcons());
+                return getReactionResponse;
+            } catch (Exception e) {
+                e.printStackTrace();
+                return null;
+            }
+        }).filter(Objects::nonNull).toList();
+        return new ResponseData<>(ResponseCode.SUCCESS, "success", response);
     }
 
 }

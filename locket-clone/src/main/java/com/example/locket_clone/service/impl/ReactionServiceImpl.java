@@ -2,6 +2,7 @@ package com.example.locket_clone.service.impl;
 
 import com.example.locket_clone.entities.Reaction;
 import com.example.locket_clone.entities.request.AddReactionPost;
+import com.example.locket_clone.entities.response.GetReactionResponse;
 import com.example.locket_clone.repository.InterfacePackage.ReactionRepository;
 import com.example.locket_clone.service.ReactionService;
 import com.example.locket_clone.utils.ModelMapper.ModelMapperUtils;
@@ -9,6 +10,10 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
+import java.util.Objects;
+import java.util.Set;
 
 @Service
 @RequiredArgsConstructor
@@ -34,4 +39,11 @@ public class ReactionServiceImpl implements ReactionService {
         newReaction.getIcons().add(addReactionPost.getReactType());
         return reactionRepository.save(newReaction).getId().toString();
     }
+
+    @Override
+    public List<Reaction> getReactions(Set<String> listReactionId) {
+        return listReactionId.stream().map(reactionId -> reactionRepository.findById(reactionId).orElse(null))
+                .filter(Objects::nonNull).toList();
+    }
+
 }

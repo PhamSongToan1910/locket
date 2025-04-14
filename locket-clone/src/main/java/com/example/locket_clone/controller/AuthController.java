@@ -49,6 +49,9 @@ public class AuthController {
         }
         User user = userService.findUserByEmail(loginVM.getEmail());
         if(user != null){
+            if(user.getIsDeleted()) {
+                return new ResponseData<>(ResponseCode.UNKNOWN_ERROR, "User is deleted");
+            }
             Set<SimpleGrantedAuthority> authorities = roleService.convertRolesToSimpleGrantedAuthorities(user.getAuthorities());
             Authentication authenticationToken = new UsernamePasswordAuthenticationToken(
                     loginVM.getEmail(),
