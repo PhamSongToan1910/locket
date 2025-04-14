@@ -17,6 +17,7 @@ import lombok.experimental.FieldDefaults;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
+import org.springframework.util.StringUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -77,12 +78,26 @@ public class PostServiceImpl implements PostService {
     }
 
     @Override
-    public boolean addReactionToPost(String postId, String reactionId) {
-        Post post = postRepository.findById(postId).orElse(null);
+    public boolean addReactionToPost(Post post, String reactionId) {
         if(Objects.isNull(post)) {
             return false;
         }
         post.getReactionIds().add(reactionId);
+        postRepository.save(post);
+        return true;
+    }
+
+    @Override
+    public Post findbyId(String postId) {
+        return postRepository.findById(postId).orElse(null);
+    }
+
+    @Override
+    public boolean hidePost(Post post, String userId) {
+        if(Objects.isNull(post) || !StringUtils.hasLength(userId)) {
+            return false;
+        }
+        post.getFriendIds().remove(userId);
         postRepository.save(post);
         return true;
     }

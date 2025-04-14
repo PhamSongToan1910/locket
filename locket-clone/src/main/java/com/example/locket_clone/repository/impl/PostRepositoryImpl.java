@@ -23,6 +23,7 @@ public class PostRepositoryImpl implements CustomPostRepository {
     @Override
     public List<Post> GetAllPosts(String userId, Pageable pageable) {
         Query query = new Query(Criteria.where(Post.FRIEND_IDS).in(userId));
+        query.addCriteria(Criteria.where(Post.IS_DELETE).is(false));
         query.with(pageable);
         return mongoTemplate.find(query, Post.class);
     }

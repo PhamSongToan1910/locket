@@ -2,12 +2,14 @@ package com.example.locket_clone.controller;
 
 import com.example.locket_clone.config.CurrentUser;
 import com.example.locket_clone.config.security.CustomUserDetail;
+import com.example.locket_clone.entities.Post;
 import com.example.locket_clone.entities.request.AddPostRequest;
 import com.example.locket_clone.entities.request.AddReactionPost;
 import com.example.locket_clone.entities.response.GetPostResponse;
 import com.example.locket_clone.entities.response.ResponseData;
 import com.example.locket_clone.service.PostService;
 import com.example.locket_clone.service.ReactionService;
+import com.example.locket_clone.service.ReportPostService;
 import com.example.locket_clone.utils.Constant.ResponseCode;
 import com.example.locket_clone.utils.fileUtils.FileUtils;
 import com.example.locket_clone.utils.s3Utils.S3Service;
@@ -19,6 +21,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -27,6 +30,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Objects;
 
 @RestController
 @RequiredArgsConstructor
@@ -37,6 +41,7 @@ public class PostController {
     PostService postService;
     S3Service s3Service;
     ReactionService reactionService;
+    ReportPostService reportPostService;
 
     @PostMapping(value = "/upload-image", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseData<String> addPost(@RequestParam("file") MultipartFile multipartFile) throws IOException {
@@ -71,12 +76,54 @@ public class PostController {
 
     @PostMapping("/react-post")
     public ResponseData<?> addReactionPost(@CurrentUser CustomUserDetail customUserDetail, @RequestBody AddReactionPost addReactionPost) {
+        Post post = postService.findbyId(addReactionPost.getPostId());
+        if(Objects.isNull(post)) {
+            return new ResponseData<>(ResponseCode.WRONG_DATA_FORMAT, "Cant find this post");
+        }
+        if(!post.getFriendIds().contains(customUserDetail.getId())) {
+            return new ResponseData<>(ResponseCode.WRONG_DATA_FORMAT, "User cant read this post");
+        }
         addReactionPost.setUserId(customUserDetail.getId());
         String reactionId = reactionService.addReaction(addReactionPost);
-        boolean result = postService.addReactionToPost(addReactionPost.getPostId(), reactionId);
+        boolean result = postService.addReactionToPost(post, reactionId);
         if(result) {
             return new ResponseData<>(ResponseCode.SUCCESS, "success");
         }
         return new ResponseData<>(ResponseCode.UNKNOWN_ERROR, "Cant find post");
     }
+
+    @GetMapping("/report-post")
+    public ResponseData<?> reportPost(@CurrentUser CustomUserDetail customUserDetail, @RequestParam("post_id") String postId) {
+        String userId = customUserDetail.getId();
+        Post post = postService.findbyId(postId);
+        if(Objects.isNull(post)) {
+            return new ResponseData<>(ResponseCode.WRONG_DATA_FORMAT, "Cant find this post");
+        }
+        if(!post.getFriendIds().contains(userId)) {
+            return new ResponseData<>(ResponseCode.WRONG_DATA_FORMAT, "User cant read this post");
+        }
+        reportPostService.addReportPost(userId, postId);
+        return new ResponseData<>(ResponseCode.SUCCESS, "success");
+    }
+
+    @PutMapping("/hide-post")
+    public ResponseData<?> hidePost(@CurrentUser CustomUserDetail customUserDetail, @RequestParam("post_id") String postId) {
+        Post post = postService.findbyId(postId);
+        String userId = customUserDetail.getId();
+        if(Objects.isNull(post)) {
+            return new ResponseData<>(ResponseCode.WRONG_DATA_FORMAT, "Cant find this post");
+        }
+        if(!post.getFriendIds().contains(userId)) {
+            return new ResponseData<>(ResponseCode.WRONG_DATA_FORMAT, "User cant read this post");
+        }
+        if(post.getUserId().equals(userId)) {
+            return new ResponseData<>(ResponseCode.WRONG_DATA_FORMAT, "User cannot hide this post");
+        }
+        boolean result = postService.hidePost(post, userId);
+        if(!result) {
+            return new ResponseData<>(ResponseCode.UNKNOWN_ERROR, "Hide post failed");
+        }
+        return new ResponseData<>(ResponseCode.SUCCESS, "success");
+    }
+
 }
