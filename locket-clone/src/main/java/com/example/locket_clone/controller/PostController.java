@@ -9,6 +9,7 @@ import com.example.locket_clone.entities.response.ResponseData;
 import com.example.locket_clone.service.PostService;
 import com.example.locket_clone.service.ReactionService;
 import com.example.locket_clone.utils.Constant.ResponseCode;
+import com.example.locket_clone.utils.fileUtils.FileUtils;
 import com.example.locket_clone.utils.s3Utils.S3Service;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -39,7 +40,7 @@ public class PostController {
 
     @PostMapping(value = "/upload-image", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseData<String> addPost(@RequestParam("file") MultipartFile multipartFile) throws IOException {
-        if(multipartFile.getOriginalFilename() == null || multipartFile.getOriginalFilename().isEmpty()){
+        if(multipartFile.getOriginalFilename() == null || multipartFile.getOriginalFilename().isEmpty() || FileUtils.validateFile(multipartFile)){
             return new ResponseData<>(ResponseCode.WRONG_DATA_FORMAT, "Wrong request format");
         }
         String imageURL = s3Service.uploadFile(multipartFile);
