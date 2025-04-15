@@ -11,6 +11,7 @@ import com.example.locket_clone.service.PostService;
 import com.example.locket_clone.service.UserFriendsService;
 import com.example.locket_clone.service.UserService;
 import com.example.locket_clone.utils.Constant.Constant;
+import com.example.locket_clone.utils.DateTimeConvertUtils;
 import com.example.locket_clone.utils.ModelMapper.ModelMapperUtils;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -21,6 +22,7 @@ import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 
@@ -32,6 +34,8 @@ public class PostServiceImpl implements PostService {
     PostRepository postRepository;
     UserFriendsService userFriendsService;
     UserService userService;
+
+    int TIME_OF_9_DAYS_AGO = 777600000;
 
     @Override
     public boolean addPost(AddPostRequest addPostRequest, String userId) {
@@ -98,6 +102,12 @@ public class PostServiceImpl implements PostService {
         for (Post post : getAllPosts) {
             GetPostResponse getPostResponse = new GetPostResponse();
             ModelMapperUtils.toObject(post, getPostResponse);
+            Date createAt = Date.from(post.getCreatedAt());
+            if(new Date().getTime() -  createAt.getTime() > TIME_OF_9_DAYS_AGO){
+                getPostResponse.setCreateAt(DateTimeConvertUtils.convertDateToString(createAt));
+            } else {
+                getPostResponse.setCreateAt((new Date().getTime() - createAt.getTime())/(TIME_OF_9_DAYS_AGO/9) + "d");
+            }
             if(post.getUserId().equals(userId)) {
                 getPostResponse.setFriendPost(false);
                 if(CollectionUtils.isEmpty(post.getReactionIds())) {
@@ -123,6 +133,12 @@ public class PostServiceImpl implements PostService {
         for (Post post : listPostsFriendid) {
             GetPostResponse getPostResponse = new GetPostResponse();
             ModelMapperUtils.toObject(post, getPostResponse);
+            Date createAt = Date.from(post.getCreatedAt());
+            if(new Date().getTime() -  createAt.getTime() > TIME_OF_9_DAYS_AGO){
+                getPostResponse.setCreateAt(DateTimeConvertUtils.convertDateToString(createAt));
+            } else {
+                getPostResponse.setCreateAt((new Date().getTime() - createAt.getTime())/(TIME_OF_9_DAYS_AGO/9) + "d");
+            }
             getPostResponse.setFriendPost(true);
             User ownerPost = userService.findUserById(post.getUserId());
             if(ownerPost != null) {
@@ -139,6 +155,12 @@ public class PostServiceImpl implements PostService {
         for (Post post : listMyPosts) {
             GetPostResponse getPostResponse = new GetPostResponse();
             ModelMapperUtils.toObject(post, getPostResponse);
+            Date createAt = Date.from(post.getCreatedAt());
+            if(new Date().getTime() -  createAt.getTime() > TIME_OF_9_DAYS_AGO){
+                getPostResponse.setCreateAt(DateTimeConvertUtils.convertDateToString(createAt));
+            } else {
+                getPostResponse.setCreateAt((new Date().getTime() - createAt.getTime())/(TIME_OF_9_DAYS_AGO/9) + "d");
+            }
             getPostResponse.setFriendPost(false);
             if(CollectionUtils.isEmpty(post.getReactionIds())) {
                 getPostResponse.setFriendReaction(false);

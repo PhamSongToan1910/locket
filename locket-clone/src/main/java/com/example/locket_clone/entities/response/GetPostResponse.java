@@ -29,7 +29,7 @@ public class GetPostResponse {
     private String friendAvt;
 
     @JsonProperty("time")
-    private String createTime;
+    private String createAt;
 
     @JsonProperty("is_friend_post")
     private boolean isFriendPost;
