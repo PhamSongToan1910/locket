@@ -9,6 +9,8 @@ import com.example.locket_clone.entities.request.AddFriendRequest;
 import com.example.locket_clone.entities.request.UpdateUserInfoRequest;
 import com.example.locket_clone.entities.request.UpdateUserInforV2Request;
 import com.example.locket_clone.entities.response.*;
+import com.example.locket_clone.repository.InterfacePackage.ConversationRepository;
+import com.example.locket_clone.service.ConversationService;
 import com.example.locket_clone.service.SendRequestFriendService;
 import com.example.locket_clone.service.UserFriendsService;
 import com.example.locket_clone.service.UserService;
@@ -40,6 +42,7 @@ public class UserController {
     UserFriendsService userFriendsService;
     SendRequestFriendService sendRequestFriendService;
     S3Service s3Service;
+    ConversationService conversationService;
 
     @PostMapping("/update-user-infor")
     public ResponseData<String> updateUserInfor(@CurrentUser CustomUserDetail customUserDetail, @RequestBody UpdateUserInfoRequest updateUserInfoRequest) {
@@ -93,6 +96,7 @@ public class UserController {
         if(!acceptFriend) {
             return new ResponseData<>(ResponseCode.UNKNOWN_ERROR, "Cant accept request");
         }
+        conversationService.createConversation(userId, friendId);
         return new ResponseData<>(ResponseCode.SUCCESS, "success");
     }
 

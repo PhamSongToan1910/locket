@@ -11,6 +11,7 @@ public class Constant {
         public static final String COMMENT_COLLECTION = "comment";
         public static final String USER_FRIENDS_COLLECTION = "user_friends";
         public static final String REPORT_POSTS_COLLECTION = "report_posts";
+        public static final String CONVERSATION_COLLECTION = "conversation";
     }
 
     public static class ROLE {

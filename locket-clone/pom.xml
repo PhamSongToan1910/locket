@@ -123,6 +123,11 @@
 			<artifactId>google-api-client</artifactId>
 			<version>1.32.1</version>
 		</dependency>
+		<dependency>
+			<groupId>com.corundumstudio.socketio</groupId>
+			<artifactId>netty-socketio</artifactId>
+			<version>1.7.19</version>
+		</dependency>
 
 
 
