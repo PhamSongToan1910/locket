@@ -25,8 +25,8 @@ public class SocketIOConfig {
     }
 
     @Bean
-    public SocketIOServer socketIOServer(com.corundumstudio.socketio.Configuration getConfiguration) {
-        SocketIOServer server = new SocketIOServer(getConfiguration);
+    public SocketIOServer socketIOServer() {
+        SocketIOServer server = new SocketIOServer(getConfiguration());
         server.start();
         return server;
     }
