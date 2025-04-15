@@ -74,12 +74,16 @@ public class PostController {
 
     @GetMapping("/get-posts")
     public ResponseData<List<GetPostResponse>> getAllPosts(@CurrentUser CustomUserDetail customUserDetail,
-                                                           @RequestBody GetPostsRequest getPostsRequest) {
-        if(!getPostsRequest.validateRequest()) {
+                                                           @RequestParam(defaultValue = "0") int page,
+                                                           @RequestParam(defaultValue = "10") int size,
+                                                           @RequestParam("type") int type,
+                                                           @RequestParam("friend_id") String friendId) {
+        GetPostsRequest request = new GetPostsRequest(page, size, type, friendId);
+        if(!request.validateRequest()) {
             return new ResponseData<>(ResponseCode.WRONG_DATA_FORMAT, "Wrong request format");
         }
-        Pageable pageable = PageRequest.of(getPostsRequest.getPage(), getPostsRequest.getSize());
-        List<GetPostResponse> responseList = postService.getPosts(customUserDetail.getId(), getPostsRequest, pageable);
+        Pageable pageable = PageRequest.of(page, size);
+        List<GetPostResponse> responseList = postService.getPosts(customUserDetail.getId(), request, pageable);
         return new ResponseData<>(ResponseCode.SUCCESS, "success", responseList);
     }
 

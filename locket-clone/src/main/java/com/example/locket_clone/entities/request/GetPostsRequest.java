@@ -1,5 +1,6 @@
 package com.example.locket_clone.entities.request;
 
+import com.example.locket_clone.utils.Constant.Constant;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -23,7 +24,7 @@ public class GetPostsRequest {
     private String friendId;
 
     public boolean validateRequest() {
-        if(this.type == 1) {
+        if(this.type == Constant.TYPE_GET_POST.FRIEND_DETAIL) {
             return StringUtils.hasText(this.friendId);
         }
         return true;
