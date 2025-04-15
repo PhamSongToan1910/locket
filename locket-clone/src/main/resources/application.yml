@@ -4,6 +4,10 @@ spring:
   data:
     mongodb:
       uri: mongodb://admin:songtoan1910@54.253.220.194:27017/locket-clone?authSource=admin
+  servlet:
+    multipart:
+      max-request-size: 10MB
+      max-file-size: 10MB
 
 
 server:
