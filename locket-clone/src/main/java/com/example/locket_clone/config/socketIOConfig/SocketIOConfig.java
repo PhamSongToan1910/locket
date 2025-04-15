@@ -20,6 +20,7 @@ public class SocketIOConfig {
         com.corundumstudio.socketio.Configuration configuration = new com.corundumstudio.socketio.Configuration();
         configuration.setHostname(hostName);
         configuration.setPort(port);
+        configuration.setOrigin("*");
         return configuration;
     }
 
