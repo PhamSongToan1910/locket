@@ -7,13 +7,13 @@ import com.corundumstudio.socketio.SocketIOServer;
 @Configuration
 public class SocketIOConfig {
 
-    private String hostName = System.getenv("HOST_NAME");
-
-    private int port = Integer.parseInt(System.getenv("PORT"));
-
-//    private String hostName = "0.0.0.0";
+//    private String hostName = System.getenv("HOST_NAME");
 //
-//    private int port = 9092;
+//    private int port = Integer.parseInt(System.getenv("PORT"));
+
+    private String hostName = "0.0.0.0";
+//
+    private int port = 9092;
 
     @Bean
     public com.corundumstudio.socketio.Configuration getConfiguration() {
