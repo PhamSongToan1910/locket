@@ -27,9 +27,6 @@ public class NettySocketIOServerRunner implements CommandLineRunner {
             server.getBroadcastOperations().sendEvent("chat_message", data);
         });
 
-
-        System.out.println("Netty Socket.IO Server started on port 9092");
-
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
             System.out.println("Stopping Netty Socket.IO Server...");
             server.stop();

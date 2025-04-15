@@ -11,22 +11,26 @@ public class SocketIOConfig {
 //
 //    private int port = Integer.parseInt(System.getenv("PORT"));
 
-    private String hostName = "0.0.0.0";
+//    private String hostName = "0.0.0.0";
 //
-    private int port = 9092;
+//    private int port = 9092;
 
-    @Bean
-    public com.corundumstudio.socketio.Configuration getConfiguration() {
-        com.corundumstudio.socketio.Configuration configuration = new com.corundumstudio.socketio.Configuration();
-        configuration.setHostname(hostName);
-        configuration.setPort(port);
-        configuration.setOrigin("*");
-        return configuration;
-    }
+//    @Bean
+//    public com.corundumstudio.socketio.Configuration getConfiguration() {
+//        com.corundumstudio.socketio.Configuration configuration = new com.corundumstudio.socketio.Configuration();
+//        configuration.setHostname(hostName);
+//        configuration.setPort(port);
+//        configuration.setOrigin("*");
+//        return configuration;
+//    }
 
     @Bean
     public SocketIOServer socketIOServer() {
-        SocketIOServer server = new SocketIOServer(getConfiguration());
+        com.corundumstudio.socketio.Configuration config = new com.corundumstudio.socketio.Configuration();
+        config.setHostname("0.0.0.0");
+        config.setPort(9092);
+        config.setOrigin("*");
+        SocketIOServer server = new SocketIOServer(config);
         server.start();
         return server;
     }
