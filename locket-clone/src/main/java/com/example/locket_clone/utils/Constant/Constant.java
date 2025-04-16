@@ -8,10 +8,10 @@ public class Constant {
         public static final String ROLE_COLLECTION = "authorities";
         public static final String POST_COLLECTION = "post";
         public static final String REACTION_COLLECTION = "reaction";
-        public static final String COMMENT_COLLECTION = "comment";
         public static final String USER_FRIENDS_COLLECTION = "user_friends";
         public static final String REPORT_POSTS_COLLECTION = "report_posts";
         public static final String CONVERSATION_COLLECTION = "conversation";
+        public static final String MESSAGE_COLLECTION = "message";
     }
 
     public static class ROLE {

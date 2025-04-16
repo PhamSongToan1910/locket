@@ -6,6 +6,7 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
@@ -24,6 +25,7 @@ public class PostRepositoryImpl implements CustomPostRepository {
     public List<Post> GetAllPosts(String userId, Pageable pageable) {
         Query query = new Query(Criteria.where(Post.FRIEND_IDS).in(userId));
         query.addCriteria(Criteria.where(Post.IS_DELETE).is(false));
+        query.with(Sort.by(Sort.Direction.DESC, Post.CREATE_AT));
         query.with(pageable);
         return mongoTemplate.find(query, Post.class);
     }
@@ -33,6 +35,7 @@ public class PostRepositoryImpl implements CustomPostRepository {
         Query query= new Query(Criteria.where(Post.USER_ID).is(friendId));
         query.addCriteria(Criteria.where(Post.FRIEND_IDS).in(userId));
         query.addCriteria(Criteria.where(Post.IS_DELETE).is(false));
+        query.with(Sort.by(Sort.Direction.DESC, Post.CREATE_AT));
         query.with(pageable);
         return mongoTemplate.find(query, Post.class);
     }
@@ -41,6 +44,7 @@ public class PostRepositoryImpl implements CustomPostRepository {
     public List<Post> getMyPosts(String userId, Pageable pageable) {
         Query query = new Query(Criteria.where(Post.USER_ID).is(userId));
         query.addCriteria(Criteria.where(Post.IS_DELETE).is(false));
+        query.with(Sort.by(Sort.Direction.DESC, Post.CREATE_AT));
         query.with(pageable);
         return mongoTemplate.find(query, Post.class);
     }

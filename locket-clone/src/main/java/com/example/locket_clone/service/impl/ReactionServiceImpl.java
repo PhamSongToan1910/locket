@@ -32,6 +32,7 @@ public class ReactionServiceImpl implements ReactionService {
             } else {
                 reaction.getIcons().add(addReactionPost.getReactType());
             }
+            reactionRepository.save(reaction);
             return reaction.getId().toString();
         }
         Reaction newReaction = new Reaction();
