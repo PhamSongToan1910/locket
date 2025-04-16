@@ -108,6 +108,8 @@ public class PostServiceImpl implements PostService {
             } else {
                 getPostResponse.setCreateAt((new Date().getTime() - createAt.getTime())/(TIME_OF_9_DAYS_AGO/9) + "d");
             }
+            User ownerPost = userService.findUserById(post.getUserId());
+            getPostResponse.setFirstname(ownerPost.getFirstName());
             if(post.getUserId().equals(userId)) {
                 getPostResponse.setFriendPost(false);
                 if(CollectionUtils.isEmpty(post.getReactionIds())) {
@@ -117,11 +119,8 @@ public class PostServiceImpl implements PostService {
                 }
             } else {
                 getPostResponse.setFriendPost(true);
-                User ownerPost = userService.findUserById(post.getUserId());
-                if(ownerPost != null) {
-                    getPostResponse.setFriendAvt(ownerPost.getAvt());
-                }
             }
+            getPostResponse.setFriendAvt(ownerPost.getAvt());
             responseList.add(getPostResponse);
         }
         return responseList;
@@ -130,6 +129,7 @@ public class PostServiceImpl implements PostService {
     private List<GetPostResponse> getPostByUserId(String userId, GetPostsRequest getPostsRequest, Pageable pageable) {
         List<Post> listPostsFriendid = postRepository.getPostByFriendId(userId, getPostsRequest.getFriendId(), pageable);
         List<GetPostResponse> responseList = new ArrayList<>();
+        User ownerPost = userService.findUserById(getPostsRequest.getFriendId());
         for (Post post : listPostsFriendid) {
             GetPostResponse getPostResponse = new GetPostResponse();
             ModelMapperUtils.toObject(post, getPostResponse);
@@ -140,9 +140,9 @@ public class PostServiceImpl implements PostService {
                 getPostResponse.setCreateAt((new Date().getTime() - createAt.getTime())/(TIME_OF_9_DAYS_AGO/9) + "d");
             }
             getPostResponse.setFriendPost(true);
-            User ownerPost = userService.findUserById(post.getUserId());
             if(ownerPost != null) {
                 getPostResponse.setFriendAvt(ownerPost.getAvt());
+                getPostResponse.setFirstname(ownerPost.getFirstName());
             }
             responseList.add(getPostResponse);
         }
@@ -152,6 +152,7 @@ public class PostServiceImpl implements PostService {
     private List<GetPostResponse> getMyPost(String userId, Pageable pageable) {
         List<Post> listMyPosts = postRepository.getMyPosts(userId, pageable);
         List<GetPostResponse> responseList = new ArrayList<>();
+        User ownerPost = userService.findUserById(userId);
         for (Post post : listMyPosts) {
             GetPostResponse getPostResponse = new GetPostResponse();
             ModelMapperUtils.toObject(post, getPostResponse);
@@ -167,6 +168,7 @@ public class PostServiceImpl implements PostService {
             } else {
                 getPostResponse.setFriendReaction(true);
             }
+            getPostResponse.setFriendAvt(ownerPost.getAvt());
             responseList.add(getPostResponse);
         }
         return responseList;
