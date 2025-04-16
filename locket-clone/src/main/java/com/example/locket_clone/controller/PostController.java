@@ -11,6 +11,7 @@ import com.example.locket_clone.entities.request.GetPostsRequest;
 import com.example.locket_clone.entities.response.GetPostResponse;
 import com.example.locket_clone.entities.response.GetReactionResponse;
 import com.example.locket_clone.entities.response.ResponseData;
+import com.example.locket_clone.runner.EventPostRunner;
 import com.example.locket_clone.service.PostService;
 import com.example.locket_clone.service.ReactionService;
 import com.example.locket_clone.service.ReportPostService;
@@ -24,13 +25,7 @@ import lombok.experimental.FieldDefaults;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
@@ -48,11 +43,11 @@ public class PostController {
     S3Service s3Service;
     ReactionService reactionService;
     ReportPostService reportPostService;
-    UserService  userService;
+    UserService userService;
 
     @PostMapping(value = "/upload-image", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseData<String> addPost(@RequestParam("file") MultipartFile multipartFile) throws IOException {
-        if(multipartFile.getOriginalFilename() == null || multipartFile.getOriginalFilename().isEmpty() || FileUtils.validateFile(multipartFile)){
+        if (multipartFile.getOriginalFilename() == null || multipartFile.getOriginalFilename().isEmpty() || FileUtils.validateFile(multipartFile)) {
             return new ResponseData<>(ResponseCode.WRONG_DATA_FORMAT, "Wrong request format");
         }
         String imageURL = s3Service.uploadFile(multipartFile);
@@ -61,12 +56,12 @@ public class PostController {
 
     @PostMapping("/add-post")
     public ResponseData<?> addPost(@CurrentUser CustomUserDetail customUserDetail, @RequestBody AddPostRequest addPostRequest) {
-        if(!addPostRequest.validateRequest()) {
+        if (!addPostRequest.validateRequest()) {
             return new ResponseData<>(ResponseCode.WRONG_DATA_FORMAT, "Wrong request format");
         }
         String userId = customUserDetail.getId();
         boolean success = postService.addPost(addPostRequest, userId);
-        if(success){
+        if (success) {
             return new ResponseData<>(ResponseCode.SUCCESS, "success");
         }
         return new ResponseData<>(ResponseCode.UNKNOWN_ERROR, "unknown error");
@@ -79,7 +74,7 @@ public class PostController {
                                                            @RequestParam("type") int type,
                                                            @RequestParam("friend_id") String friendId) {
         GetPostsRequest request = new GetPostsRequest(page, size, type, friendId);
-        if(!request.validateRequest()) {
+        if (!request.validateRequest()) {
             return new ResponseData<>(ResponseCode.WRONG_DATA_FORMAT, "Wrong request format");
         }
         Pageable pageable = PageRequest.of(page, size);
@@ -89,33 +84,20 @@ public class PostController {
 
     @PostMapping("/react-post")
     public ResponseData<?> addReactionPost(@CurrentUser CustomUserDetail customUserDetail, @RequestBody AddReactionPost addReactionPost) {
-        Post post = postService.findbyId(addReactionPost.getPostId());
-        if(Objects.isNull(post)) {
-            return new ResponseData<>(ResponseCode.WRONG_DATA_FORMAT, "Cant find this post");
-        }
-        if(!post.getFriendIds().contains(customUserDetail.getId())) {
-            return new ResponseData<>(ResponseCode.WRONG_DATA_FORMAT, "User cant read this post");
-        }
-        if(post.getUserId().equals(customUserDetail.getId())) {
-            return new ResponseData<>(ResponseCode.WRONG_DATA_FORMAT, "User cant reaction my own post");
-        }
         addReactionPost.setUserId(customUserDetail.getId());
-        String reactionId = reactionService.addReaction(addReactionPost);
-        boolean result = postService.addReactionToPost(post, reactionId);
-        if(result) {
-            return new ResponseData<>(ResponseCode.SUCCESS, "success");
-        }
-        return new ResponseData<>(ResponseCode.UNKNOWN_ERROR, "Cant find post");
+        EventPostRunner.reactions.add(addReactionPost);
+        return new ResponseData<>(ResponseCode.SUCCESS, "success");
+
     }
 
     @GetMapping("/report-post")
     public ResponseData<?> reportPost(@CurrentUser CustomUserDetail customUserDetail, @RequestParam("post_id") String postId) {
         String userId = customUserDetail.getId();
         Post post = postService.findbyId(postId);
-        if(Objects.isNull(post)) {
+        if (Objects.isNull(post)) {
             return new ResponseData<>(ResponseCode.WRONG_DATA_FORMAT, "Cant find this post");
         }
-        if(!post.getFriendIds().contains(userId)) {
+        if (!post.getFriendIds().contains(userId)) {
             return new ResponseData<>(ResponseCode.WRONG_DATA_FORMAT, "User cant read this post");
         }
         reportPostService.addReportPost(userId, postId);
@@ -126,17 +108,17 @@ public class PostController {
     public ResponseData<?> hidePost(@CurrentUser CustomUserDetail customUserDetail, @RequestParam("post_id") String postId) {
         Post post = postService.findbyId(postId);
         String userId = customUserDetail.getId();
-        if(Objects.isNull(post)) {
+        if (Objects.isNull(post)) {
             return new ResponseData<>(ResponseCode.WRONG_DATA_FORMAT, "Cant find this post");
         }
-        if(!post.getFriendIds().contains(userId)) {
+        if (!post.getFriendIds().contains(userId)) {
             return new ResponseData<>(ResponseCode.WRONG_DATA_FORMAT, "User cant read this post");
         }
-        if(post.getUserId().equals(userId)) {
+        if (post.getUserId().equals(userId)) {
             return new ResponseData<>(ResponseCode.WRONG_DATA_FORMAT, "User cannot hide this post");
         }
         boolean result = postService.hidePost(post, userId);
-        if(!result) {
+        if (!result) {
             return new ResponseData<>(ResponseCode.UNKNOWN_ERROR, "Hide post failed");
         }
         return new ResponseData<>(ResponseCode.SUCCESS, "success");
@@ -145,7 +127,7 @@ public class PostController {
     @GetMapping("/list-reaction")
     public ResponseData<List<GetReactionResponse>> listReaction(@RequestParam("post_id") String postId) {
         Post post = postService.findbyId(postId);
-        if(Objects.isNull(post)) {
+        if (Objects.isNull(post)) {
             return new ResponseData<>(ResponseCode.WRONG_DATA_FORMAT, "Cant find post");
         }
         Set<String> setReactionIds = post.getReactionIds();
