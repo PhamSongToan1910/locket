@@ -14,4 +14,5 @@ public interface PostService {
     boolean addReactionToPost(Post post, String reactionId);
     Post findbyId(String postId);
     boolean hidePost(Post post, String userId);
+    void deletePost(String postId);
 }

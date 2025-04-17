@@ -96,6 +96,11 @@ public class PostServiceImpl implements PostService {
         return true;
     }
 
+    @Override
+    public void deletePost(String postId) {
+        postRepository.deleteById(postId);
+    }
+
     private List<GetPostResponse> getAllPosts(String userId, GetPostsRequest getPostsRequest, Pageable pageable) {
         List<Post> getAllPosts = postRepository.GetAllPosts(userId, pageable);
         List<GetPostResponse> responseList = new ArrayList<>();

@@ -47,4 +47,9 @@ public class ReactionServiceImpl implements ReactionService {
                 .filter(Objects::nonNull).toList();
     }
 
+    @Override
+    public void deleteReaction(String reactionId) {
+        reactionRepository.deleteById(reactionId);
+    }
+
 }

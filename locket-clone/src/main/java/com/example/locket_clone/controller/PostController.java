@@ -7,7 +7,11 @@ import com.example.locket_clone.entities.Reaction;
 import com.example.locket_clone.entities.User;
 import com.example.locket_clone.entities.request.AddPostRequest;
 import com.example.locket_clone.entities.request.AddReactionPost;
+import com.example.locket_clone.entities.request.DeletePostRequest;
 import com.example.locket_clone.entities.request.GetPostsRequest;
+import com.example.locket_clone.entities.request.HidePostRequest;
+import com.example.locket_clone.entities.request.ObjectRequest;
+import com.example.locket_clone.entities.request.ReportPostRequest;
 import com.example.locket_clone.entities.response.GetPostResponse;
 import com.example.locket_clone.entities.response.GetReactionResponse;
 import com.example.locket_clone.entities.response.ResponseData;
@@ -16,6 +20,7 @@ import com.example.locket_clone.service.PostService;
 import com.example.locket_clone.service.ReactionService;
 import com.example.locket_clone.service.ReportPostService;
 import com.example.locket_clone.service.UserService;
+import com.example.locket_clone.utils.Constant.Constant;
 import com.example.locket_clone.utils.Constant.ResponseCode;
 import com.example.locket_clone.utils.fileUtils.FileUtils;
 import com.example.locket_clone.utils.s3Utils.S3Service;
@@ -85,42 +90,25 @@ public class PostController {
     @PostMapping("/react-post")
     public ResponseData<?> addReactionPost(@CurrentUser CustomUserDetail customUserDetail, @RequestBody AddReactionPost addReactionPost) {
         addReactionPost.setUserId(customUserDetail.getId());
-        EventPostRunner.reactions.add(addReactionPost);
+        ObjectRequest objectRequest = new ObjectRequest(Constant.API.ADD_REACTION, addReactionPost);
+        EventPostRunner.reactions.add(objectRequest);
         return new ResponseData<>(ResponseCode.SUCCESS, "success");
 
     }
 
-    @GetMapping("/report-post")
+    @PostMapping("/report-post")
     public ResponseData<?> reportPost(@CurrentUser CustomUserDetail customUserDetail, @RequestParam("post_id") String postId) {
-        String userId = customUserDetail.getId();
-        Post post = postService.findbyId(postId);
-        if (Objects.isNull(post)) {
-            return new ResponseData<>(ResponseCode.WRONG_DATA_FORMAT, "Cant find this post");
-        }
-        if (!post.getFriendIds().contains(userId)) {
-            return new ResponseData<>(ResponseCode.WRONG_DATA_FORMAT, "User cant read this post");
-        }
-        reportPostService.addReportPost(userId, postId);
+        ReportPostRequest reportPostRequest = new ReportPostRequest(customUserDetail.getId(), postId);
+        ObjectRequest request = new ObjectRequest(Constant.API.REPORT_POST, reportPostRequest);
+        EventPostRunner.reactions.add(request);
         return new ResponseData<>(ResponseCode.SUCCESS, "success");
     }
 
     @PutMapping("/hide-post")
     public ResponseData<?> hidePost(@CurrentUser CustomUserDetail customUserDetail, @RequestParam("post_id") String postId) {
-        Post post = postService.findbyId(postId);
-        String userId = customUserDetail.getId();
-        if (Objects.isNull(post)) {
-            return new ResponseData<>(ResponseCode.WRONG_DATA_FORMAT, "Cant find this post");
-        }
-        if (!post.getFriendIds().contains(userId)) {
-            return new ResponseData<>(ResponseCode.WRONG_DATA_FORMAT, "User cant read this post");
-        }
-        if (post.getUserId().equals(userId)) {
-            return new ResponseData<>(ResponseCode.WRONG_DATA_FORMAT, "User cannot hide this post");
-        }
-        boolean result = postService.hidePost(post, userId);
-        if (!result) {
-            return new ResponseData<>(ResponseCode.UNKNOWN_ERROR, "Hide post failed");
-        }
+        HidePostRequest hidePostRequest = new HidePostRequest(customUserDetail.getId(), postId);
+        ObjectRequest request = new ObjectRequest(Constant.API.HIDE_POST, hidePostRequest);
+        EventPostRunner.reactions.add(request);
         return new ResponseData<>(ResponseCode.SUCCESS, "success");
     }
 
@@ -146,6 +134,14 @@ public class PostController {
             }
         }).filter(Objects::nonNull).toList();
         return new ResponseData<>(ResponseCode.SUCCESS, "success", response);
+    }
+
+    @DeleteMapping("/delete-post")
+    public ResponseData<?> deletePost(@CurrentUser CustomUserDetail customUserDetail,@RequestParam("post_id") String postId) {
+         DeletePostRequest deletePostRequest = new DeletePostRequest(customUserDetail.getId(), postId);
+         ObjectRequest request = new ObjectRequest(Constant.API.DELETE_POST, deletePostRequest);
+         EventPostRunner.reactions.add(request);
+         return new ResponseData<>(ResponseCode.SUCCESS, "success");
     }
 
 }

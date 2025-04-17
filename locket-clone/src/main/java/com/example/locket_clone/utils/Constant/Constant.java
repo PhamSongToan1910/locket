@@ -41,4 +41,11 @@ public class Constant {
         public static final int FRIEND_DETAIL = 1;
         public static final int ME = 2;
     }
+
+    public static class API {
+        public static final int ADD_REACTION = 1;
+        public static final int REPORT_POST = 2;
+        public static final int HIDE_POST = 3;
+        public static final int DELETE_POST = 4;
+    }
 }

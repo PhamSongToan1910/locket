@@ -11,4 +11,6 @@ public interface ReactionService {
     String addReaction(AddReactionPost addReactionPost);
 
     List<Reaction> getReactions(Set<String> reactionIds);
+
+    void deleteReaction(String reactionId);
 }
