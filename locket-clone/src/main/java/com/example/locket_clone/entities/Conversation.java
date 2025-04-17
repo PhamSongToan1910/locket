@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
 
+import java.util.HashSet;
 import java.util.Set;
 
 @EqualsAndHashCode(callSuper = true)
@@ -19,5 +20,5 @@ public class Conversation extends BaseEntity{
     public static final String USER_IDS = "user_ids";
 
     @Field(USER_IDS)
-    private Set<String> userIds;
+    private Set<String> userIds = new HashSet<>();
 }
