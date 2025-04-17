@@ -113,10 +113,14 @@ public class PostController {
     }
 
     @GetMapping("/list-reaction")
-    public ResponseData<List<GetReactionResponse>> listReaction(@RequestParam("post_id") String postId) {
+    public ResponseData<List<GetReactionResponse>> listReaction(@CurrentUser CustomUserDetail customUserDetail, @RequestParam("post_id") String postId) {
         Post post = postService.findbyId(postId);
+        String userId = customUserDetail.getId();
         if (Objects.isNull(post)) {
             return new ResponseData<>(ResponseCode.WRONG_DATA_FORMAT, "Cant find post");
+        }
+        if(!post.getUserId().equals(userId)) {
+            return new ResponseData<>(ResponseCode.WRONG_DATA_FORMAT, "User is not authorized");
         }
         Set<String> setReactionIds = post.getReactionIds();
         List<Reaction> listReactions = reactionService.getReactions(setReactionIds);
