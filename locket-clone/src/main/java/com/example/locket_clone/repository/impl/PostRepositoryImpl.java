@@ -48,4 +48,13 @@ public class PostRepositoryImpl implements CustomPostRepository {
         query.with(pageable);
         return mongoTemplate.find(query, Post.class);
     }
+
+    @Override
+    public Post getNewestPostByUserId(String userId) {
+        Query query = new Query(Criteria.where(Post.FRIEND_IDS).in(userId));
+        query.addCriteria(Criteria.where(Post.IS_DELETE).is(false));
+        query.with(Sort.by(Sort.Direction.DESC, Post.CREATE_AT));
+        query.limit(1);
+        return mongoTemplate.findOne(query, Post.class);
+    }
 }

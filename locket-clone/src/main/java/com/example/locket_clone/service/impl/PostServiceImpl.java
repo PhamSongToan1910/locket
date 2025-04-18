@@ -25,6 +25,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 
 @Service
 @RequiredArgsConstructor
@@ -38,7 +39,7 @@ public class PostServiceImpl implements PostService {
     int TIME_OF_9_DAYS_AGO = 777600000;
 
     @Override
-    public boolean addPost(AddPostRequest addPostRequest, String userId) {
+    public Post addPost(AddPostRequest addPostRequest, String userId) {
         try{
             Post post = new Post();
             post.setUserId(userId);
@@ -48,11 +49,10 @@ public class PostServiceImpl implements PostService {
             }
             addPostRequest.getFriendIds().add(userId);
             ModelMapperUtils.toObject(addPostRequest, post);
-            postRepository.save(post);
-            return true;
+            return postRepository.save(post);
         } catch (Exception e) {
             e.printStackTrace();
-            return false;
+            return null;
         }
     }
 
@@ -99,6 +99,18 @@ public class PostServiceImpl implements PostService {
     @Override
     public void deletePost(String postId) {
         postRepository.deleteById(postId);
+    }
+
+    @Override
+    public List<Post> getPostsByIds(Set<String> postIds) {
+        return postIds.stream().map(id -> postRepository.findById(id).orElse(null))
+                .filter(Objects::nonNull)
+                .toList();
+    }
+
+    @Override
+    public Post getNewestPostByUserId(String userId) {
+        return postRepository.getNewestPostByUserId(userId);
     }
 
     private List<GetPostResponse> getAllPosts(String userId, GetPostsRequest getPostsRequest, Pageable pageable) {

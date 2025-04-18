@@ -4,9 +4,11 @@ import com.example.locket_clone.config.CurrentUser;
 import com.example.locket_clone.config.security.CustomUserDetail;
 import com.example.locket_clone.entities.Post;
 import com.example.locket_clone.entities.Reaction;
+import com.example.locket_clone.entities.UnreadPost;
 import com.example.locket_clone.entities.User;
 import com.example.locket_clone.entities.request.AddPostRequest;
 import com.example.locket_clone.entities.request.AddReactionPost;
+import com.example.locket_clone.entities.request.AddUnreadPostRequest;
 import com.example.locket_clone.entities.request.DeletePostRequest;
 import com.example.locket_clone.entities.request.GetPostsRequest;
 import com.example.locket_clone.entities.request.HidePostRequest;
@@ -14,14 +16,17 @@ import com.example.locket_clone.entities.request.ObjectRequest;
 import com.example.locket_clone.entities.request.ReportPostRequest;
 import com.example.locket_clone.entities.response.GetPostResponse;
 import com.example.locket_clone.entities.response.GetReactionResponse;
+import com.example.locket_clone.entities.response.GetUnreadPostResponse;
 import com.example.locket_clone.entities.response.ResponseData;
 import com.example.locket_clone.runner.EventPostRunner;
 import com.example.locket_clone.service.PostService;
 import com.example.locket_clone.service.ReactionService;
 import com.example.locket_clone.service.ReportPostService;
+import com.example.locket_clone.service.UnreadPostService;
 import com.example.locket_clone.service.UserService;
 import com.example.locket_clone.utils.Constant.Constant;
 import com.example.locket_clone.utils.Constant.ResponseCode;
+import com.example.locket_clone.utils.ModelMapper.ModelMapperUtils;
 import com.example.locket_clone.utils.fileUtils.FileUtils;
 import com.example.locket_clone.utils.s3Utils.S3Service;
 import lombok.AccessLevel;
@@ -30,6 +35,8 @@ import lombok.experimental.FieldDefaults;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
+import org.springframework.util.CollectionUtils;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -49,6 +56,7 @@ public class PostController {
     ReactionService reactionService;
     ReportPostService reportPostService;
     UserService userService;
+    UnreadPostService unreadPostService;
 
     @PostMapping(value = "/upload-image", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseData<String> addPost(@RequestParam("file") MultipartFile multipartFile) throws IOException {
@@ -65,8 +73,11 @@ public class PostController {
             return new ResponseData<>(ResponseCode.WRONG_DATA_FORMAT, "Wrong request format");
         }
         String userId = customUserDetail.getId();
-        boolean success = postService.addPost(addPostRequest, userId);
-        if (success) {
+        Post post = postService.addPost(addPostRequest, userId);
+        AddUnreadPostRequest addUnreadPostRequest = new AddUnreadPostRequest(post.getFriendIds(), post.getId().toString());
+        ObjectRequest request = new ObjectRequest(Constant.API.ADD_POST_TO_UNREAD_POST, addUnreadPostRequest);
+        EventPostRunner.reactions.add(request);
+        if (StringUtils.hasLength(post.getId().toString())) {
             return new ResponseData<>(ResponseCode.SUCCESS, "success");
         }
         return new ResponseData<>(ResponseCode.UNKNOWN_ERROR, "unknown error");
@@ -83,7 +94,9 @@ public class PostController {
             return new ResponseData<>(ResponseCode.WRONG_DATA_FORMAT, "Wrong request format");
         }
         Pageable pageable = PageRequest.of(page, size);
-        List<GetPostResponse> responseList = postService.getPosts(customUserDetail.getId(), request, pageable);
+        String userId = customUserDetail.getId();
+        EventPostRunner.reactions.add(new ObjectRequest(Constant.API.CHANGE_UNREAD_POST_STATUS, userId));
+        List<GetPostResponse> responseList = postService.getPosts(userId, request, pageable);
         return new ResponseData<>(ResponseCode.SUCCESS, "success", responseList);
     }
 
@@ -148,4 +161,27 @@ public class PostController {
          return new ResponseData<>(ResponseCode.SUCCESS, "success");
     }
 
+    @GetMapping("/get-unread-post")
+    public ResponseData<?> getUnreadPost(@CurrentUser CustomUserDetail customUserDetail) {
+        String userId = customUserDetail.getId();
+        UnreadPost unreadPost = unreadPostService.getUnreadPosts(userId);
+        if(!CollectionUtils.isEmpty(unreadPost.getPostIds())) {
+            Post unreadPostNewest = postService.findbyId(unreadPost.getPostIds().getLast());
+            GetUnreadPostResponse getUnreadPostResponse = new GetUnreadPostResponse();
+            ModelMapperUtils.toObject(unreadPostNewest, getUnreadPostResponse);
+            User ownerPost = userService.findUserById(unreadPost.getUserId());
+            getUnreadPostResponse.setUnreadCount(unreadPost.getPostIds().size());
+            getUnreadPostResponse.setFriendAvt(ownerPost.getAvt());
+            getUnreadPostResponse.setId(unreadPostNewest.getId().toString());
+            return new ResponseData<>(ResponseCode.SUCCESS, "success", getUnreadPostResponse);
+        }
+        Post newestPost = postService.getNewestPostByUserId(userId);
+        GetUnreadPostResponse getLastesPost = new GetUnreadPostResponse();
+        ModelMapperUtils.toObject(newestPost, getLastesPost);
+        User ownerPost = userService.findUserById(unreadPost.getUserId());
+        getLastesPost.setUnreadCount(unreadPost.getPostIds().size());
+        getLastesPost.setFriendAvt(ownerPost.getAvt());
+        getLastesPost.setId(newestPost.getId().toString());
+        return new ResponseData<>(ResponseCode.SUCCESS, "success", getLastesPost);
+    }
 }

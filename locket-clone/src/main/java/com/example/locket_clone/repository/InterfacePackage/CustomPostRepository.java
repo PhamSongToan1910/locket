@@ -11,4 +11,6 @@ public interface CustomPostRepository {
     List<Post> getPostByFriendId(String userId, String friendId, Pageable pageable);
 
     List<Post> getMyPosts(String userId, Pageable pageable);
+
+    Post getNewestPostByUserId(String userId);
 }

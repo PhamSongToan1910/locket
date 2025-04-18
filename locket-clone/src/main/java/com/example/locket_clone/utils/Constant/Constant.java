@@ -12,6 +12,7 @@ public class Constant {
         public static final String REPORT_POSTS_COLLECTION = "report_posts";
         public static final String CONVERSATION_COLLECTION = "conversation";
         public static final String MESSAGE_COLLECTION = "message";
+        public static final String UNREAD_POST_COLLECTION = "unread_post";
     }
 
     public static class ROLE {
@@ -47,5 +48,7 @@ public class Constant {
         public static final int REPORT_POST = 2;
         public static final int HIDE_POST = 3;
         public static final int DELETE_POST = 4;
+        public static final int ADD_POST_TO_UNREAD_POST = 5;
+        public static final int CHANGE_UNREAD_POST_STATUS = 6;
     }
 }

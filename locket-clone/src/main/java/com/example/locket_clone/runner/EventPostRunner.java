@@ -2,6 +2,7 @@ package com.example.locket_clone.runner;
 
 import com.example.locket_clone.entities.Post;
 import com.example.locket_clone.entities.request.AddReactionPost;
+import com.example.locket_clone.entities.request.AddUnreadPostRequest;
 import com.example.locket_clone.entities.request.DeletePostRequest;
 import com.example.locket_clone.entities.request.HidePostRequest;
 import com.example.locket_clone.entities.request.ObjectRequest;
@@ -10,6 +11,7 @@ import com.example.locket_clone.entities.response.ResponseData;
 import com.example.locket_clone.service.PostService;
 import com.example.locket_clone.service.ReactionService;
 import com.example.locket_clone.service.ReportPostService;
+import com.example.locket_clone.service.UnreadPostService;
 import com.example.locket_clone.utils.Constant.Constant;
 import com.example.locket_clone.utils.Constant.ResponseCode;
 import com.example.locket_clone.utils.s3Utils.S3Service;
@@ -33,6 +35,7 @@ public class EventPostRunner implements CommandLineRunner {
     private final PostService postService;
     private final ReportPostService reportPostService;
     private final S3Service s3Service;
+    private final UnreadPostService unreadPostService;
 
     private final ScheduledExecutorService schedule = Executors.newSingleThreadScheduledExecutor(Thread::new);
 
@@ -55,6 +58,8 @@ public class EventPostRunner implements CommandLineRunner {
                     case Constant.API.REPORT_POST -> reportPost(objectRequest);
                     case Constant.API.HIDE_POST -> hidePost(objectRequest);
                     case Constant.API.DELETE_POST -> deletePost(objectRequest);
+                    case Constant.API.ADD_POST_TO_UNREAD_POST -> addUnreadPost(objectRequest);
+                    case Constant.API.CHANGE_UNREAD_POST_STATUS -> changeUnreadPostStatus(objectRequest);
                 }
             }
         } catch (Exception e){
@@ -95,5 +100,17 @@ public class EventPostRunner implements CommandLineRunner {
             s3Service.deleteFile(s3Service.getFileNameFromURl(post.getImageURL()));
             post.getReactionIds().forEach(reactionService::deleteReaction);
         }
+    }
+
+    private void addUnreadPost(ObjectRequest objectRequest) {
+        System.out.println("========= addUnreadPost ===========");
+        AddUnreadPostRequest request = (AddUnreadPostRequest) objectRequest.getData();
+        String postId = request.getPostId();
+        request.getUserIds().forEach(userId -> unreadPostService.addUnreadPost(userId, postId));
+    }
+
+    private void changeUnreadPostStatus(ObjectRequest objectRequest) {
+        String userId = (String) objectRequest.getData();
+        unreadPostService.deleteUnreadPost(userId);
     }
 }
