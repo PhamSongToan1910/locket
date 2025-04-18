@@ -23,4 +23,6 @@ public interface UserService {
     Boolean updateAvt(String userId, String avtPath);
 
     SearchFriendByUsernameResponse searchByUsername(String username);
+
+    void updateDeviceToken(User user);
 }

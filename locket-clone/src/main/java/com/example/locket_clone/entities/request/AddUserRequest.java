@@ -10,4 +10,5 @@ import lombok.NoArgsConstructor;
 public class AddUserRequest {
     private String email;
     private String avt;
+    private String deviceToken;
 }

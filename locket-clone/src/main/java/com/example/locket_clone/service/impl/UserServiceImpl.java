@@ -34,6 +34,7 @@ public class UserServiceImpl implements UserService {
         ModelMapperUtils.toObject(user, userInsert);
         Role role = roleRepository.findByName(Constant.ROLE.USER_ROLE);
         userInsert.getAuthorities().add(role.getId().toString());
+        userInsert.getDeviceToken().add(user.getDeviceToken());
         userRepository.save(userInsert);
         return userInsert;
     }
@@ -95,5 +96,10 @@ public class UserServiceImpl implements UserService {
             return searchFriendByUsernameResponse;
         }
         return null;
+    }
+
+    @Override
+    public void updateDeviceToken(User user) {
+        userRepository.save(user);
     }
 }

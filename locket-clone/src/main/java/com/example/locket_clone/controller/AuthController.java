@@ -63,10 +63,12 @@ public class AuthController {
             if(!StringUtils.hasText(user.getFullName())) {
                 return new ResponseData<>(new LoginResponse(jwt, refreshToken, false));
             }
+            user.getDeviceToken().add(loginVM.getDeviceToken());
+            userService.updateDeviceToken(user);
             return new ResponseData<>(new LoginResponse(jwt, refreshToken, true));
 
         } else {
-            User userInsert = userService.insertUser(new AddUserRequest(loginVM.getEmail(), loginVM.getAvt()));
+            User userInsert = userService.insertUser(new AddUserRequest(loginVM.getEmail(), loginVM.getAvt(), loginVM.getDeviceToken()));
             Set<SimpleGrantedAuthority> authorities = roleService.convertRolesToSimpleGrantedAuthorities(userInsert.getAuthorities());
             Authentication authenticationToken = new UsernamePasswordAuthenticationToken(
                     loginVM.getEmail(),

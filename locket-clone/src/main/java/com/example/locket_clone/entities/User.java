@@ -26,6 +26,7 @@ public class User extends BaseEntity {
     public static final String AUTHORITIES = "authorities";
     public static final String LOGIN_TIME = "login_time";
     public static final String PLAYER_ID = "player_id";
+    public static final String DEVICE_TOKEN = "device_token";
 
 
     @Field(USERNAME)
@@ -58,6 +59,10 @@ public class User extends BaseEntity {
 
     @Field(PLAYER_ID)
     private String playerId;
+
+    @Field(DEVICE_TOKEN)
+    private Set<String> deviceToken;
+
 
     public String getFullName() {
         if(StringUtils.hasLength(this.firstName) && StringUtils.hasLength(this.lastName)) {
