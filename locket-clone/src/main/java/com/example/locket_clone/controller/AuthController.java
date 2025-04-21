@@ -7,11 +7,14 @@ import com.example.locket_clone.entities.User;
 import com.example.locket_clone.entities.request.AddUserRequest;
 import com.example.locket_clone.entities.request.GetNewTokenFromRefreshToken;
 import com.example.locket_clone.entities.request.LoginVM;
+import com.example.locket_clone.entities.request.ObjectRequest;
 import com.example.locket_clone.entities.response.GetNewTokenFromRefreshTokenResponse;
 import com.example.locket_clone.entities.response.LoginResponse;
 import com.example.locket_clone.entities.response.ResponseData;
+import com.example.locket_clone.runner.EventUserRunner;
 import com.example.locket_clone.service.RoleService;
 import com.example.locket_clone.service.UserService;
+import com.example.locket_clone.utils.Constant.Constant;
 import com.example.locket_clone.utils.Constant.ResponseCode;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -64,7 +67,8 @@ public class AuthController {
                 return new ResponseData<>(new LoginResponse(jwt, refreshToken, false));
             }
             user.getDeviceToken().add(loginVM.getDeviceToken());
-            userService.updateDeviceToken(user);
+            ObjectRequest request = new ObjectRequest(Constant.API.UPDATE_DEVICE_TOKEN, user);
+            EventUserRunner.requests.add(request);
             return new ResponseData<>(new LoginResponse(jwt, refreshToken, true));
 
         } else {

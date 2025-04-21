@@ -44,11 +44,16 @@ public class Constant {
     }
 
     public static class API {
+        //post
         public static final int ADD_REACTION = 1;
         public static final int REPORT_POST = 2;
         public static final int HIDE_POST = 3;
         public static final int DELETE_POST = 4;
         public static final int ADD_POST_TO_UNREAD_POST = 5;
         public static final int CHANGE_UNREAD_POST_STATUS = 6;
+        public static final int ADD_NOTIFICATION_NEW_POST = 7;
+
+        //user
+        public static final int UPDATE_DEVICE_TOKEN = 8;
     }
 }

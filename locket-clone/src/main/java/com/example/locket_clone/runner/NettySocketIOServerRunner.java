@@ -36,8 +36,9 @@ public class NettySocketIOServerRunner implements CommandLineRunner {
                 String postId = message[2];
                 String content = message[3];
                 Message newMessage = new Message(content, conversationId, userSenderId, false, postId);
-
-                server.getBroadcastOperations().sendEvent("chat_message", data);
+                //Todo save to Message collection
+                //Todo save to last_message collection
+                server.getBroadcastOperations().sendEvent(conversationId, data);
             }
 
         });

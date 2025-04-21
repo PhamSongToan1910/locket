@@ -21,6 +21,7 @@ import org.springframework.stereotype.Component;
 
 import java.util.Objects;
 import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -29,7 +30,7 @@ import java.util.concurrent.TimeUnit;
 @RequiredArgsConstructor
 public class EventPostRunner implements CommandLineRunner {
 
-    public static ConcurrentLinkedQueue<ObjectRequest> reactions = new ConcurrentLinkedQueue<>();
+    public static ConcurrentLinkedQueue<ObjectRequest> requests = new ConcurrentLinkedQueue<>();
 
     private final ReactionService reactionService;
     private final PostService postService;
@@ -37,22 +38,22 @@ public class EventPostRunner implements CommandLineRunner {
     private final S3Service s3Service;
     private final UnreadPostService unreadPostService;
 
-    private final ScheduledExecutorService schedule = Executors.newSingleThreadScheduledExecutor(Thread::new);
-
-    private static final long INITIAL_DELAY_MS = 0;
-    private static final long PERIOD_MS = 500;
+    private final int MAX_THREAD_POOL = 5;
+    private final ExecutorService schedule = Executors.newFixedThreadPool(MAX_THREAD_POOL);
 
 
 
     @Override
     public void run(String... args) throws Exception {
-        schedule.scheduleAtFixedRate(this::proccessEventReaction, INITIAL_DELAY_MS, PERIOD_MS, TimeUnit.MILLISECONDS);
+        for (int i = 0; i < MAX_THREAD_POOL; i++) {
+            schedule.execute(this::proccessEventReaction);
+        }
     }
 
     private void proccessEventReaction() {
         try{
             ObjectRequest objectRequest;
-            while((objectRequest = reactions.poll()) != null){
+            while((objectRequest = requests.poll()) != null){
                 switch (objectRequest.getType()) {
                     case Constant.API.ADD_REACTION -> addReaction(objectRequest);
                     case Constant.API.REPORT_POST -> reportPost(objectRequest);

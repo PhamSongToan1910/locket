@@ -76,7 +76,7 @@ public class PostController {
         Post post = postService.addPost(addPostRequest, userId);
         AddUnreadPostRequest addUnreadPostRequest = new AddUnreadPostRequest(post.getFriendIds(), post.getId().toString());
         ObjectRequest request = new ObjectRequest(Constant.API.ADD_POST_TO_UNREAD_POST, addUnreadPostRequest);
-        EventPostRunner.reactions.add(request);
+        EventPostRunner.requests.add(request);
         if (StringUtils.hasLength(post.getId().toString())) {
             return new ResponseData<>(ResponseCode.SUCCESS, "success");
         }
@@ -95,7 +95,7 @@ public class PostController {
         }
         Pageable pageable = PageRequest.of(page, size);
         String userId = customUserDetail.getId();
-        EventPostRunner.reactions.add(new ObjectRequest(Constant.API.CHANGE_UNREAD_POST_STATUS, userId));
+        EventPostRunner.requests.add(new ObjectRequest(Constant.API.CHANGE_UNREAD_POST_STATUS, userId));
         List<GetPostResponse> responseList = postService.getPosts(userId, request, pageable);
         return new ResponseData<>(ResponseCode.SUCCESS, "success", responseList);
     }
@@ -104,7 +104,7 @@ public class PostController {
     public ResponseData<?> addReactionPost(@CurrentUser CustomUserDetail customUserDetail, @RequestBody AddReactionPost addReactionPost) {
         addReactionPost.setUserId(customUserDetail.getId());
         ObjectRequest objectRequest = new ObjectRequest(Constant.API.ADD_REACTION, addReactionPost);
-        EventPostRunner.reactions.add(objectRequest);
+        EventPostRunner.requests.add(objectRequest);
         return new ResponseData<>(ResponseCode.SUCCESS, "success");
 
     }
@@ -113,7 +113,7 @@ public class PostController {
     public ResponseData<?> reportPost(@CurrentUser CustomUserDetail customUserDetail, @RequestParam("post_id") String postId) {
         ReportPostRequest reportPostRequest = new ReportPostRequest(customUserDetail.getId(), postId);
         ObjectRequest request = new ObjectRequest(Constant.API.REPORT_POST, reportPostRequest);
-        EventPostRunner.reactions.add(request);
+        EventPostRunner.requests.add(request);
         return new ResponseData<>(ResponseCode.SUCCESS, "success");
     }
 
@@ -121,7 +121,7 @@ public class PostController {
     public ResponseData<?> hidePost(@CurrentUser CustomUserDetail customUserDetail, @RequestParam("post_id") String postId) {
         HidePostRequest hidePostRequest = new HidePostRequest(customUserDetail.getId(), postId);
         ObjectRequest request = new ObjectRequest(Constant.API.HIDE_POST, hidePostRequest);
-        EventPostRunner.reactions.add(request);
+        EventPostRunner.requests.add(request);
         return new ResponseData<>(ResponseCode.SUCCESS, "success");
     }
 
@@ -157,7 +157,7 @@ public class PostController {
     public ResponseData<?> deletePost(@CurrentUser CustomUserDetail customUserDetail,@RequestParam("post_id") String postId) {
          DeletePostRequest deletePostRequest = new DeletePostRequest(customUserDetail.getId(), postId);
          ObjectRequest request = new ObjectRequest(Constant.API.DELETE_POST, deletePostRequest);
-         EventPostRunner.reactions.add(request);
+         EventPostRunner.requests.add(request);
          return new ResponseData<>(ResponseCode.SUCCESS, "success");
     }
 
