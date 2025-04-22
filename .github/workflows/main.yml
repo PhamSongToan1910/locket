@@ -37,15 +37,15 @@ jobs:
             fi
             echo "Navigating to app directory and pulling the latest code..."
             cd /home/ec2-user/app/locket-clone
-            git pull --no-rebase
+            echo "Stopping and removing old containers..."
+            docker-compose down
+            echo "Old containers stopped and removed."
+            git pull origin main
             git status
             echo "Git pull completed."
             echo "Building the application using Maven..."
             mvn clean install -DskipTests
             echo "Build completed successfully."
-            echo "Stopping and removing old containers..."
-            docker-compose down
-            echo "Old containers stopped and removed."
             echo "Rebuilding and starting containers..."
             docker ps
             docker-compose build --no-cache
