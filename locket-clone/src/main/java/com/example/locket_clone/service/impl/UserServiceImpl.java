@@ -18,7 +18,11 @@ import lombok.experimental.FieldDefaults;
 import org.bson.types.ObjectId;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 
 @Service
 @RequiredArgsConstructor
@@ -101,5 +105,17 @@ public class UserServiceImpl implements UserService {
     @Override
     public void updateDeviceToken(User user) {
         userRepository.save(user);
+    }
+
+    @Override
+    public HashMap<String, Set<String>> getDeviceTokens(List<String> userIds) {
+        HashMap<String, Set<String>> deviceTokens = new HashMap<>();
+        for (String userId : userIds) {
+            User user = userRepository.findById(userId).orElse(null);
+            if(user != null) {
+                deviceTokens.put(userId, user.getDeviceToken());
+            }
+        }
+        return deviceTokens;
     }
 }

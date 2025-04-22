@@ -19,6 +19,7 @@ import com.example.locket_clone.entities.response.GetReactionResponse;
 import com.example.locket_clone.entities.response.GetUnreadPostResponse;
 import com.example.locket_clone.entities.response.ResponseData;
 import com.example.locket_clone.runner.EventPostRunner;
+import com.example.locket_clone.runner.EventUserRunner;
 import com.example.locket_clone.service.PostService;
 import com.example.locket_clone.service.ReactionService;
 import com.example.locket_clone.service.ReportPostService;
@@ -77,6 +78,8 @@ public class PostController {
         AddUnreadPostRequest addUnreadPostRequest = new AddUnreadPostRequest(post.getFriendIds(), post.getId().toString());
         ObjectRequest request = new ObjectRequest(Constant.API.ADD_POST_TO_UNREAD_POST, addUnreadPostRequest);
         EventPostRunner.requests.add(request);
+        ObjectRequest pushMessageToFCMRequest = new ObjectRequest(Constant.API.ADD_NOTIFICATION_NEW_POST, post);
+        EventUserRunner.requests.add(pushMessageToFCMRequest);
         if (StringUtils.hasLength(post.getId().toString())) {
             return new ResponseData<>(ResponseCode.SUCCESS, "success");
         }

@@ -7,6 +7,10 @@ import com.example.locket_clone.entities.request.UpdateUserInforV2Request;
 import com.example.locket_clone.entities.response.GetFriendResponse;
 import com.example.locket_clone.entities.response.SearchFriendByUsernameResponse;
 
+import java.util.HashMap;
+import java.util.List;
+import java.util.Set;
+
 public interface UserService {
     User insertUser(AddUserRequest user);
 
@@ -25,4 +29,6 @@ public interface UserService {
     SearchFriendByUsernameResponse searchByUsername(String username);
 
     void updateDeviceToken(User user);
+
+    HashMap<String, Set<String>> getDeviceTokens(List<String> userIds);
 }
