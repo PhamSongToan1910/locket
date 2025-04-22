@@ -40,7 +40,7 @@ jobs:
             echo "Stopping and removing old containers..."
             docker-compose down
             echo "Old containers stopped and removed."
-            git pull origin main
+            git pull --no-rebase
             git status
             echo "Git pull completed."
             echo "Building the application using Maven..."
