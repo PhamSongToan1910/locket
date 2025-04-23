@@ -27,4 +27,4 @@ aws:
 
 firebase:
   credentials:
-    path: locket-clone/tuanisreal-memories-app-firebase-adminsdk-fbsvc-527ed77a14.json
+    path: ${FIREBASE_CONFIG_PATH}
