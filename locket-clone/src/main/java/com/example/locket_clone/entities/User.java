@@ -61,7 +61,7 @@ public class User extends BaseEntity {
     private String playerId;
 
     @Field(DEVICE_TOKEN)
-    private Set<String> deviceToken;
+    private Set<String> deviceToken = new HashSet<>();
 
 
     public String getFullName() {

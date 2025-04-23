@@ -26,6 +26,9 @@ services:
         {
           "spring.data.mongodb.uri": "mongodb://${MONGO_INITDB_ROOT_USERNAME}:${MONGO_INITDB_ROOT_PASSWORD}@mongo_db:27017/locket-clone?authSource=admin"
         }
+      FIREBASE_CONFIG_PATH: /app/firebase-credentials.json
+    volumes:
+      - /home/ec2-user/app/locket-clone/tuanisreal-memories-app-firebase-adminsdk-fbsvc-527ed77a14.json:/app/firebase-credentials.json
     depends_on:
       - mongo
 
