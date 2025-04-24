@@ -2,11 +2,14 @@ package com.example.locket_clone.controller;
 
 
 import com.ctc.wstx.util.StringUtil;
+import com.example.locket_clone.config.CurrentUser;
+import com.example.locket_clone.config.security.CustomUserDetail;
 import com.example.locket_clone.config.security.TokenProvider;
 import com.example.locket_clone.entities.User;
 import com.example.locket_clone.entities.request.AddUserRequest;
 import com.example.locket_clone.entities.request.GetNewTokenFromRefreshToken;
 import com.example.locket_clone.entities.request.LoginVM;
+import com.example.locket_clone.entities.request.LogoutRequest;
 import com.example.locket_clone.entities.request.ObjectRequest;
 import com.example.locket_clone.entities.response.GetNewTokenFromRefreshTokenResponse;
 import com.example.locket_clone.entities.response.LoginResponse;
@@ -30,8 +33,10 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
 
@@ -63,12 +68,15 @@ public class AuthController {
             SecurityContextHolder.getContext().setAuthentication(authenticationToken);
             String jwt = tokenProvider.createToken(authenticationToken, user.getId().toString());
             String refreshToken = tokenProvider.createRefreshToken(authenticationToken, user.getId().toString());
-            if(!StringUtils.hasText(user.getFullName())) {
-                return new ResponseData<>(new LoginResponse(jwt, refreshToken, false));
+            if (Objects.isNull(user.getDeviceToken())) {
+                user.setDeviceToken(new HashSet<>());
             }
             user.getDeviceToken().add(loginVM.getDeviceToken());
             ObjectRequest request = new ObjectRequest(Constant.API.UPDATE_DEVICE_TOKEN, user);
-            EventUserRunner.requests.add(request);
+            EventUserRunner.eventUserRequests.add(request);
+            if(!StringUtils.hasText(user.getFullName())) {
+                return new ResponseData<>(new LoginResponse(jwt, refreshToken, false));
+            }
             return new ResponseData<>(new LoginResponse(jwt, refreshToken, true));
 
         } else {
@@ -87,15 +95,13 @@ public class AuthController {
     }
 
     @PostMapping("/logout")
-    public ResponseData<String> logout() {
-        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        if (principal instanceof org.springframework.security.core.userdetails.UserDetails) {
-            SecurityContextHolder.clearContext();
-        } else {
-            // Trong trường hợp người dùng chưa đăng nhập, `principal` sẽ là chuỗi "anonymousUser"
-            String username = principal.toString();
-            System.out.println("Username: " + username);
+    public ResponseData<String> logout(@CurrentUser CustomUserDetail customUserDetail, @RequestParam("device_token") String deviceToken) {
+        if (customUserDetail == null) {
+            return new ResponseData<>(ResponseCode.UNKNOWN_ERROR, "user is null");
         }
+        ObjectRequest objectRequest = new ObjectRequest(Constant.API.LOGOUT, new LogoutRequest(customUserDetail.getId(), deviceToken));
+        EventUserRunner.eventUserRequests.add(objectRequest);
+        SecurityContextHolder.clearContext();
         return new ResponseData<>(ResponseCode.SUCCESS, "Logout success!!!");
     }
 

@@ -79,7 +79,7 @@ public class PostController {
         ObjectRequest request = new ObjectRequest(Constant.API.ADD_POST_TO_UNREAD_POST, addUnreadPostRequest);
         EventPostRunner.requests.add(request);
         ObjectRequest pushMessageToFCMRequest = new ObjectRequest(Constant.API.ADD_NOTIFICATION_NEW_POST, post);
-        EventUserRunner.requests.add(pushMessageToFCMRequest);
+        EventUserRunner.eventUserRequests.add(pushMessageToFCMRequest);
         if (StringUtils.hasLength(post.getId().toString())) {
             return new ResponseData<>(ResponseCode.SUCCESS, "success");
         }

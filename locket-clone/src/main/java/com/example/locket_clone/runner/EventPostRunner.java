@@ -42,28 +42,37 @@ public class EventPostRunner implements CommandLineRunner {
     private final ExecutorService schedule = Executors.newFixedThreadPool(MAX_THREAD_POOL);
 
 
-
     @Override
     public void run(String... args) throws Exception {
         for (int i = 0; i < MAX_THREAD_POOL; i++) {
-            schedule.execute(this::proccessEventReaction);
+            schedule.execute(() -> {
+                while (true) {
+                    ObjectRequest objectRequest = requests.poll();
+                    if (objectRequest != null) {
+                        proccessEventReaction(objectRequest);
+                    } else {
+                        try {
+                            Thread.sleep(1000);
+                        } catch (InterruptedException e) {
+                            throw new RuntimeException(e);
+                        }
+                    }
+                }
+            });
         }
     }
 
-    private void proccessEventReaction() {
-        try{
-            ObjectRequest objectRequest;
-            while((objectRequest = requests.poll()) != null){
-                switch (objectRequest.getType()) {
-                    case Constant.API.ADD_REACTION -> addReaction(objectRequest);
-                    case Constant.API.REPORT_POST -> reportPost(objectRequest);
-                    case Constant.API.HIDE_POST -> hidePost(objectRequest);
-                    case Constant.API.DELETE_POST -> deletePost(objectRequest);
-                    case Constant.API.ADD_POST_TO_UNREAD_POST -> addUnreadPost(objectRequest);
-                    case Constant.API.CHANGE_UNREAD_POST_STATUS -> changeUnreadPostStatus(objectRequest);
-                }
+    private void proccessEventReaction(ObjectRequest objectRequest) {
+        try {
+            switch (objectRequest.getType()) {
+                case Constant.API.ADD_REACTION -> addReaction(objectRequest);
+                case Constant.API.REPORT_POST -> reportPost(objectRequest);
+                case Constant.API.HIDE_POST -> hidePost(objectRequest);
+                case Constant.API.DELETE_POST -> deletePost(objectRequest);
+                case Constant.API.ADD_POST_TO_UNREAD_POST -> addUnreadPost(objectRequest);
+                case Constant.API.CHANGE_UNREAD_POST_STATUS -> changeUnreadPostStatus(objectRequest);
             }
-        } catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
@@ -71,7 +80,7 @@ public class EventPostRunner implements CommandLineRunner {
     private void addReaction(ObjectRequest objectRequest) {
         AddReactionPost reactionPost = (AddReactionPost) objectRequest.getData();
         Post post = postService.findbyId(reactionPost.getPostId());
-        if(post != null && post.getFriendIds().contains(reactionPost.getUserId()) && !post.getUserId().equals(reactionPost.getUserId())) {
+        if (post != null && post.getFriendIds().contains(reactionPost.getUserId()) && !post.getUserId().equals(reactionPost.getUserId())) {
             String reactionId = reactionService.addReaction(reactionPost);
             postService.addReactionToPost(post, reactionId);
         }
@@ -80,7 +89,7 @@ public class EventPostRunner implements CommandLineRunner {
     private void reportPost(ObjectRequest objectRequest) {
         ReportPostRequest reportPostRequest = (ReportPostRequest) objectRequest.getData();
         Post post = postService.findbyId(reportPostRequest.getPostId());
-        if(Objects.nonNull(post) && post.getFriendIds().contains(reportPostRequest.getUserId())) {
+        if (Objects.nonNull(post) && post.getFriendIds().contains(reportPostRequest.getUserId())) {
             reportPostService.addReportPost(reportPostRequest.getUserId(), reportPostRequest.getPostId());
         }
     }
@@ -88,7 +97,7 @@ public class EventPostRunner implements CommandLineRunner {
     private void hidePost(ObjectRequest objectRequest) {
         HidePostRequest request = (HidePostRequest) objectRequest.getData();
         Post post = postService.findbyId(request.getPostId());
-        if(Objects.nonNull(post) && post.getFriendIds().contains(request.getUserId()) && !post.getUserId().equals(request.getUserId())){
+        if (Objects.nonNull(post) && post.getFriendIds().contains(request.getUserId()) && !post.getUserId().equals(request.getUserId())) {
             postService.hidePost(post, request.getUserId());
         }
     }
@@ -96,7 +105,7 @@ public class EventPostRunner implements CommandLineRunner {
     private void deletePost(ObjectRequest objectRequest) {
         DeletePostRequest deletePostRequest = (DeletePostRequest) objectRequest.getData();
         Post post = postService.findbyId(deletePostRequest.getPostId());
-        if(Objects.nonNull(post) && post.getUserId().equals(deletePostRequest.getUserId())) {
+        if (Objects.nonNull(post) && post.getUserId().equals(deletePostRequest.getUserId())) {
             postService.deletePost(post.getId().toString());
             s3Service.deleteFile(s3Service.getFileNameFromURl(post.getImageURL()));
             post.getReactionIds().forEach(reactionService::deleteReaction);

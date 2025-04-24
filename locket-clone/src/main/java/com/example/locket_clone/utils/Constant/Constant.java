@@ -55,5 +55,6 @@ public class Constant {
 
         //user
         public static final int UPDATE_DEVICE_TOKEN = 8;
+        public static final int LOGOUT = 9;
     }
 }
