@@ -18,6 +18,7 @@ public class Message extends BaseEntity {
     public static final String CONTENT = "content";
     public static final String CONVERSATION_ID = "conversation_id";
     public static final String USER_SENDER_ID = "user_sender_id";
+    public static final String USER_RECEIVER_ID = "user_receiver_id";
     public static final String IS_READ = "is_read";
     public static final String POST_ID = "post_id";
 
@@ -28,7 +29,10 @@ public class Message extends BaseEntity {
     private String conversationId;
 
     @Field(USER_SENDER_ID)
-    private String userSender;
+    private String userSenderId;
+
+    @Field(USER_RECEIVER_ID)
+    private String userReceiverId;
 
     @Field(IS_READ)
     private boolean isRead;

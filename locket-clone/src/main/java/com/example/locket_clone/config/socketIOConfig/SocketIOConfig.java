@@ -1,12 +1,17 @@
 package com.example.locket_clone.config.socketIOConfig;
 
+import com.example.locket_clone.config.security.TokenProvider;
+import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import com.corundumstudio.socketio.SocketIOServer;
+import org.springframework.util.StringUtils;
 
 @Configuration
+@RequiredArgsConstructor
 public class SocketIOConfig {
 
+    private final TokenProvider tokenProvider;
 //    private String hostName = System.getenv("HOST_NAME");
 //
 //    private int port = Integer.parseInt(System.getenv("PORT"));
@@ -30,6 +35,10 @@ public class SocketIOConfig {
         config.setHostname("0.0.0.0");
         config.setPort(9092);
         config.setOrigin("*");
+        config.setAuthorizationListener(data -> {
+            String jwtToken = data.getSingleUrlParam("token");
+            return StringUtils.hasLength(jwtToken) && tokenProvider.validateToken(jwtToken);
+        });
         SocketIOServer server = new SocketIOServer(config);
         server.start();
         return server;

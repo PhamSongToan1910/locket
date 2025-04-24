@@ -13,6 +13,7 @@ public class Constant {
         public static final String CONVERSATION_COLLECTION = "conversation";
         public static final String MESSAGE_COLLECTION = "message";
         public static final String UNREAD_POST_COLLECTION = "unread_post";
+        public static final String LAST_MESSAGE_COLLECTION = "last_message";
     }
 
     public static class ROLE {
@@ -56,5 +57,7 @@ public class Constant {
         //user
         public static final int UPDATE_DEVICE_TOKEN = 8;
         public static final int LOGOUT = 9;
+        public static final int UPLOAD_LAST_MESSAGE = 10;
+        public static final int UPLOAD_MESSAGE = 11;
     }
 }
