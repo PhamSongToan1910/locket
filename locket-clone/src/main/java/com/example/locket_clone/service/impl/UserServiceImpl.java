@@ -5,7 +5,6 @@ import com.example.locket_clone.entities.User;
 import com.example.locket_clone.entities.request.AddUserRequest;
 import com.example.locket_clone.entities.request.UpdateUserInfoRequest;
 import com.example.locket_clone.entities.request.UpdateUserInforV2Request;
-import com.example.locket_clone.entities.response.GetFriendResponse;
 import com.example.locket_clone.entities.response.SearchFriendByUsernameResponse;
 import com.example.locket_clone.repository.InterfacePackage.RoleRepository;
 import com.example.locket_clone.repository.InterfacePackage.UserRepository;
@@ -15,11 +14,9 @@ import com.example.locket_clone.utils.ModelMapper.ModelMapperUtils;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
-import org.bson.types.ObjectId;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
@@ -108,12 +105,12 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public HashMap<String, Set<String>> getDeviceTokens(List<String> userIds) {
-        HashMap<String, Set<String>> deviceTokens = new HashMap<>();
+    public Set<String> getDeviceTokens(List<String> userIds) {
+        Set<String> deviceTokens = new HashSet<>();
         for (String userId : userIds) {
             User user = userRepository.findById(userId).orElse(null);
             if(user != null) {
-                deviceTokens.put(userId, user.getDeviceToken());
+                deviceTokens.addAll(user.getDeviceToken());
             }
         }
         return deviceTokens;

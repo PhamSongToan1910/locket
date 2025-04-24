@@ -30,5 +30,5 @@ public interface UserService {
 
     void updateDeviceToken(User user);
 
-    HashMap<String, Set<String>> getDeviceTokens(List<String> userIds);
+    Set<String> getDeviceTokens(List<String> userIds);
 }

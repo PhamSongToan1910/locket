@@ -1,24 +1,18 @@
 package com.example.locket_clone.runner;
 
-import com.example.locket_clone.config.security.CustomUserDetail;
 import com.example.locket_clone.entities.Post;
 import com.example.locket_clone.entities.User;
 import com.example.locket_clone.entities.request.LogoutRequest;
 import com.example.locket_clone.entities.request.ObjectRequest;
 import com.example.locket_clone.service.UserService;
 import com.example.locket_clone.utils.Constant.Constant;
-import com.google.firebase.messaging.BatchResponse;
 import com.google.firebase.messaging.FirebaseMessaging;
 import com.google.firebase.messaging.FirebaseMessagingException;
-import com.google.firebase.messaging.MulticastMessage;
-import com.google.firebase.messaging.SendResponse;
+import com.google.firebase.messaging.Message;
 import lombok.RequiredArgsConstructor;
-import lombok.experimental.FieldDefaults;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
@@ -77,28 +71,14 @@ public class EventUserRunner implements CommandLineRunner {
     private void pushMessageToFCM(ObjectRequest objectRequest) {
         Post post = (Post) objectRequest.getData();
         List<String> listUserIDs = post.getFriendIds();
-        HashMap<String, Set<String>> deviceTokens = userService.getDeviceTokens(listUserIDs);
-        deviceTokens.forEach((key, value) -> {
-            MulticastMessage multicastMessage = MulticastMessage.builder()
-                    .addAllTokens(value)
+        Set<String> deviceTokens = userService.getDeviceTokens(listUserIDs);
+        deviceTokens.forEach((value) -> {
+            Message message = Message.builder()
+                    .setToken(value)
                     .putData("new_post_available", "true")
                     .build();
-            BatchResponse response;
             try {
-                response = FirebaseMessaging.getInstance().sendMulticast(multicastMessage);
-                if (response.getFailureCount() > 0) {
-                    List<String> listToken = value.stream().toList();
-                    List<SendResponse> responses = response.getResponses();
-                    List<String> failedTokens = new ArrayList<>();
-                    for (int i = 0; i < responses.size(); i++) {
-                        if (!responses.get(i).isSuccessful()) {
-                            // The order of responses corresponds to the order of the registration tokens.
-                            failedTokens.add(listToken.get(i));
-                        }
-                    }
-
-                    System.out.println("List of tokens that caused failures: " + failedTokens);
-                }
+                FirebaseMessaging.getInstance().send(message);
             } catch (FirebaseMessagingException e) {
                 e.printStackTrace();
             }
