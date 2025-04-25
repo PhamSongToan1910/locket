@@ -74,7 +74,7 @@ public class NettySocketIOServerRunner implements CommandLineRunner {
                         ObjectRequest saveMessageRequest = new ObjectRequest(Constant.API.UPLOAD_MESSAGE, newMessage);
                         EventMessageRunner.eventMessageRequests.add(updateLastMessageRequest);
                         EventMessageRunner.eventMessageRequests.add(saveMessageRequest);
-                        socketReceiver.sendEvent("send_message", data);
+                        socketReceiver.sendEvent("receiver_message", data);
                     }
                 });
             }

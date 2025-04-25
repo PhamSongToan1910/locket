@@ -22,4 +22,9 @@ public class ConversationServiceImpl implements ConversationService {
         conversation.getUserIds().add(friendId);
         conversationRepository.save(conversation);
     }
+
+    @Override
+    public Conversation getConversationById(String id) {
+        return conversationRepository.findById(id).orElse(null);
+    }
 }

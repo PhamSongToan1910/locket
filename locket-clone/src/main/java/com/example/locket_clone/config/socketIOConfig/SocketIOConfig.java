@@ -35,10 +35,6 @@ public class SocketIOConfig {
         config.setHostname("0.0.0.0");
         config.setPort(9092);
         config.setOrigin("*");
-        config.setAuthorizationListener(data -> {
-            String jwtToken = data.getSingleUrlParam("token");
-            return StringUtils.hasLength(jwtToken) && tokenProvider.validateToken(jwtToken);
-        });
         SocketIOServer server = new SocketIOServer(config);
         server.start();
         return server;

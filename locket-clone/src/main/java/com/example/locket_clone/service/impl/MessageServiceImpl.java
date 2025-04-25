@@ -6,6 +6,7 @@ import com.example.locket_clone.service.MessageService;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -23,7 +24,12 @@ public class MessageServiceImpl implements MessageService {
     }
 
     @Override
-    public List<Message> getMessagesByConversationId(String conversationId) {
-        return messageRepository.findByConversationIdOrderByConversationIdDesc(conversationId);
+    public List<Message> getMessagesByConversationId(String conversationId, Pageable pageable) {
+        return messageRepository.findByConversationIdOrderByConversationIdDesc(conversationId, pageable);
+    }
+
+    @Override
+    public Message getMessageById(String messageId) {
+        return messageRepository.findById(messageId).orElse(null);
     }
 }
