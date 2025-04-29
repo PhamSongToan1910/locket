@@ -115,4 +115,13 @@ public class UserServiceImpl implements UserService {
         }
         return deviceTokens;
     }
+
+    @Override
+    public Set<String> getDeviceTokenByUserID(String userID) {
+        User user = userRepository.findById(userID).orElse(null);
+        if(user != null) {
+            return user.getDeviceToken();
+        }
+        return null;
+    }
 }

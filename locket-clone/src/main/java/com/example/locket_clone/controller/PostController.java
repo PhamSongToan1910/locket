@@ -2,6 +2,7 @@ package com.example.locket_clone.controller;
 
 import com.example.locket_clone.config.CurrentUser;
 import com.example.locket_clone.config.security.CustomUserDetail;
+import com.example.locket_clone.entities.Notification;
 import com.example.locket_clone.entities.Post;
 import com.example.locket_clone.entities.Reaction;
 import com.example.locket_clone.entities.UnreadPost;
@@ -13,6 +14,7 @@ import com.example.locket_clone.entities.request.DeletePostRequest;
 import com.example.locket_clone.entities.request.GetPostsRequest;
 import com.example.locket_clone.entities.request.HidePostRequest;
 import com.example.locket_clone.entities.request.ObjectRequest;
+import com.example.locket_clone.entities.request.RemovePostNotificationRequest;
 import com.example.locket_clone.entities.request.ReportPostRequest;
 import com.example.locket_clone.entities.response.GetPostResponse;
 import com.example.locket_clone.entities.response.GetReactionResponse;
@@ -34,6 +36,7 @@ import com.example.locket_clone.utils.s3Utils.S3Service;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import org.springframework.context.annotation.Role;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
@@ -222,5 +225,21 @@ public class PostController {
 
 
         return new ResponseData<>(ResponseCode.SUCCESS, "success", getReportPostsList);
+    }
+
+    @DeleteMapping("/delete-post-by-admin")
+    public ResponseData<?> deletePostByAdmin(@CurrentUser CustomUserDetail customUserDetail,
+                                             @RequestParam("post_id") String postId) {
+        String userId = customUserDetail.getId();
+        Post post = postService.findbyId(postId);
+        DeletePostRequest deletePostRequest = new DeletePostRequest(customUserDetail.getId(), postId);
+        ObjectRequest objectRequest = new ObjectRequest(Constant.API.DELETE_POST_BY_ADMIN, deletePostRequest);
+        EventPostRunner.requests.add(objectRequest);
+        RemovePostNotificationRequest removePostNotificationRequest = new RemovePostNotificationRequest(post.getUserId(), "...", post.getCaption(), post.getImageURL());
+        ObjectRequest addNotiRemovePostByAdmin = new ObjectRequest(Constant.API.DELETE_POST_BY_ADMIN, removePostNotificationRequest);
+        EventUserRunner.eventUserRequests.add(addNotiRemovePostByAdmin);
+        Notification notification = new Notification(postId, Constant.TYPE_OF_NOTIFICATION.REMOVE_POST_BY_ADMIN, userId);
+        EventUserRunner.eventUserRequests.add(new ObjectRequest(Constant.API.SAVE_NOTIFICATION, notification));
+        return new ResponseData<>(ResponseCode.SUCCESS, "success");
     }
 }

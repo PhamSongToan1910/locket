@@ -4,11 +4,13 @@ import com.example.locket_clone.entities.Post;
 import com.example.locket_clone.entities.User;
 import com.example.locket_clone.entities.request.LogoutRequest;
 import com.example.locket_clone.entities.request.ObjectRequest;
+import com.example.locket_clone.entities.request.RemovePostNotificationRequest;
 import com.example.locket_clone.service.UserService;
 import com.example.locket_clone.utils.Constant.Constant;
 import com.google.firebase.messaging.FirebaseMessaging;
 import com.google.firebase.messaging.FirebaseMessagingException;
 import com.google.firebase.messaging.Message;
+import com.google.firebase.messaging.Notification;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
@@ -57,6 +59,7 @@ public class EventUserRunner implements CommandLineRunner {
                 case Constant.API.UPDATE_DEVICE_TOKEN -> updateDeviceToken(objectRequest);
                 case Constant.API.ADD_NOTIFICATION_NEW_POST -> pushMessageToFCM(objectRequest);
                 case Constant.API.LOGOUT -> logout(objectRequest);
+                case Constant.API.DELETE_POST_BY_ADMIN -> pushNotificationToFCM(objectRequest);
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -65,13 +68,13 @@ public class EventUserRunner implements CommandLineRunner {
 
     private void updateDeviceToken(ObjectRequest objectRequest) {
         User user = (User) objectRequest.getData();
-        userService.updateDeviceToken(user);
+        userService.updateDeviceToken(user); //TODO them step luu vao cache
     }
 
     private void pushMessageToFCM(ObjectRequest objectRequest) {
         Post post = (Post) objectRequest.getData();
         List<String> listUserIDs = post.getFriendIds();
-        Set<String> deviceTokens = userService.getDeviceTokens(listUserIDs);
+        Set<String> deviceTokens = userService.getDeviceTokens(listUserIDs); //TODO chuyen sang luu cache
         deviceTokens.forEach((value) -> {
             Message message = Message.builder()
                     .setToken(value)
@@ -92,5 +95,27 @@ public class EventUserRunner implements CommandLineRunner {
             user.getDeviceToken().remove(logoutRequest.getDeviceToken());
             userService.updateDeviceToken(user);
         }
+    }
+
+    private void pushNotificationToFCM(ObjectRequest objectRequest) {
+        RemovePostNotificationRequest removePostNotificationRequest = (RemovePostNotificationRequest) objectRequest.getData();
+        Notification notification = Notification.builder()
+                .setTitle(removePostNotificationRequest.getTitle())
+                .setBody(removePostNotificationRequest.getCaption())
+                .setImage(removePostNotificationRequest.getImageURL())
+                .build();
+
+        Set<String> deviceToken = userService.getDeviceTokenByUserID(removePostNotificationRequest.getUserId());
+        deviceToken.forEach((value) -> {
+            Message message = Message.builder()
+                    .setToken(value)
+                    .setNotification(notification)
+                    .build();
+            try {
+                FirebaseMessaging.getInstance().send(message);
+            } catch (FirebaseMessagingException e) {
+                e.printStackTrace();
+            }
+        });
     }
 }

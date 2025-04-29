@@ -71,6 +71,7 @@ public class EventPostRunner implements CommandLineRunner {
                 case Constant.API.DELETE_POST -> deletePost(objectRequest);
                 case Constant.API.ADD_POST_TO_UNREAD_POST -> addUnreadPost(objectRequest);
                 case Constant.API.CHANGE_UNREAD_POST_STATUS -> changeUnreadPostStatus(objectRequest);
+                case Constant.API.DELETE_POST_BY_ADMIN -> deletePost(objectRequest);
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -105,10 +106,18 @@ public class EventPostRunner implements CommandLineRunner {
     private void deletePost(ObjectRequest objectRequest) {
         DeletePostRequest deletePostRequest = (DeletePostRequest) objectRequest.getData();
         Post post = postService.findbyId(deletePostRequest.getPostId());
-        if (Objects.nonNull(post) && post.getUserId().equals(deletePostRequest.getUserId())) {
-            postService.deletePost(post.getId().toString());
-            s3Service.deleteFile(s3Service.getFileNameFromURl(post.getImageURL()));
-            post.getReactionIds().forEach(reactionService::deleteReaction);
+        if(objectRequest.getType() == Constant.API.DELETE_POST) {
+            if (Objects.nonNull(post) && post.getUserId().equals(deletePostRequest.getUserId())) {
+                postService.deletePost(post.getId().toString());
+                s3Service.deleteFile(s3Service.getFileNameFromURl(post.getImageURL()));
+                post.getReactionIds().forEach(reactionService::deleteReaction);
+            }
+        } else if(objectRequest.getType() == Constant.API.DELETE_POST_BY_ADMIN) {
+            if(Objects.nonNull(post)) {
+                postService.deletePost(post.getId().toString());
+                s3Service.deleteFile(s3Service.getFileNameFromURl(post.getImageURL()));
+                post.getReactionIds().forEach(reactionService::deleteReaction);
+            }
         }
     }
 

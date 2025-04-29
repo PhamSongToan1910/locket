@@ -31,4 +31,6 @@ public interface UserService {
     void updateDeviceToken(User user);
 
     Set<String> getDeviceTokens(List<String> userIds);
+
+    Set<String> getDeviceTokenByUserID(String userID);
 }

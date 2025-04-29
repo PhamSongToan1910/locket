@@ -44,6 +44,10 @@ public class Constant {
         public static final int ME = 2;
     }
 
+    public static class TYPE_OF_NOTIFICATION {
+        public static final int REMOVE_POST_BY_ADMIN = 1;
+    }
+
     public static class API {
         //post
         public static final int ADD_REACTION = 1;
@@ -53,11 +57,18 @@ public class Constant {
         public static final int ADD_POST_TO_UNREAD_POST = 5;
         public static final int CHANGE_UNREAD_POST_STATUS = 6;
         public static final int ADD_NOTIFICATION_NEW_POST = 7;
+        public static final int DELETE_POST_BY_ADMIN = 12;
 
         //user
         public static final int UPDATE_DEVICE_TOKEN = 8;
         public static final int LOGOUT = 9;
+
+        //Message
         public static final int UPLOAD_LAST_MESSAGE = 10;
         public static final int UPLOAD_MESSAGE = 11;
+
+        //Notification
+        public static final int SAVE_NOTIFICATION = 13;
+
     }
 }
