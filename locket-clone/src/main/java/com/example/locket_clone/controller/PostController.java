@@ -16,6 +16,7 @@ import com.example.locket_clone.entities.request.ObjectRequest;
 import com.example.locket_clone.entities.request.ReportPostRequest;
 import com.example.locket_clone.entities.response.GetPostResponse;
 import com.example.locket_clone.entities.response.GetReactionResponse;
+import com.example.locket_clone.entities.response.GetReportPosts;
 import com.example.locket_clone.entities.response.GetUnreadPostResponse;
 import com.example.locket_clone.entities.response.ResponseData;
 import com.example.locket_clone.runner.EventPostRunner;
@@ -38,7 +39,14 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
@@ -186,5 +194,33 @@ public class PostController {
         getLastesPost.setFriendAvt(ownerPost.getAvt());
         getLastesPost.setId(newestPost.getId().toString());
         return new ResponseData<>(ResponseCode.SUCCESS, "success", getLastesPost);
+    }
+
+    @GetMapping("/get-report-post")
+    public ResponseData<?> getReportPost(@RequestParam(defaultValue = "0") int page,
+                                         @RequestParam(defaultValue = "10") int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        List<GetReportPosts> getReportPostsList = reportPostService.getReportPosts(pageable).stream().map(reportPost -> {
+            GetReportPosts dto = new GetReportPosts();
+            ModelMapperUtils.toObject(reportPost, dto);
+
+            Post post = postService.findbyId(dto.getPostId());
+            User user = userService.findUserById(dto.getUserId());
+
+            if (post != null) {
+                dto.setCaption(post.getCaption());
+                dto.setImageURL(post.getImageURL());
+                dto.setCreatedAt(post.getCreatedAt());
+            }
+
+            if (user != null) {
+                dto.setUsername(user.getUsername());
+            }
+
+            return dto;
+        }).toList();
+
+
+        return new ResponseData<>(ResponseCode.SUCCESS, "success", getReportPostsList);
     }
 }

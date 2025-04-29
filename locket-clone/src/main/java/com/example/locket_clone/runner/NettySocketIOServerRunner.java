@@ -60,16 +60,16 @@ public class NettySocketIOServerRunner implements CommandLineRunner {
             String[] message = parseFromMessage(data);
             assert message != null;
             String conversationId = message[0];
-            String userReceiver = message[1];
-            String postId = message[2];
-            String content = message[3];
-            String userId = client.getHandshakeData().getSingleUrlParam("userId");
+            String userSender = message[1];
+            String userReceiver = message[2];
+            String postId = message[3];
+            String content = message[4];
             Set<UUID> usersOnline = onlineUsers.get(userReceiver);
             if(Objects.nonNull(usersOnline)) {
                 usersOnline.forEach(uuid -> {
                     SocketIOClient socketReceiver = server.getClient(uuid);
                     if(socketReceiver != null) {
-                        Message newMessage = new Message(content, conversationId, userId, userReceiver, false, postId);
+                        Message newMessage = new Message(content, conversationId, userSender, userReceiver, false, postId);
                         ObjectRequest updateLastMessageRequest = new ObjectRequest(Constant.API.UPLOAD_LAST_MESSAGE, newMessage);
                         ObjectRequest saveMessageRequest = new ObjectRequest(Constant.API.UPLOAD_MESSAGE, newMessage);
                         EventMessageRunner.eventMessageRequests.add(updateLastMessageRequest);

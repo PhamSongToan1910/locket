@@ -6,6 +6,7 @@ import com.example.locket_clone.service.ReportPostService;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -18,8 +19,8 @@ public class ReportPostServiceImpl implements ReportPostService {
     ReportPostRepository reportPostRepository;
 
     @Override
-    public List<ReportPost> getReportPosts() {
-        return reportPostRepository.findAll();
+    public List<ReportPost> getReportPosts(Pageable pageable) {
+        return reportPostRepository.findAll(pageable).stream().toList();
     }
 
     @Override
