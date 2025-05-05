@@ -124,4 +124,9 @@ public class UserServiceImpl implements UserService {
         }
         return null;
     }
+
+    @Override
+    public List<User> getAllUserNormal() {
+        return userRepository.findUserNormal();
+    }
 }

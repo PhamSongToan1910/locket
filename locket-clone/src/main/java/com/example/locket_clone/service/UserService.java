@@ -33,4 +33,6 @@ public interface UserService {
     Set<String> getDeviceTokens(List<String> userIds);
 
     Set<String> getDeviceTokenByUserID(String userID);
+
+    List<User> getAllUserNormal();
 }
