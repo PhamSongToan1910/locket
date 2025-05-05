@@ -35,4 +35,6 @@ public interface UserService {
     Set<String> getDeviceTokenByUserID(String userID);
 
     List<User> getAllUserNormal();
+
+//    void addUserAdmin(String email, String password);
 }

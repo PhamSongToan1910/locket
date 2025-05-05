@@ -14,6 +14,7 @@ import com.example.locket_clone.utils.ModelMapper.ModelMapperUtils;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.HashSet;
@@ -28,6 +29,7 @@ public class UserServiceImpl implements UserService {
 
     UserRepository userRepository;
     RoleRepository roleRepository;
+//    PasswordEncoder passwordEncoder;
 
     @Override
     public User insertUser(AddUserRequest user) {
@@ -129,4 +131,12 @@ public class UserServiceImpl implements UserService {
     public List<User> getAllUserNormal() {
         return userRepository.findUserNormal();
     }
+
+//    @Override
+//    public void addUserAdmin(String email, String password) {
+//        User user = new User();
+//        user.setEmail(email);
+//        user.setPassword(passwordEncoder.encode(password));
+//        userRepository.save(user);
+//    }
 }
