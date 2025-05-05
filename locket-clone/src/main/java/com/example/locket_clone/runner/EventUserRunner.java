@@ -15,9 +15,11 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -27,6 +29,7 @@ import java.util.concurrent.Executors;
 public class EventUserRunner implements CommandLineRunner {
 
     public static ConcurrentLinkedQueue<ObjectRequest> eventUserRequests = new ConcurrentLinkedQueue<>();
+    private static final ConcurrentHashMap<String, Set<String>> deviceTokensMap = new ConcurrentHashMap<>();
 
     private final UserService userService;
 
@@ -68,13 +71,24 @@ public class EventUserRunner implements CommandLineRunner {
 
     private void updateDeviceToken(ObjectRequest objectRequest) {
         User user = (User) objectRequest.getData();
-        userService.updateDeviceToken(user); //TODO them step luu vao cache
+        if(deviceTokensMap.containsKey(user.getId().toString())) {
+            Set<String> userDeviceTokens = deviceTokensMap.get(user.getId().toString());
+            userDeviceTokens.addAll(user.getDeviceToken());
+        } else {
+            deviceTokensMap.put(user.getId().toString(), user.getDeviceToken());
+        }
+        userService.updateDeviceToken(user);
     }
 
     private void pushMessageToFCM(ObjectRequest objectRequest) {
         Post post = (Post) objectRequest.getData();
         List<String> listUserIDs = post.getFriendIds();
-        Set<String> deviceTokens = userService.getDeviceTokens(listUserIDs); //TODO chuyen sang luu cache
+        Set<String> deviceTokens = new HashSet<>();
+        for(String userId : listUserIDs) {
+            if(deviceTokensMap.containsKey(userId)) {
+                deviceTokens.addAll(deviceTokensMap.get(userId));
+            }
+        }
         deviceTokens.forEach((value) -> {
             Message message = Message.builder()
                     .setToken(value)
@@ -93,6 +107,11 @@ public class EventUserRunner implements CommandLineRunner {
         User user = userService.findUserById(logoutRequest.getUserId());
         if(user != null && Objects.nonNull(user.getDeviceToken())) {
             user.getDeviceToken().remove(logoutRequest.getDeviceToken());
+            if(deviceTokensMap.containsKey(user.getId().toString())) {
+                Set<String> userDeviceTokens = deviceTokensMap.get(user.getId().toString());
+                userDeviceTokens.removeAll(user.getDeviceToken());
+                deviceTokensMap.put(user.getId().toString(), userDeviceTokens);
+            }
             userService.updateDeviceToken(user);
         }
     }
