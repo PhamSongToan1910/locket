@@ -25,11 +25,10 @@ import java.util.List;
 public class AuthenticationFilter extends GenericFilterBean {
     public static final String AUTHORIZATION_HEADER = "Authorization";
     private final TokenProvider tokenProvider;
-    private final UserService userService;
 
     private final List<String> API_UN_AUTHEN = Arrays.asList("/api/locket-clone/auth/login",
                                                             "/api/locket-clone/auth/get-new-token",
-                                                            "/api/locket-clone/auth/add-user-admin");
+                                                            "/api/locket-clone/user/add-user-admin");
 
     @Override
     public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain) throws IOException, ServletException {

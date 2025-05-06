@@ -5,7 +5,12 @@ import com.example.locket_clone.config.CurrentUser;
 import com.example.locket_clone.config.security.CustomUserDetail;
 import com.example.locket_clone.config.security.TokenProvider;
 import com.example.locket_clone.entities.User;
-import com.example.locket_clone.entities.request.*;
+import com.example.locket_clone.entities.request.AddUserRequest;
+import com.example.locket_clone.entities.request.GetNewTokenFromRefreshToken;
+import com.example.locket_clone.entities.request.LoginAdminRequest;
+import com.example.locket_clone.entities.request.LoginVM;
+import com.example.locket_clone.entities.request.LogoutRequest;
+import com.example.locket_clone.entities.request.ObjectRequest;
 import com.example.locket_clone.entities.response.GetNewTokenFromRefreshTokenResponse;
 import com.example.locket_clone.entities.response.LoginResponse;
 import com.example.locket_clone.entities.response.ResponseData;
@@ -24,9 +29,12 @@ import org.springframework.security.config.annotation.authentication.builders.Au
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.util.StringUtils;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.util.HashSet;
 import java.util.Objects;
@@ -109,23 +117,17 @@ public class AuthController {
         return ResponseEntity.status(HttpStatus.OK).body(new ResponseData<>(ResponseCode.SUCCESS, "success", new GetNewTokenFromRefreshTokenResponse(token)));
     }
 
-//    @PostMapping("/login-admin")
-//    public ResponseData<?> loginAdmin(@RequestBody LoginAdminRequest loginAdminRequest) {
-//        if(!loginAdminRequest.validateRequest()) {
-//            return new ResponseData<>(ResponseCode.WRONG_DATA_FORMAT, "Wrong request format");
-//        }
-//        UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken = new UsernamePasswordAuthenticationToken(
-//                loginAdminRequest.getEmail(),
-//                loginAdminRequest.getPassword()
-//        );
-//        User user = userService.findUserByEmail(loginAdminRequest.getEmail());
-//        String jwt = tokenProvider.createToken(usernamePasswordAuthenticationToken, user.getId().toString());
-//        return new ResponseData<>(ResponseCode.SUCCESS, "success", jwt);
-//    }
-//
-//    @PostMapping("/add-user-admin")
-//    public ResponseData<?> addUserAdmin(@RequestBody LoginAdminRequest loginAdminRequest) {
-//        userService.addUserAdmin(loginAdminRequest.getEmail(), loginAdminRequest.getPassword());
-//        return new ResponseData<>(ResponseCode.SUCCESS, "success");
-//    }
+    @PostMapping("/login-admin")
+    public ResponseData<?> loginAdmin(@RequestBody LoginAdminRequest loginAdminRequest) {
+        if(!loginAdminRequest.validateRequest()) {
+            return new ResponseData<>(ResponseCode.WRONG_DATA_FORMAT, "Wrong request format");
+        }
+        UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken = new UsernamePasswordAuthenticationToken(
+                loginAdminRequest.getEmail(),
+                loginAdminRequest.getPassword()
+        );
+        User user = userService.findUserByEmail(loginAdminRequest.getEmail());
+        String jwt = tokenProvider.createToken(usernamePasswordAuthenticationToken, user.getId().toString());
+        return new ResponseData<>(ResponseCode.SUCCESS, "success", jwt);
+    }
 }

@@ -29,7 +29,7 @@ public class UserServiceImpl implements UserService {
 
     UserRepository userRepository;
     RoleRepository roleRepository;
-//    PasswordEncoder passwordEncoder;
+    PasswordEncoder passwordEncoder;
 
     @Override
     public User insertUser(AddUserRequest user) {
@@ -132,11 +132,12 @@ public class UserServiceImpl implements UserService {
         return userRepository.findUserNormal();
     }
 
-//    @Override
-//    public void addUserAdmin(String email, String password) {
-//        User user = new User();
-//        user.setEmail(email);
-//        user.setPassword(passwordEncoder.encode(password));
-//        userRepository.save(user);
-//    }
+    @Override
+    public void addUserAdmin(String email, String password) {
+        User user = new User();
+        user.getAuthorities().add("6819716727d55c531dab4db6");
+        user.setEmail(email);
+        user.setPassword(passwordEncoder.encode(password));
+        userRepository.save(user);
+    }
 }

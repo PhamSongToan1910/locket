@@ -6,6 +6,7 @@ import com.example.locket_clone.entities.SendRequestFriend;
 import com.example.locket_clone.entities.User;
 import com.example.locket_clone.entities.UserFriends;
 import com.example.locket_clone.entities.request.AddFriendRequest;
+import com.example.locket_clone.entities.request.LoginAdminRequest;
 import com.example.locket_clone.entities.request.UpdateUserInfoRequest;
 import com.example.locket_clone.entities.request.UpdateUserInforV2Request;
 import com.example.locket_clone.entities.response.*;
@@ -231,5 +232,11 @@ public class UserController {
     @GetMapping("/get-all-user-normal")
     public ResponseData<List<User>> getAllUserNormal() {
         return new ResponseData<>(ResponseCode.SUCCESS, "success", userService.getAllUserNormal());
+    }
+
+    @PostMapping("/add-user-admin")
+    public ResponseData<?> addUserAdmin(@RequestBody LoginAdminRequest loginAdminRequest) {
+        userService.addUserAdmin(loginAdminRequest.getEmail(), loginAdminRequest.getPassword());
+        return new ResponseData<>(ResponseCode.SUCCESS, "success");
     }
 }

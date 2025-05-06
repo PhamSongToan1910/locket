@@ -36,5 +36,5 @@ public interface UserService {
 
     List<User> getAllUserNormal();
 
-//    void addUserAdmin(String email, String password);
+    void addUserAdmin(String email, String password);
 }

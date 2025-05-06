@@ -34,7 +34,7 @@ public class SecurityConfiguration {
                 .authorizeHttpRequests(authorizationRequests -> authorizationRequests
                         .requestMatchers("/api/locket-clone/auth/login",
                                 "/api/locket-clone/auth/get-new-token",
-                                "/api/locket-clone/auth/add-user-admin").permitAll()
+                                "/api/locket-clone/user/add-user-admin").permitAll()
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(authenticationFilter, UsernamePasswordAuthenticationFilter.class);
