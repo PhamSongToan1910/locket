@@ -35,10 +35,6 @@ public class NettySocketIOServerRunner implements CommandLineRunner {
     @Override
     public void run(String... args) throws Exception {
         server.addConnectListener(client -> {
-            System.out.println("User connection: " + client.getSessionId());
-        });
-
-        server.addEventListener("authentication", String.class, (client, data, ackSender) -> {
             String token = client.getHandshakeData().getSingleUrlParam("token");
             if (Objects.nonNull(token)) {
                 String userId = tokenProvider.getUserIdByToken(token);
