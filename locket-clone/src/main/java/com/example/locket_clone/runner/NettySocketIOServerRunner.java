@@ -8,12 +8,12 @@ import com.example.locket_clone.entities.request.ObjectRequest;
 import com.example.locket_clone.service.LastMessageService;
 import com.example.locket_clone.service.MessageService;
 import com.example.locket_clone.utils.Constant.Constant;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Objects;
@@ -35,6 +35,10 @@ public class NettySocketIOServerRunner implements CommandLineRunner {
     @Override
     public void run(String... args) throws Exception {
         server.addConnectListener(client -> {
+            System.out.println("User connection: " + client.getSessionId());
+        });
+
+        server.addEventListener("authentication", String.class, (client, data, ackSender) -> {
             String token = client.getHandshakeData().getSingleUrlParam("token");
             if (Objects.nonNull(token)) {
                 String userId = tokenProvider.getUserIdByToken(token);
@@ -55,21 +59,21 @@ public class NettySocketIOServerRunner implements CommandLineRunner {
         });
 
         server.addEventListener("send_message", String.class, (client, data, ackSender) -> {
-            //data : conversationId&UserSenderId&userReceiverId&PostId&Content
+            //data : conversationId&userReceiverId&PostURL&Content
             //if PostId == null => data = conversationId&UserSenderId&--&Content
-            String[] message = parseFromMessage(data);
-            assert message != null;
-            String conversationId = message[0];
-            String userSender = message[1];
-            String userReceiver = message[2];
-            String postId = message[3];
-            String content = message[4];
+            ObjectMapper mapper = new ObjectMapper();
+            Map<String, Object> jsonMap = mapper.readValue(data, Map.class);
+            String conversationId = (String) jsonMap.get("conversation_id");
+            String userReceiver = (String) jsonMap.get("user_receiver");
+            String postURL = (String) jsonMap.get("post_url");
+            String content = (String) jsonMap.get("content");
+            String userSender = client.getHandshakeData().getSingleUrlParam("userId");
             Set<UUID> usersOnline = onlineUsers.get(userReceiver);
             if(Objects.nonNull(usersOnline)) {
                 usersOnline.forEach(uuid -> {
                     SocketIOClient socketReceiver = server.getClient(uuid);
                     if(socketReceiver != null) {
-                        Message newMessage = new Message(content, conversationId, userSender, userReceiver, false, postId);
+                        Message newMessage = new Message(content, conversationId, userSender, userReceiver, false, postURL);
                         ObjectRequest updateLastMessageRequest = new ObjectRequest(Constant.API.UPLOAD_LAST_MESSAGE, newMessage);
                         ObjectRequest saveMessageRequest = new ObjectRequest(Constant.API.UPLOAD_MESSAGE, newMessage);
                         EventMessageRunner.eventMessageRequests.add(updateLastMessageRequest);
