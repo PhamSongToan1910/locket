@@ -47,6 +47,7 @@ public class NettySocketIOServerRunner implements CommandLineRunner {
             } else {
                 System.out.println("unauthorized " + client.getSessionId());
             }
+            System.out.println("Connect success: " + client.getSessionId());
         });
 
         server.addDisconnectListener(client -> {
@@ -63,6 +64,7 @@ public class NettySocketIOServerRunner implements CommandLineRunner {
         server.addEventListener("send_message", String.class, (client, data, ackSender) -> {
             //data : conversationId&userReceiverId&PostURL&Content
             //if PostId == null => data = conversationId&UserSenderId&--&Content
+            System.out.println("data: " + data);
             ObjectMapper mapper = new ObjectMapper();
             Map<String, Object> jsonMap = mapper.readValue(data, Map.class);
             String conversationId = (String) jsonMap.get("conversation_id");
