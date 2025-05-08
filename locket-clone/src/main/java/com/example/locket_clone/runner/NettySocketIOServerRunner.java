@@ -36,6 +36,7 @@ public class NettySocketIOServerRunner implements CommandLineRunner {
     public void run(String... args) throws Exception {
         server.addConnectListener(client -> {
             String token = client.getHandshakeData().getSingleUrlParam("token");
+            System.out.println("token: " + token);
             if (Objects.nonNull(token)) {
                 String userId = tokenProvider.getUserIdByToken(token);
                 client.set("userId", userId);
@@ -43,14 +44,19 @@ public class NettySocketIOServerRunner implements CommandLineRunner {
                     onlineUsers.put(userId, new HashSet<>());
                 }
                 onlineUsers.get(userId).add(client.getSessionId());
+            } else {
+                System.out.println("unauthorized " + client.getSessionId());
             }
         });
 
         server.addDisconnectListener(client -> {
             String token = client.getHandshakeData().getSingleUrlParam("token");
             if(Objects.nonNull(token)) {
+                System.out.println("removed token: " + token);
                 String userId = tokenProvider.getUserIdByToken(token);
                 onlineUsers.get(userId).remove(client.getSessionId());
+            } else {
+                System.out.println("unauthorized " + client.getSessionId());
             }
         });
 
@@ -64,6 +70,7 @@ public class NettySocketIOServerRunner implements CommandLineRunner {
             String postURL = (String) jsonMap.get("post_url");
             String content = (String) jsonMap.get("content");
             String userSender = client.getHandshakeData().getSingleUrlParam("userId");
+            System.out.println("send message: " + conversationId + " " + userSender + " " + userReceiver + " " + postURL + " " + content);
             Set<UUID> usersOnline = onlineUsers.get(userReceiver);
             if(Objects.nonNull(usersOnline)) {
                 usersOnline.forEach(uuid -> {
