@@ -45,8 +45,6 @@ public class TokenProvider {
     long tokenValidityInMilliseconds;
     long refreshTokenValidityInMilliseconds;
 
-    private final UserService userService;
-
     @PostConstruct
     protected void init(){
         this.tokenSecretKey = Base64.getEncoder().encodeToString(tokenSecretKey.getBytes());
@@ -101,9 +99,8 @@ public class TokenProvider {
                 .toList();
 
         String userId = claims.get(USER_ID_KEY).toString();
-        User user = userService.findUserById(userId);
         Set<SimpleGrantedAuthority> simpleGrantedAuthorities = authorities.stream().map(authority -> (SimpleGrantedAuthority) authority).collect(Collectors.toSet());
-        CustomUserDetail principal = new CustomUserDetail(user, simpleGrantedAuthorities);
+        CustomUserDetail principal = new CustomUserDetail(userId, simpleGrantedAuthorities);
         return new UsernamePasswordAuthenticationToken(principal, token, authorities);
     }
 

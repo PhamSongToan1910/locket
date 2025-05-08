@@ -48,7 +48,7 @@ public class DomainUserDetailService implements UserDetailsService {
                 })
                 .map(SimpleGrantedAuthority::new)
                 .collect(Collectors.toSet());
-        return new CustomUserDetail(userEntity, authorities);
+        return new CustomUserDetail(userEntity.getId().toString(), authorities);
     }
 
     private String stringToRole(String id) throws Exception {

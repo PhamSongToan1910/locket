@@ -13,14 +13,10 @@ import java.util.Set;
 public class CustomUserDetail implements UserDetails {
 
     private final String id;
-    private final String email;
-    private final String password;
     private final Collection<SimpleGrantedAuthority> authorities;
 
-    public CustomUserDetail(User user, Set<SimpleGrantedAuthority> authorities) {
-        this.id = user.getId().toString();
-        this.email = user.getEmail();
-        this.password = user.getPassword();
+    public CustomUserDetail(String userId, Set<SimpleGrantedAuthority> authorities) {
+        this.id = userId;
         this.authorities = authorities;
     }
 
@@ -31,12 +27,12 @@ public class CustomUserDetail implements UserDetails {
 
     @Override
     public String getPassword() {
-        return this.password;
+        return "";
     }
 
     @Override
     public String getUsername() {
-        return this.email;
+        return "";
     }
 
 }
