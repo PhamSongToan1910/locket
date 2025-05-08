@@ -47,6 +47,10 @@ public class TokenProvider {
     @Lazy
     private UserService userService;
 
+    public TokenProvider(UserService userService) {
+        this.userService = userService;
+    }
+
     @PostConstruct
     protected void init(){
         this.tokenSecretKey = Base64.getEncoder().encodeToString(tokenSecretKey.getBytes());
