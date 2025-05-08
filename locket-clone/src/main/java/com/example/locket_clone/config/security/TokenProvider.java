@@ -105,12 +105,26 @@ public class TokenProvider {
     }
 
     public String getUserIdByToken(String token) {
-        Claims claims = Jwts.parser()
-                .setSigningKey(tokenSecretKey)
-                .parseClaimsJws(token)
-                .getBody();
-
-        return claims.get(USER_ID_KEY).toString();
+        Claims claims = null;
+        try {
+            claims = Jwts.parser()
+                    .setSigningKey(tokenSecretKey)
+                    .parseClaimsJws(token)
+                    .getBody();
+            return claims.get(USER_ID_KEY).toString();
+        } catch (ExpiredJwtException e) {
+            claims = e.getClaims();
+            if (claims != null && claims.containsKey(USER_ID_KEY)) {
+                return claims.get(USER_ID_KEY).toString();
+            } else {
+                log.error("Không thể lấy userId từ token đã hết hạn hoặc key không tồn tại.");
+                return null;
+            }
+        } catch (Exception e) {
+            // Xử lý các loại exception khác (ví dụ: MalformedJwtException, SignatureException,...)
+            log.error("Lỗi parse token: " + e.getMessage());
+            return null;
+        }
     }
 
     public boolean validateToken(String token) {
