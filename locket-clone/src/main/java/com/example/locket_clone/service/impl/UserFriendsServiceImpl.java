@@ -62,6 +62,9 @@ public class UserFriendsServiceImpl implements UserFriendsService {
     @Override
     public int getNumberFriends(String userId) {
         UserFriends userFriends = userFriendsRepository.findByUserId(userId);
+        if(Objects.isNull(userFriends)) {
+            return 0;
+        }
         return userFriends.getFriendIds().size();
     }
 
