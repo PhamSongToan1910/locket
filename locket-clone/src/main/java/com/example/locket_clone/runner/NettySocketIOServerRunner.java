@@ -44,6 +44,8 @@ public class NettySocketIOServerRunner implements CommandLineRunner {
                     onlineUsers.put(userId, new HashSet<>());
                 }
                 onlineUsers.get(userId).add(client.getSessionId());
+                System.out.println("UserId: " + userId);
+                System.out.println("list sessionID: " + onlineUsers.get(userId));
             } else {
                 System.out.println("unauthorized " + client.getSessionId());
             }
@@ -56,9 +58,12 @@ public class NettySocketIOServerRunner implements CommandLineRunner {
                 System.out.println("removed token: " + token);
                 String userId = tokenProvider.getUserIdByToken(token);
                 onlineUsers.get(userId).remove(client.getSessionId());
+                System.out.println("UserId: " + userId);
+                System.out.println("list sessionID: " + onlineUsers.get(userId));
             } else {
                 System.out.println("unauthorized " + client.getSessionId());
             }
+            System.out.println("disconnect success: " + client.getSessionId());
         });
 
         server.addEventListener("send_message", String.class, (client, data, ackSender) -> {
@@ -83,6 +88,7 @@ public class NettySocketIOServerRunner implements CommandLineRunner {
                         ObjectRequest saveMessageRequest = new ObjectRequest(Constant.API.UPLOAD_MESSAGE, newMessage);
                         EventMessageRunner.eventMessageRequests.add(updateLastMessageRequest);
                         EventMessageRunner.eventMessageRequests.add(saveMessageRequest);
+                        System.out.println("data received: " + data);
                         socketReceiver.sendEvent("receiver_message", data);
                     }
                 });
