@@ -55,11 +55,14 @@ public class ConversationController {
     }
 
     @GetMapping("/get-conversation-history")
-    public ResponseData<List<GetChatHistoryResponse>> getConversationHistory(@CurrentUser CustomUserDetail customUserDetail,
+    public ResponseData<List<String>> getConversationHistory(@CurrentUser CustomUserDetail customUserDetail,
                                                                              @RequestParam("conversation_id") String conversationId,
                                                                              @RequestParam(defaultValue = "0") int page,
                                                                              @RequestParam(defaultValue = "10") int size) {
-        return null;
+        Pageable pageable = PageRequest.of(page, size);
+        List<Message> listMessage = messageService.getMessagesByConversationId(conversationId, pageable);
+        List<String> listMessageString = listMessage.stream().map(Message::getContent).toList();
+        return new ResponseData<>(ResponseCode.SUCCESS, "success", listMessageString);
     }
 
     private ListConversationResponse convertMessageToListConversationResponse(Message message) {
