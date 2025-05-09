@@ -5,11 +5,11 @@ import com.example.locket_clone.entities.Message;
 import com.example.locket_clone.repository.InterfacePackage.LastMessageRepository;
 import com.example.locket_clone.service.LastMessageService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
 import java.util.List;
+import java.util.Objects;
 
 @Service
 @RequiredArgsConstructor
@@ -20,9 +20,11 @@ public class LastMessageServiceImpl implements LastMessageService {
     @Override
     public void updateLastMessage(Message message) {
         LastMessage lastMessage = lastMessageRepository.findByConversationId(message.getConversationId());
-        lastMessage.setMessageId(message.getId().toString());
-        lastMessage.setLastModifiedAt(Instant.now());
-        lastMessageRepository.save(lastMessage);
+        if(Objects.nonNull(lastMessage)) {
+            lastMessage.setMessageId(message.getId().toString());
+            lastMessage.setLastModifiedAt(Instant.now());
+            lastMessageRepository.save(lastMessage);
+        }
     }
 
     @Override
