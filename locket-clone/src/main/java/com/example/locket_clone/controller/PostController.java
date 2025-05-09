@@ -240,6 +240,7 @@ public class PostController {
         String userSender = customUserDetail.getId();
         String userReceiver = replyPostRequest.getUserId();
         Conversation conversation = conversationService.getConversationByUserIdAndFriendId(userReceiver, userSender);
+        System.out.println(userReceiver + "////////");
         Message message = new Message(replyPostRequest.getContent(), conversation.getId().toString(), userSender, userReceiver, false, replyPostRequest.getPostURL());
         Map<String, Object> map = new HashMap<>();
         map.put("conversation_id", message.getConversationId());
@@ -249,7 +250,9 @@ public class PostController {
 
         ObjectMapper objectMapper = new ObjectMapper();
         String json = objectMapper.writeValueAsString(map);
+        EventMessageRunner.eventMessageRequests.add(new ObjectRequest(Constant.API.UPDATE_LAST_MESSAGE, message));
         Set<UUID> usersOnline = NettySocketIOServerRunner.onlineUsers.get(userReceiver);
+        System.out.println("usersOnline: " + usersOnline);
         if(Objects.nonNull(usersOnline)) {
             usersOnline.forEach(uuid -> {
                 SocketIOClient socketReceiver = server.getClient(uuid);
@@ -258,7 +261,6 @@ public class PostController {
                 }
             });
         }
-        EventMessageRunner.eventMessageRequests.add(new ObjectRequest(Constant.API.UPDATE_LAST_MESSAGE, message));
         return new ResponseData<>(ResponseCode.SUCCESS, "success");
     }
 }
