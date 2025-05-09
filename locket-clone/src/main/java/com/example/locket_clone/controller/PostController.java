@@ -258,9 +258,7 @@ public class PostController {
                 }
             });
         }
-        String savedMessageId = messageService.saveMessage(newMessage);
-        newMessage.setId(new ObjectId(savedMessageId));
-        lastMessageService.updateLastMessage(newMessage);
+        EventMessageRunner.eventMessageRequests.add(new ObjectRequest(Constant.API.UPDATE_LAST_MESSAGE, message));
         return new ResponseData<>(ResponseCode.SUCCESS, "success");
     }
 }
