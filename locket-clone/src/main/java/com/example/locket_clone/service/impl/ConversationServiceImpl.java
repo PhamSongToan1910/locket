@@ -27,4 +27,9 @@ public class ConversationServiceImpl implements ConversationService {
     public Conversation getConversationById(String id) {
         return conversationRepository.findById(id).orElse(null);
     }
+
+    @Override
+    public Conversation getConversationByUserIdAndFriendId(String userId, String friendId) {
+        return conversationRepository.findByUserIds(userId, friendId);
+    }
 }

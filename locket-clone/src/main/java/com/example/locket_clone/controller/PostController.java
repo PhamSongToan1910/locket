@@ -1,38 +1,28 @@
 package com.example.locket_clone.controller;
 
+import com.corundumstudio.socketio.SocketIOClient;
+import com.corundumstudio.socketio.SocketIOServer;
 import com.example.locket_clone.config.CurrentUser;
 import com.example.locket_clone.config.security.CustomUserDetail;
-import com.example.locket_clone.entities.Notification;
-import com.example.locket_clone.entities.Post;
-import com.example.locket_clone.entities.Reaction;
-import com.example.locket_clone.entities.UnreadPost;
-import com.example.locket_clone.entities.User;
-import com.example.locket_clone.entities.request.AddPostRequest;
-import com.example.locket_clone.entities.request.AddReactionPost;
-import com.example.locket_clone.entities.request.AddUnreadPostRequest;
-import com.example.locket_clone.entities.request.DeletePostRequest;
-import com.example.locket_clone.entities.request.GetPostsRequest;
-import com.example.locket_clone.entities.request.HidePostRequest;
-import com.example.locket_clone.entities.request.ObjectRequest;
-import com.example.locket_clone.entities.request.RemovePostNotificationRequest;
-import com.example.locket_clone.entities.request.ReportPostRequest;
+import com.example.locket_clone.entities.*;
+import com.example.locket_clone.entities.request.*;
 import com.example.locket_clone.entities.response.GetPostResponse;
 import com.example.locket_clone.entities.response.GetReactionResponse;
 import com.example.locket_clone.entities.response.GetReportPosts;
 import com.example.locket_clone.entities.response.GetUnreadPostResponse;
 import com.example.locket_clone.entities.response.ResponseData;
+import com.example.locket_clone.runner.EventMessageRunner;
 import com.example.locket_clone.runner.EventPostRunner;
 import com.example.locket_clone.runner.EventUserRunner;
-import com.example.locket_clone.service.PostService;
-import com.example.locket_clone.service.ReactionService;
-import com.example.locket_clone.service.ReportPostService;
-import com.example.locket_clone.service.UnreadPostService;
-import com.example.locket_clone.service.UserService;
+import com.example.locket_clone.runner.NettySocketIOServerRunner;
+import com.example.locket_clone.service.*;
 import com.example.locket_clone.utils.Constant.Constant;
 import com.example.locket_clone.utils.Constant.ResponseCode;
 import com.example.locket_clone.utils.ModelMapper.ModelMapperUtils;
 import com.example.locket_clone.utils.fileUtils.FileUtils;
 import com.example.locket_clone.utils.s3Utils.S3Service;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -53,9 +43,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.util.List;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 
 @RestController
 @RequiredArgsConstructor
@@ -69,6 +57,8 @@ public class PostController {
     ReportPostService reportPostService;
     UserService userService;
     UnreadPostService unreadPostService;
+    ConversationService conversationService;
+    SocketIOServer server;
 
     @PostMapping(value = "/upload-image", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseData<String> addPost(@RequestParam("file") MultipartFile multipartFile) throws IOException {
@@ -240,6 +230,35 @@ public class PostController {
         EventUserRunner.eventUserRequests.add(addNotiRemovePostByAdmin);
         Notification notification = new Notification(postId, Constant.TYPE_OF_NOTIFICATION.REMOVE_POST_BY_ADMIN, userId);
         EventUserRunner.eventUserRequests.add(new ObjectRequest(Constant.API.SAVE_NOTIFICATION, notification));
+        return new ResponseData<>(ResponseCode.SUCCESS, "success");
+    }
+
+    @PostMapping("/reply-post")
+    public ResponseData<?> replyPost(@CurrentUser CustomUserDetail customUserDetail,
+                                     @RequestBody ReplyPostRequest replyPostRequest) throws JsonProcessingException {
+        String userSender = customUserDetail.getId();
+        String userReceiver = replyPostRequest.getUserId();
+        Conversation conversation = conversationService.getConversationByUserIdAndFriendId(userReceiver, userSender);
+        Message message = new Message(replyPostRequest.getContent(), conversation.getId().toString(), userSender, userReceiver, false, replyPostRequest.getPostURL());
+        Map<String, Object> map = new HashMap<>();
+        map.put("conversation_id", message.getConversationId());
+        map.put("user_receiver", message.getUserReceiverId());
+        map.put("content", message.getContent());
+        map.put("post_url", message.getPostURL());
+
+        ObjectMapper objectMapper = new ObjectMapper();
+        String json = objectMapper.writeValueAsString(map);
+        Set<UUID> usersOnline = NettySocketIOServerRunner.onlineUsers.get(userReceiver);
+        if(Objects.nonNull(usersOnline)) {
+            usersOnline.forEach(uuid -> {
+                SocketIOClient socketReceiver = server.getClient(uuid);
+                if(socketReceiver != null) {
+                    socketReceiver.sendEvent("receiver_message", json);
+                }
+            });
+        }
+        EventMessageRunner.eventMessageRequests.add(new ObjectRequest(Constant.API.UPLOAD_MESSAGE, message));
+        EventMessageRunner.eventMessageRequests.add(new ObjectRequest(Constant.API.UPLOAD_LAST_MESSAGE, message));
         return new ResponseData<>(ResponseCode.SUCCESS, "success");
     }
 }

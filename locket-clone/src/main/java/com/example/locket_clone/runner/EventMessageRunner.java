@@ -1,5 +1,6 @@
 package com.example.locket_clone.runner;
 
+import com.example.locket_clone.entities.LastMessage;
 import com.example.locket_clone.entities.Message;
 import com.example.locket_clone.entities.request.ObjectRequest;
 import com.example.locket_clone.service.LastMessageService;
@@ -50,6 +51,7 @@ public class EventMessageRunner implements CommandLineRunner {
             switch (request.getType()) {
                 case Constant.API.UPLOAD_MESSAGE -> uploadMessage(request);
                 case Constant.API.UPLOAD_LAST_MESSAGE -> uploadLastMessage(request);
+                case Constant.API.UPDATE_UNREAD_MESSAGE -> updateUnreadMessage(request);
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -64,5 +66,13 @@ public class EventMessageRunner implements CommandLineRunner {
     private void uploadLastMessage(ObjectRequest request) {
         Message message = (Message) request.getData();
         lastMessageService.updateLastMessage(message);
+    }
+
+    private void updateUnreadMessage(ObjectRequest request) {
+        String conversationId = (String) request.getData();
+        LastMessage lastMessage = lastMessageService.getLastMessageByConversationId(conversationId);
+        if(lastMessage != null) {
+            messageService.updateReadStatus(lastMessage.getMessageId());
+        }
     }
 }

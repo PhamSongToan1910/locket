@@ -26,8 +26,8 @@ import java.util.concurrent.ConcurrentHashMap;
 @RequiredArgsConstructor(onConstructor = @__(@Autowired))
 public class NettySocketIOServerRunner implements CommandLineRunner {
 
-    private final Map<String, Set<UUID>> onlineUsers = new ConcurrentHashMap<>();
-    private final Map<UUID, String> socketMap = new ConcurrentHashMap<>();
+    public static final Map<String, Set<UUID>> onlineUsers = new ConcurrentHashMap<>();
+    public static final Map<UUID, String> socketMap = new ConcurrentHashMap<>();
 
     private final SocketIOServer server;
     private final TokenProvider tokenProvider;
@@ -101,6 +101,14 @@ public class NettySocketIOServerRunner implements CommandLineRunner {
             String savedMessageId = messageService.saveMessage(newMessage);
             newMessage.setId(new ObjectId(savedMessageId));
             lastMessageService.updateLastMessage(newMessage);
+        });
+
+        server.addEventListener("read", String.class, (client, data, ackSender) -> {
+            ObjectMapper mapper = new ObjectMapper();
+            Map<String, Object> jsonMap = mapper.readValue(data, Map.class);
+            String conversationId = (String) jsonMap.get("conversation_id");
+            ObjectRequest request = new ObjectRequest(Constant.API.UPDATE_UNREAD_MESSAGE, conversationId);
+            EventMessageRunner.eventMessageRequests.add(request);
         });
 
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {

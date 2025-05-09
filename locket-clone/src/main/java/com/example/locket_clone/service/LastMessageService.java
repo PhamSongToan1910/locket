@@ -10,4 +10,7 @@ public interface LastMessageService {
     void updateLastMessage(Message message);
 
     List<LastMessage> getLastMessages(int skip, int take);
+
+    LastMessage getLastMessageByConversationId(String conversationId);
+
 }

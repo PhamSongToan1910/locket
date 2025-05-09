@@ -73,9 +73,8 @@ public class ConversationController {
             GetConversationHistoryResponse getConversationHistoryResponse = new GetConversationHistoryResponse();
             ModelMapperUtils.toObject(message, getConversationHistoryResponse);
             getConversationHistoryResponse.setId(message.getId().toString());
-            if(StringUtils.hasLength(message.getPostId())) {
-                Post post = postService.findbyId(message.getPostId());
-                getConversationHistoryResponse.setPostURL(post.getImageURL());
+            if(StringUtils.hasLength(message.getPostURL())) {
+                getConversationHistoryResponse.setPostURL(message.getPostURL());
             }
             return getConversationHistoryResponse;
         }).toList();

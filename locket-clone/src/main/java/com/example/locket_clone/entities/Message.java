@@ -20,7 +20,7 @@ public class Message extends BaseEntity {
     public static final String USER_SENDER_ID = "user_sender_id";
     public static final String USER_RECEIVER_ID = "user_receiver_id";
     public static final String IS_READ = "is_read";
-    public static final String POST_ID = "post_id";
+    public static final String POST_URL = "post_url";
 
     @Field(CONTENT)
     private String content;
@@ -37,6 +37,6 @@ public class Message extends BaseEntity {
     @Field(IS_READ)
     private boolean isRead;
 
-    @Field(POST_ID)
-    private String postId;
+    @Field(POST_URL)
+    private String postURL;
 }

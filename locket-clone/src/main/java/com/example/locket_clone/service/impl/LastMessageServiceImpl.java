@@ -3,6 +3,7 @@ package com.example.locket_clone.service.impl;
 import com.example.locket_clone.entities.LastMessage;
 import com.example.locket_clone.entities.Message;
 import com.example.locket_clone.repository.InterfacePackage.LastMessageRepository;
+import com.example.locket_clone.repository.InterfacePackage.MessageRepository;
 import com.example.locket_clone.service.LastMessageService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -30,5 +31,10 @@ public class LastMessageServiceImpl implements LastMessageService {
     @Override
     public List<LastMessage> getLastMessages(int skip, int take) {
         return lastMessageRepository.getLastMessages(skip, take);
+    }
+
+    @Override
+    public LastMessage getLastMessageByConversationId(String conversationId) {
+        return lastMessageRepository.findByConversationId(conversationId);
     }
 }
