@@ -19,7 +19,7 @@ public class ConversationRepositoryImpl implements CustomConversationRepository 
 
     @Override
     public Conversation findByUserIds(String userId, String friendId) {
-        Query query = new Query(Criteria.where(Conversation.USER_IDS).in(userId, friendId));
+        Query query = new Query(Criteria.where(Conversation.USER_IDS).all(userId, friendId));
         return mongoTemplate.findOne(query, Conversation.class);
     }
 }
