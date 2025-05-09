@@ -9,6 +9,7 @@ import lombok.experimental.FieldDefaults;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.time.Instant;
 import java.util.List;
 
 @Service
@@ -36,5 +37,15 @@ public class MessageServiceImpl implements MessageService {
     @Override
     public long countUnreadMessageByUserReceiverId(String userId) {
         return messageRepository.countUnreadMessageByUserReceiverId(userId);
+    }
+
+    @Override
+    public void updateReadStatus(String messageId) {
+        Message message = messageRepository.findById(messageId).orElse(null);
+        if(message != null) {
+            message.setRead(true);
+            message.setLastModifiedAt(Instant.now());
+            messageRepository.save(message);
+        }
     }
 }

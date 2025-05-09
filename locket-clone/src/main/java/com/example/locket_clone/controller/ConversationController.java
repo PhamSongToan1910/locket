@@ -5,13 +5,15 @@ import com.example.locket_clone.config.security.CustomUserDetail;
 import com.example.locket_clone.entities.Conversation;
 import com.example.locket_clone.entities.LastMessage;
 import com.example.locket_clone.entities.Message;
+import com.example.locket_clone.entities.Post;
 import com.example.locket_clone.entities.User;
-import com.example.locket_clone.entities.response.GetChatHistoryResponse;
+import com.example.locket_clone.entities.response.GetConversationHistoryResponse;
 import com.example.locket_clone.entities.response.ListConversationResponse;
 import com.example.locket_clone.entities.response.ResponseData;
 import com.example.locket_clone.service.ConversationService;
 import com.example.locket_clone.service.LastMessageService;
 import com.example.locket_clone.service.MessageService;
+import com.example.locket_clone.service.PostService;
 import com.example.locket_clone.service.UserService;
 import com.example.locket_clone.utils.Constant.ResponseCode;
 import com.example.locket_clone.utils.DateTimeConvertUtils;
@@ -21,12 +23,13 @@ import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.time.ZoneId;
 import java.util.Date;
 import java.util.List;
 import java.util.Objects;
@@ -41,6 +44,7 @@ public class ConversationController {
     MessageService messageService;
     ConversationService conversationService;
     UserService userService;
+    PostService postService;
 
     @GetMapping("/list-conversation")
     public ResponseData<List<ListConversationResponse>> listConversation(@CurrentUser CustomUserDetail customUserDetail,
@@ -58,13 +62,23 @@ public class ConversationController {
     }
 
     @GetMapping("/get-conversation-history")
-    public ResponseData<List<Message>> getConversationHistory(@CurrentUser CustomUserDetail customUserDetail,
+    public ResponseData<List<GetConversationHistoryResponse>> getConversationHistory(@CurrentUser CustomUserDetail customUserDetail,
                                                                              @RequestParam("conversation_id") String conversationId,
                                                                              @RequestParam(defaultValue = "0") int page,
                                                                              @RequestParam(defaultValue = "10") int size) {
         Pageable pageable = PageRequest.of(page, size);
         List<Message> listMessage = messageService.getMessagesByConversationId(conversationId, pageable);
-        return new ResponseData<>(ResponseCode.SUCCESS, "success", listMessage);
+        List<GetConversationHistoryResponse> response = listMessage.stream().map(message -> {
+            GetConversationHistoryResponse getConversationHistoryResponse = new GetConversationHistoryResponse();
+            ModelMapperUtils.toObject(message, getConversationHistoryResponse);
+            getConversationHistoryResponse.setId(message.getId().toString());
+            if(StringUtils.hasLength(message.getPostId())) {
+                Post post = postService.findbyId(message.getPostId());
+                getConversationHistoryResponse.setPostURL(post.getImageURL());
+            }
+            return getConversationHistoryResponse;
+        }).toList();
+        return new ResponseData<>(ResponseCode.SUCCESS, "success", response);
     }
 
     @GetMapping("/total-unread")
@@ -72,6 +86,13 @@ public class ConversationController {
         String userId = customUserDetail.getId();
         long unreadMessageNumber = messageService.countUnreadMessageByUserReceiverId(userId);
         return new ResponseData<>(ResponseCode.SUCCESS, "success", unreadMessageNumber);
+    }
+
+    @PostMapping("/update-read-status")
+    public ResponseData updateReadStatus(@CurrentUser CustomUserDetail customUserDetail,
+                                         @RequestParam("message_id") String messageId) {
+        messageService.updateReadStatus(messageId);
+        return new ResponseData<>(ResponseCode.SUCCESS, "success");
     }
 
     private ListConversationResponse convertMessageToListConversationResponse(Message message) {

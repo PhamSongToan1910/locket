@@ -13,4 +13,6 @@ public interface MessageService {
     Message getMessageById(String messageId);
 
     long countUnreadMessageByUserReceiverId(String userId);
+
+    void updateReadStatus(String messageId);
 }
