@@ -26,6 +26,7 @@ import java.util.concurrent.ConcurrentHashMap;
 public class NettySocketIOServerRunner implements CommandLineRunner {
 
     private final Map<String, Set<UUID>> onlineUsers = new ConcurrentHashMap<>();
+    private final Map<UUID, String> socketMap = new ConcurrentHashMap<>();
 
     private final SocketIOServer server;
     private final TokenProvider tokenProvider;
@@ -44,6 +45,7 @@ public class NettySocketIOServerRunner implements CommandLineRunner {
                     onlineUsers.put(userId, new HashSet<>());
                 }
                 onlineUsers.get(userId).add(client.getSessionId());
+                socketMap.put(client.getSessionId(), userId);
                 System.out.println("UserId: " + userId);
                 System.out.println("list sessionID: " + onlineUsers.get(userId));
             } else {
@@ -58,6 +60,7 @@ public class NettySocketIOServerRunner implements CommandLineRunner {
                 System.out.println("removed token: " + token);
                 String userId = tokenProvider.getUserIdByToken(token);
                 onlineUsers.get(userId).remove(client.getSessionId());
+                socketMap.remove(client.getSessionId());
                 System.out.println("UserId: " + userId);
                 System.out.println("list sessionID: " + onlineUsers.get(userId));
             } else {
@@ -70,16 +73,17 @@ public class NettySocketIOServerRunner implements CommandLineRunner {
             //data : conversationId&userReceiverId&PostURL&Content
             //if PostId == null => data = conversationId&UserSenderId&--&Content
             System.out.println("data: " + data);
+            System.out.println("mapSocketID: " + onlineUsers);
             System.out.println("socketID: " + client.getSessionId());
             System.out.println("token: + " + client.getHandshakeData().getSingleUrlParam("token"));
-            System.out.println("userId: + " + client.getHandshakeData().getSingleUrlParam("userId"));
             ObjectMapper mapper = new ObjectMapper();
             Map<String, Object> jsonMap = mapper.readValue(data, Map.class);
             String conversationId = (String) jsonMap.get("conversation_id");
             String userReceiver = (String) jsonMap.get("user_receiver");
             String postURL = (String) jsonMap.get("post_url");
             String content = (String) jsonMap.get("content");
-            String userSender = client.getHandshakeData().getSingleUrlParam("userId");
+            String userSender = socketMap.get(client.getSessionId());
+            System.out.println("userId: + " + userSender);
             System.out.println("send message: " + conversationId + " " + userSender + " " + userReceiver + " " + postURL + " " + content);
             Set<UUID> usersOnline = onlineUsers.get(userReceiver);
             Message newMessage = new Message(content, conversationId, userSender, userReceiver, false, postURL);
