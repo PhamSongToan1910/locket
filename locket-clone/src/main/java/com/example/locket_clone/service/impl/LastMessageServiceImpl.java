@@ -25,6 +25,12 @@ public class LastMessageServiceImpl implements LastMessageService {
             lastMessage.setMessageId(message.getId().toString());
             lastMessage.setLastModifiedAt(Instant.now());
             lastMessageRepository.save(lastMessage);
+        } else {
+            lastMessage = new LastMessage();
+            lastMessage.setConversationId(message.getConversationId());
+            lastMessage.setMessageId(message.getId().toString());
+            lastMessage.setLastModifiedAt(Instant.now());
+            lastMessageRepository.save(lastMessage);
         }
     }
 
