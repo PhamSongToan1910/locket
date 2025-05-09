@@ -58,7 +58,9 @@ public class ConversationController {
                 .filter(Objects::nonNull)
                 .map(this::convertMessageToListConversationResponse)
                 .toList();
-        responseList = responseList.stream().map(listConversationResponse -> this.addAvtAndNameToListConversationResponse(listConversationResponse, userId)).toList();
+        responseList = responseList.stream().map(listConversationResponse -> this.addAvtAndNameToListConversationResponse(listConversationResponse, userId))
+                .filter(Objects::nonNull)
+                .toList();
         return new ResponseData<>(ResponseCode.SUCCESS, "success", responseList);
     }
 
@@ -115,6 +117,11 @@ public class ConversationController {
             response.setUserSenderId(user.getId().toString());
             response.setAvt(user.getAvt());
             response.setName(user.getFullName());
+        } else {
+            assert conversation != null;
+            if(!conversation.getUserIds().contains(userId)){
+                return null;
+            }
         }
         return response;
     }
