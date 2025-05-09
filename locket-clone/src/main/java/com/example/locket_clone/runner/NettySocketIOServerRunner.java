@@ -70,6 +70,9 @@ public class NettySocketIOServerRunner implements CommandLineRunner {
             //data : conversationId&userReceiverId&PostURL&Content
             //if PostId == null => data = conversationId&UserSenderId&--&Content
             System.out.println("data: " + data);
+            System.out.println("socketID: " + client.getSessionId());
+            System.out.println("token: + " + client.getHandshakeData().getSingleUrlParam("token"));
+            System.out.println("userId: + " + client.getHandshakeData().getSingleUrlParam("userId"));
             ObjectMapper mapper = new ObjectMapper();
             Map<String, Object> jsonMap = mapper.readValue(data, Map.class);
             String conversationId = (String) jsonMap.get("conversation_id");
@@ -79,20 +82,20 @@ public class NettySocketIOServerRunner implements CommandLineRunner {
             String userSender = client.getHandshakeData().getSingleUrlParam("userId");
             System.out.println("send message: " + conversationId + " " + userSender + " " + userReceiver + " " + postURL + " " + content);
             Set<UUID> usersOnline = onlineUsers.get(userReceiver);
+            Message newMessage = new Message(content, conversationId, userSender, userReceiver, false, postURL);
+            ObjectRequest updateLastMessageRequest = new ObjectRequest(Constant.API.UPLOAD_LAST_MESSAGE, newMessage);
+            ObjectRequest saveMessageRequest = new ObjectRequest(Constant.API.UPLOAD_MESSAGE, newMessage);
+            System.out.println("data received: " + data);
             if(Objects.nonNull(usersOnline)) {
                 usersOnline.forEach(uuid -> {
                     SocketIOClient socketReceiver = server.getClient(uuid);
                     if(socketReceiver != null) {
-                        Message newMessage = new Message(content, conversationId, userSender, userReceiver, false, postURL);
-                        ObjectRequest updateLastMessageRequest = new ObjectRequest(Constant.API.UPLOAD_LAST_MESSAGE, newMessage);
-                        ObjectRequest saveMessageRequest = new ObjectRequest(Constant.API.UPLOAD_MESSAGE, newMessage);
-                        EventMessageRunner.eventMessageRequests.add(updateLastMessageRequest);
-                        EventMessageRunner.eventMessageRequests.add(saveMessageRequest);
-                        System.out.println("data received: " + data);
                         socketReceiver.sendEvent("receiver_message", data);
                     }
                 });
             }
+            EventMessageRunner.eventMessageRequests.add(updateLastMessageRequest);
+            EventMessageRunner.eventMessageRequests.add(saveMessageRequest);
         });
 
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {

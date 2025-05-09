@@ -100,7 +100,7 @@ public class ConversationController {
         ListConversationResponse response = new ListConversationResponse();
         ModelMapperUtils.toObject(message, response);
         if(System.currentTimeMillis() - message.getCreatedAt().toEpochMilli() <= 86400000) {
-            response.setCreatedAt(message.getCreatedAt().toString());
+            response.setCreatedAt(message.getCreatedAt().toString().substring(11, 16));
         } else {
             response.setCreatedAt(DateTimeConvertUtils.convertDateToString(Date.from(message.getCreatedAt())));
         }
