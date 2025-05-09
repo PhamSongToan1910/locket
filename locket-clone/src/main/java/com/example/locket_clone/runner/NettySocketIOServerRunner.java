@@ -10,6 +10,7 @@ import com.example.locket_clone.service.MessageService;
 import com.example.locket_clone.utils.Constant.Constant;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
+import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
@@ -87,8 +88,7 @@ public class NettySocketIOServerRunner implements CommandLineRunner {
             System.out.println("send message: " + conversationId + " " + userSender + " " + userReceiver + " " + postURL + " " + content);
             Set<UUID> usersOnline = onlineUsers.get(userReceiver);
             Message newMessage = new Message(content, conversationId, userSender, userReceiver, false, postURL);
-            ObjectRequest updateLastMessageRequest = new ObjectRequest(Constant.API.UPLOAD_LAST_MESSAGE, newMessage);
-            ObjectRequest saveMessageRequest = new ObjectRequest(Constant.API.UPLOAD_MESSAGE, newMessage);
+
             System.out.println("data received: " + data);
             if(Objects.nonNull(usersOnline)) {
                 usersOnline.forEach(uuid -> {
@@ -98,8 +98,9 @@ public class NettySocketIOServerRunner implements CommandLineRunner {
                     }
                 });
             }
-            EventMessageRunner.eventMessageRequests.add(updateLastMessageRequest);
-            EventMessageRunner.eventMessageRequests.add(saveMessageRequest);
+            String savedMessageId = messageService.saveMessage(newMessage);
+            newMessage.setId(new ObjectId(savedMessageId));
+            lastMessageService.updateLastMessage(newMessage);
         });
 
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {

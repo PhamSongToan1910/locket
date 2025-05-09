@@ -22,8 +22,9 @@ public class MessageServiceImpl implements MessageService {
     MessageRepositoryCustom messageRepositoryCustom;
 
     @Override
-    public void saveMessage(Message message) {
-        messageRepository.save(message);
+    public String saveMessage(Message message) {
+        Message saveMessage = messageRepository.save(message);
+        return saveMessage.getId().toString();
     }
 
     @Override

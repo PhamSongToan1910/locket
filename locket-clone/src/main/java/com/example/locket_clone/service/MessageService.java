@@ -6,7 +6,7 @@ import org.springframework.data.domain.Pageable;
 import java.util.List;
 
 public interface MessageService {
-    void saveMessage(Message message);
+    String saveMessage(Message message);
 
     List<Message> getMessages(String conversationId, int skip, int take);
 
