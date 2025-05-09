@@ -10,6 +10,7 @@ import com.example.locket_clone.entities.User;
 import com.example.locket_clone.entities.response.GetConversationHistoryResponse;
 import com.example.locket_clone.entities.response.ListConversationResponse;
 import com.example.locket_clone.entities.response.ResponseData;
+import com.example.locket_clone.repository.InterfacePackage.MessageRepository;
 import com.example.locket_clone.service.ConversationService;
 import com.example.locket_clone.service.LastMessageService;
 import com.example.locket_clone.service.MessageService;
@@ -45,6 +46,7 @@ public class ConversationController {
     ConversationService conversationService;
     UserService userService;
     PostService postService;
+    MessageRepository messageRepository;
 
     @GetMapping("/list-conversation")
     public ResponseData<List<ListConversationResponse>> listConversation(@CurrentUser CustomUserDetail customUserDetail,
@@ -65,7 +67,8 @@ public class ConversationController {
                                                                              @RequestParam("conversation_id") String conversationId,
                                                                              @RequestParam("skip") int skip,
                                                                              @RequestParam("take") int take) {
-        List<Message> listMessage = messageService.getMessagesByConversationId(conversationId, skip, take);
+        System.out.println("take: " + take);
+        List<Message> listMessage = messageService.getMessages(conversationId, skip, take);
         List<GetConversationHistoryResponse> response = listMessage.stream().map(message -> {
             GetConversationHistoryResponse getConversationHistoryResponse = new GetConversationHistoryResponse();
             ModelMapperUtils.toObject(message, getConversationHistoryResponse);

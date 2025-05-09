@@ -2,6 +2,7 @@ package com.example.locket_clone.service.impl;
 
 import com.example.locket_clone.entities.Message;
 import com.example.locket_clone.repository.InterfacePackage.MessageRepository;
+import com.example.locket_clone.repository.InterfacePackage.MessageRepositoryCustom;
 import com.example.locket_clone.service.MessageService;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -18,6 +19,7 @@ import java.util.List;
 public class MessageServiceImpl implements MessageService {
 
     MessageRepository messageRepository;
+    MessageRepositoryCustom messageRepositoryCustom;
 
     @Override
     public void saveMessage(Message message) {
@@ -25,8 +27,9 @@ public class MessageServiceImpl implements MessageService {
     }
 
     @Override
-    public List<Message> getMessagesByConversationId(String conversationId, int skip, int take) {
-        return messageRepository.findByConversationIdOrderByConversationIdDesc(conversationId, skip, take);
+    public List<Message> getMessages(String conversationId, int skip, int take) {
+        List<Message> lstMessage = messageRepositoryCustom.getMessageByConversationId(conversationId, skip, take);
+        return lstMessage;
     }
 
     @Override
@@ -36,7 +39,7 @@ public class MessageServiceImpl implements MessageService {
 
     @Override
     public long countUnreadMessageByUserReceiverId(String userId) {
-        return messageRepository.countUnreadMessageByUserReceiverId(userId);
+        return messageRepositoryCustom.countUnreadMessagesByUserReceiverId(userId);
     }
 
     @Override
