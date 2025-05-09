@@ -67,6 +67,7 @@ public class Constant {
         public static final int UPLOAD_LAST_MESSAGE = 10;
         public static final int UPLOAD_MESSAGE = 11;
         public static final int UPDATE_UNREAD_MESSAGE = 14;
+        public static final int UPDATE_LAST_MESSAGE = 15;
 
         //Notification
         public static final int SAVE_NOTIFICATION = 13;

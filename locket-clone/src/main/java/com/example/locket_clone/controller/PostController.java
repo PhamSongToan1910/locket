@@ -26,6 +26,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import org.bson.types.ObjectId;
 import org.springframework.context.annotation.Role;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -257,8 +258,9 @@ public class PostController {
                 }
             });
         }
-        EventMessageRunner.eventMessageRequests.add(new ObjectRequest(Constant.API.UPLOAD_MESSAGE, message));
-        EventMessageRunner.eventMessageRequests.add(new ObjectRequest(Constant.API.UPLOAD_LAST_MESSAGE, message));
+        String savedMessageId = messageService.saveMessage(newMessage);
+        newMessage.setId(new ObjectId(savedMessageId));
+        lastMessageService.updateLastMessage(newMessage);
         return new ResponseData<>(ResponseCode.SUCCESS, "success");
     }
 }

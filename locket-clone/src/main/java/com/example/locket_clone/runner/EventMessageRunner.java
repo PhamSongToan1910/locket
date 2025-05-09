@@ -7,6 +7,7 @@ import com.example.locket_clone.service.LastMessageService;
 import com.example.locket_clone.service.MessageService;
 import com.example.locket_clone.utils.Constant.Constant;
 import lombok.RequiredArgsConstructor;
+import org.bson.types.ObjectId;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 
@@ -52,6 +53,7 @@ public class EventMessageRunner implements CommandLineRunner {
                 case Constant.API.UPLOAD_MESSAGE -> uploadMessage(request);
                 case Constant.API.UPLOAD_LAST_MESSAGE -> uploadLastMessage(request);
                 case Constant.API.UPDATE_UNREAD_MESSAGE -> updateUnreadMessage(request);
+                case Constant.API.UPDATE_LAST_MESSAGE -> updateLastMessage(request);
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -74,5 +76,12 @@ public class EventMessageRunner implements CommandLineRunner {
         if(lastMessage != null) {
             messageService.updateReadStatus(lastMessage.getMessageId());
         }
+    }
+
+    private void updateLastMessage(ObjectRequest request) {
+        Message message = (Message) request.getData();
+        String savedMessageId = messageService.saveMessage(message);
+        message.setId(new ObjectId(savedMessageId));
+        lastMessageService.updateLastMessage(message);
     }
 }
