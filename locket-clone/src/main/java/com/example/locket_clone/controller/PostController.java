@@ -183,7 +183,7 @@ public class PostController {
         Post newestPost = postService.getNewestPostByUserId(userId);
         GetUnreadPostResponse getLastesPost = new GetUnreadPostResponse();
         ModelMapperUtils.toObject(newestPost, getLastesPost);
-        User ownerPost = userService.findUserById(unreadPost.getUserId());
+        User ownerPost = userService.findUserById(newestPost.getUserId());
         getLastesPost.setUnreadCount(unreadPost.getPostIds().size());
         getLastesPost.setFriendAvt(ownerPost.getAvt());
         getLastesPost.setId(newestPost.getId().toString());
