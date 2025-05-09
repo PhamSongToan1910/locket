@@ -8,7 +8,7 @@ import java.util.List;
 public interface MessageService {
     void saveMessage(Message message);
 
-    List<Message> getMessagesByConversationId(String conversationId, Pageable pageable);
+    List<Message> getMessagesByConversationId(String conversationId, int skip, int take);
 
     Message getMessageById(String messageId);
 

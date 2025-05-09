@@ -22,10 +22,11 @@ public class CustomMessageRepositoryImpl implements CustomMessageRepository {
     MongoTemplate mongoTemplate;
 
     @Override
-    public List<Message> findByConversationIdOrderByConversationIdDesc(String conversationId, Pageable pageable) {
+    public List<Message> findByConversationIdOrderByConversationIdDesc(String conversationId, int skip, int take) {
         Query query = new Query(Criteria.where(Message.CONVERSATION_ID).is(conversationId));
         query.with(Sort.by(Sort.Direction.DESC, Message.CREATE_AT));
-        query.with(pageable);
+        query.skip(skip);
+        query.limit(take);
         return mongoTemplate.find(query, Message.class);
     }
 

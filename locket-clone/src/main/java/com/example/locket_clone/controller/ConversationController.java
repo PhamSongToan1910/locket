@@ -63,10 +63,9 @@ public class ConversationController {
     @GetMapping("/get-conversation-history")
     public ResponseData<List<GetConversationHistoryResponse>> getConversationHistory(@CurrentUser CustomUserDetail customUserDetail,
                                                                              @RequestParam("conversation_id") String conversationId,
-                                                                             @RequestParam(defaultValue = "0") int page,
-                                                                             @RequestParam(defaultValue = "10") int size) {
-        Pageable pageable = PageRequest.of(page, size);
-        List<Message> listMessage = messageService.getMessagesByConversationId(conversationId, pageable);
+                                                                             @RequestParam("skip") int skip,
+                                                                             @RequestParam("take") int take) {
+        List<Message> listMessage = messageService.getMessagesByConversationId(conversationId, skip, take);
         List<GetConversationHistoryResponse> response = listMessage.stream().map(message -> {
             GetConversationHistoryResponse getConversationHistoryResponse = new GetConversationHistoryResponse();
             ModelMapperUtils.toObject(message, getConversationHistoryResponse);
