@@ -11,4 +11,6 @@ public interface MessageService {
     List<Message> getMessagesByConversationId(String conversationId, Pageable pageable);
 
     Message getMessageById(String messageId);
+
+    long countUnreadMessageByUserReceiverId(String userId);
 }

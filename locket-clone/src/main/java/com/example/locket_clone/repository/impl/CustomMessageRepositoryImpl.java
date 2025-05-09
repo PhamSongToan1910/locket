@@ -28,4 +28,11 @@ public class CustomMessageRepositoryImpl implements CustomMessageRepository {
         query.with(pageable);
         return mongoTemplate.find(query, Message.class);
     }
+
+    @Override
+    public long countUnreadMessageByUserReceiverId(String userId) {
+        Query query = new Query(Criteria.where(Message.USER_RECEIVER_ID).is(userId));
+        query.addCriteria(Criteria.where(Message.IS_READ).is(false));
+        return mongoTemplate.count(query, Message.class);
+    }
 }

@@ -27,5 +27,8 @@ public class ListConversationResponse {
     private boolean isRead;
 
     @JsonProperty("create_at")
-    private Instant createdAt;
+    private String createdAt;
+
+    @JsonProperty("user_id")
+    private String userSenderId;
 }

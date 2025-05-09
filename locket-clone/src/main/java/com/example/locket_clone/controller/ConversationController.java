@@ -14,6 +14,7 @@ import com.example.locket_clone.service.LastMessageService;
 import com.example.locket_clone.service.MessageService;
 import com.example.locket_clone.service.UserService;
 import com.example.locket_clone.utils.Constant.ResponseCode;
+import com.example.locket_clone.utils.DateTimeConvertUtils;
 import com.example.locket_clone.utils.ModelMapper.ModelMapperUtils;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -25,6 +26,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.time.ZoneId;
+import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 
@@ -64,9 +67,21 @@ public class ConversationController {
         return new ResponseData<>(ResponseCode.SUCCESS, "success", listMessage);
     }
 
+    @GetMapping("/total-unread")
+    public ResponseData<Long> getUnread(@CurrentUser CustomUserDetail customUserDetail) {
+        String userId = customUserDetail.getId();
+        long unreadMessageNumber = messageService.countUnreadMessageByUserReceiverId(userId);
+        return new ResponseData<>(ResponseCode.SUCCESS, "success", unreadMessageNumber);
+    }
+
     private ListConversationResponse convertMessageToListConversationResponse(Message message) {
         ListConversationResponse response = new ListConversationResponse();
         ModelMapperUtils.toObject(message, response);
+        if(System.currentTimeMillis() - message.getCreatedAt().toEpochMilli() <= 86400000) {
+            response.setCreatedAt(message.getCreatedAt().toString());
+        } else {
+            response.setCreatedAt(DateTimeConvertUtils.convertDateToString(Date.from(message.getCreatedAt())));
+        }
         return response;
     }
 
@@ -76,6 +91,7 @@ public class ConversationController {
         if (conversation != null && conversation.getUserIds().contains(userId)) {
             String friendId = conversation.getUserIds().stream().filter(id -> !id.equals(userId)).findFirst().get();
             User user = userService.findUserById(friendId);
+            response.setUserSenderId(user.getId().toString());
             response.setAvt(user.getAvt());
             response.setName(user.getFullName());
         }

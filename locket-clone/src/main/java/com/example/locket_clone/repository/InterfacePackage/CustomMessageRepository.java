@@ -8,4 +8,6 @@ import java.util.List;
 public interface CustomMessageRepository {
     List<Message> findByConversationIdOrderByConversationIdDesc(String conversationId, Pageable pageable);
 
+    long countUnreadMessageByUserReceiverId(String userId);
+
 }

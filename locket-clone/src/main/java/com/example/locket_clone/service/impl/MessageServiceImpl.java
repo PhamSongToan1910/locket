@@ -32,4 +32,9 @@ public class MessageServiceImpl implements MessageService {
     public Message getMessageById(String messageId) {
         return messageRepository.findById(messageId).orElse(null);
     }
+
+    @Override
+    public long countUnreadMessageByUserReceiverId(String userId) {
+        return messageRepository.countUnreadMessageByUserReceiverId(userId);
+    }
 }
