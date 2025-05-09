@@ -9,5 +9,5 @@ import java.util.List;
 public interface LastMessageService {
     void updateLastMessage(Message message);
 
-    List<LastMessage> getLastMessages(Pageable pageable);
+    List<LastMessage> getLastMessages(int skip, int take);
 }

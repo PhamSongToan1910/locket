@@ -48,11 +48,10 @@ public class ConversationController {
 
     @GetMapping("/list-conversation")
     public ResponseData<List<ListConversationResponse>> listConversation(@CurrentUser CustomUserDetail customUserDetail,
-                                                                         @RequestParam(defaultValue = "0") int page,
-                                                                         @RequestParam(defaultValue = "10") int size) {
+                                                                         @RequestParam("skip") int skip,
+                                                                         @RequestParam("take") int take) {
         String userId = customUserDetail.getId();
-        Pageable pageable = PageRequest.of(page, size);
-        List<LastMessage> lastMessageList = lastMessageService.getLastMessages(pageable);
+        List<LastMessage> lastMessageList = lastMessageService.getLastMessages(skip, take);
         List<ListConversationResponse> responseList = lastMessageList.stream().map(lastMessage -> messageService.getMessageById(lastMessage.getMessageId()))
                 .filter(Objects::nonNull)
                 .map(this::convertMessageToListConversationResponse)

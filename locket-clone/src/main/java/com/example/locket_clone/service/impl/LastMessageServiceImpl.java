@@ -26,7 +26,7 @@ public class LastMessageServiceImpl implements LastMessageService {
     }
 
     @Override
-    public List<LastMessage> getLastMessages(Pageable pageable) {
-        return lastMessageRepository.getLastMessages(pageable);
+    public List<LastMessage> getLastMessages(int skip, int take) {
+        return lastMessageRepository.getLastMessages(skip, take);
     }
 }

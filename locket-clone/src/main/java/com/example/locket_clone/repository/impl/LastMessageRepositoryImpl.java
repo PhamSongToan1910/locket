@@ -21,10 +21,11 @@ public class LastMessageRepositoryImpl implements CustomLastMessageRepository {
     MongoTemplate mongoTemplate;
 
     @Override
-    public List<LastMessage> getLastMessages(Pageable pageable) {
+    public List<LastMessage> getLastMessages(int skip, int take) {
         Query query = new Query();
         query.with(Sort.by(Sort.Direction.DESC, LastMessage.LAST_MODIFIED_AT));
-        query.with(pageable);
+        query.skip(skip);
+        query.limit(take);
         return mongoTemplate.find(query, LastMessage.class);
     }
 }
