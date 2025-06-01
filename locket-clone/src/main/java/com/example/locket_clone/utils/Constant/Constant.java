@@ -73,4 +73,10 @@ public class Constant {
         public static final int SAVE_NOTIFICATION = 13;
 
     }
+
+    public static class STATUS_REPORT_POST {
+        public static final int SKIP = 1;
+        public static final int PENDING = 2;
+        public static final int DELETE = 3;
+    }
 }

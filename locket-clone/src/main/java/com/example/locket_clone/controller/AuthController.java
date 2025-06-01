@@ -122,11 +122,12 @@ public class AuthController {
         if(!loginAdminRequest.validateRequest()) {
             return new ResponseData<>(ResponseCode.WRONG_DATA_FORMAT, "Wrong request format");
         }
+        User user = userService.findUserByEmail(loginAdminRequest.getEmail());
+        Set<SimpleGrantedAuthority> authorities = roleService.convertRolesToSimpleGrantedAuthorities(user.getAuthorities());
         UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken = new UsernamePasswordAuthenticationToken(
                 loginAdminRequest.getEmail(),
-                loginAdminRequest.getPassword()
-        );
-        User user = userService.findUserByEmail(loginAdminRequest.getEmail());
+                loginAdminRequest.getPassword(),
+                authorities);
         String jwt = tokenProvider.createToken(usernamePasswordAuthenticationToken, user.getId().toString());
         return new ResponseData<>(ResponseCode.SUCCESS, "success", jwt);
     }

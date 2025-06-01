@@ -3,6 +3,7 @@ package com.example.locket_clone.service;
 import com.example.locket_clone.entities.Post;
 import com.example.locket_clone.entities.request.AddPostRequest;
 import com.example.locket_clone.entities.request.GetPostsRequest;
+import com.example.locket_clone.entities.response.GetAllPostResponse;
 import com.example.locket_clone.entities.response.GetPostResponse;
 import org.springframework.data.domain.Pageable;
 
@@ -18,4 +19,5 @@ public interface PostService {
     void deletePost(String postId);
     List<Post> getPostsByIds(Set<String> postIds);
     Post getNewestPostByUserId(String userId);
+    List<GetAllPostResponse> getAllPostsByAdmin(Pageable pageable);
 }

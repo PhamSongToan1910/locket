@@ -54,6 +54,7 @@ public class DomainUserDetailService implements UserDetailsService {
     private String stringToRole(String id) throws Exception {
         Role role = roleRepository.findById(id).orElse(null);
         if(role != null) {
+            System.out.println(role.getName());
             return role.getName();
         }
         throw new Exception();

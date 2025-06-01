@@ -5,14 +5,12 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.time.Instant;
-
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class GetReportPosts {
+public class GetAllPostResponse {
     @JsonProperty("post_id")
-    private String postId;
+    private String id;
 
     @JsonProperty("caption")
     private String caption;
@@ -23,15 +21,6 @@ public class GetReportPosts {
     @JsonProperty("user_id")
     private String userId;
 
-    @JsonProperty("owner_id")
-    private String onwerId;
-
-    @JsonProperty("create_at")
-    private Instant createdAt;
-
-    @JsonProperty("status")
-    private String status;
-
-    @JsonProperty("action")
-    private String action;
+    @JsonProperty("create_time")
+    private String createTime;
 }

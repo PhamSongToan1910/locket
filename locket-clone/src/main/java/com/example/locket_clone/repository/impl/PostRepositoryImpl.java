@@ -57,4 +57,12 @@ public class PostRepositoryImpl implements CustomPostRepository {
         query.limit(1);
         return mongoTemplate.findOne(query, Post.class);
     }
+
+    @Override
+    public List<Post> getAllPostsByAdmin(Pageable pageable) {
+        Query query = new Query();
+        query.with(Sort.by(Sort.Direction.DESC, Post.CREATE_AT));
+        query.with(pageable);
+        return mongoTemplate.find(query, Post.class);
+    }
 }

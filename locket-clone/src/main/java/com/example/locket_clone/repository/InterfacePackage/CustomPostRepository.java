@@ -13,4 +13,6 @@ public interface CustomPostRepository {
     List<Post> getMyPosts(String userId, Pageable pageable);
 
     Post getNewestPostByUserId(String userId);
+
+    List<Post> getAllPostsByAdmin(Pageable pageable);
 }

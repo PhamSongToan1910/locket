@@ -190,34 +190,6 @@ public class PostController {
         return new ResponseData<>(ResponseCode.SUCCESS, "success", getLastesPost);
     }
 
-    @GetMapping("/get-report-post")
-    public ResponseData<?> getReportPost(@RequestParam(defaultValue = "0") int page,
-                                         @RequestParam(defaultValue = "10") int size) {
-        Pageable pageable = PageRequest.of(page, size);
-        List<GetReportPosts> getReportPostsList = reportPostService.getReportPosts(pageable).stream().map(reportPost -> {
-            GetReportPosts dto = new GetReportPosts();
-            ModelMapperUtils.toObject(reportPost, dto);
-
-            Post post = postService.findbyId(dto.getPostId());
-            User user = userService.findUserById(dto.getUserId());
-
-            if (post != null) {
-                dto.setCaption(post.getCaption());
-                dto.setImageURL(post.getImageURL());
-                dto.setCreatedAt(post.getCreatedAt());
-            }
-
-            if (user != null) {
-                dto.setUsername(user.getUsername());
-            }
-
-            return dto;
-        }).toList();
-
-
-        return new ResponseData<>(ResponseCode.SUCCESS, "success", getReportPostsList);
-    }
-
     @DeleteMapping("/delete-post-by-admin")
     public ResponseData<?> deletePostByAdmin(@CurrentUser CustomUserDetail customUserDetail,
                                              @RequestParam("post_id") String postId) {

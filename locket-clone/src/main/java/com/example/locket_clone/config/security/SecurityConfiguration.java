@@ -36,7 +36,8 @@ public class SecurityConfiguration {
                                 "/api/locket-clone/auth/get-new-token",
                                 "/api/locket-clone/user/add-user-admin",
                                 "/api/locket-clone/auth/login-admin").permitAll()
-                        .anyRequest().authenticated()
+                        .requestMatchers("/api/locket-clone/backend/**").hasAuthority("admin")
+                        .anyRequest().hasAuthority("user")
                 )
                 .addFilterBefore(authenticationFilter, UsernamePasswordAuthenticationFilter.class);
         return http.build();

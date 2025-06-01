@@ -4,6 +4,7 @@ import com.example.locket_clone.entities.Post;
 import com.example.locket_clone.entities.User;
 import com.example.locket_clone.entities.request.AddPostRequest;
 import com.example.locket_clone.entities.request.GetPostsRequest;
+import com.example.locket_clone.entities.response.GetAllPostResponse;
 import com.example.locket_clone.entities.response.GetFriendResponse;
 import com.example.locket_clone.entities.response.GetPostResponse;
 import com.example.locket_clone.repository.InterfacePackage.PostRepository;
@@ -21,6 +22,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -111,6 +113,18 @@ public class PostServiceImpl implements PostService {
     @Override
     public Post getNewestPostByUserId(String userId) {
         return postRepository.getNewestPostByUserId(userId);
+    }
+
+    @Override
+    public List<GetAllPostResponse> getAllPostsByAdmin(Pageable pageable) {
+        List<Post> listPost = postRepository.getAllPostsByAdmin(pageable);
+        return listPost.stream().map(post -> {
+            GetAllPostResponse getAllPostResponse = new GetAllPostResponse();
+            ModelMapperUtils.toObject(post, getAllPostResponse);
+            getAllPostResponse.setId(post.getId().toString());
+            getAllPostResponse.setCreateTime(post.getCreatedAt().atZone(ZoneId.systemDefault()).toString());
+            return  getAllPostResponse;
+        }).toList();
     }
 
     private List<GetPostResponse> getAllPosts(String userId, GetPostsRequest getPostsRequest, Pageable pageable) {
