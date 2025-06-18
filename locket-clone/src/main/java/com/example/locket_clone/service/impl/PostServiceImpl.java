@@ -4,6 +4,7 @@ import com.example.locket_clone.entities.Post;
 import com.example.locket_clone.entities.User;
 import com.example.locket_clone.entities.request.AddPostRequest;
 import com.example.locket_clone.entities.request.GetPostsRequest;
+import com.example.locket_clone.entities.request.UpdateReportPostByAdmin;
 import com.example.locket_clone.entities.response.GetAllPostResponse;
 import com.example.locket_clone.entities.response.GetFriendResponse;
 import com.example.locket_clone.entities.response.GetPostResponse;
@@ -125,6 +126,16 @@ public class PostServiceImpl implements PostService {
             getAllPostResponse.setCreateTime(post.getCreatedAt().atZone(ZoneId.systemDefault()).toString());
             return  getAllPostResponse;
         }).toList();
+    }
+
+    @Override
+    public void updatePostByAdmin(UpdateReportPostByAdmin request) {
+        Post post = postRepository.findById(request.getPostId()).orElse(null);
+        if(Objects.nonNull(post)) {
+            post.setIsDeleted(request.isAction());
+            post.setLastModifiedBy(request.getUserId());
+            postRepository.save(post);
+        }
     }
 
     private List<GetPostResponse> getAllPosts(String userId, GetPostsRequest getPostsRequest, Pageable pageable) {

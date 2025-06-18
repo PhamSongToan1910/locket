@@ -72,6 +72,10 @@ public class Constant {
         //Notification
         public static final int SAVE_NOTIFICATION = 13;
 
+        //backend
+        public static final int UPDATE_POST_BY_ADMIN = 16;
+        public static final int UPDATE_REPORT_POST_BY_ADMIN = 17;
+
     }
 
     public static class STATUS_REPORT_POST {

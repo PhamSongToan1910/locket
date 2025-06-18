@@ -5,7 +5,11 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.text.SimpleDateFormat;
 import java.time.Instant;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.util.Date;
 
 @Data
 @NoArgsConstructor
@@ -27,11 +31,19 @@ public class GetReportPosts {
     private String onwerId;
 
     @JsonProperty("create_at")
-    private Instant createdAt;
+    private String createdAt;
 
     @JsonProperty("status")
     private String status;
 
     @JsonProperty("action")
     private String action;
+
+    public void convertCreateAtInstantToString(Instant instant) {
+        String timeString = instant.toString();
+        String builder = timeString.split("T")[0] +
+                " " +
+                timeString.split("T")[1].substring(0,8);
+        this.createdAt = builder;
+    }
 }

@@ -1,12 +1,7 @@
 package com.example.locket_clone.runner;
 
 import com.example.locket_clone.entities.Post;
-import com.example.locket_clone.entities.request.AddReactionPost;
-import com.example.locket_clone.entities.request.AddUnreadPostRequest;
-import com.example.locket_clone.entities.request.DeletePostRequest;
-import com.example.locket_clone.entities.request.HidePostRequest;
-import com.example.locket_clone.entities.request.ObjectRequest;
-import com.example.locket_clone.entities.request.ReportPostRequest;
+import com.example.locket_clone.entities.request.*;
 import com.example.locket_clone.entities.response.ResponseData;
 import com.example.locket_clone.service.PostService;
 import com.example.locket_clone.service.ReactionService;
@@ -72,6 +67,8 @@ public class EventPostRunner implements CommandLineRunner {
                 case Constant.API.ADD_POST_TO_UNREAD_POST -> addUnreadPost(objectRequest);
                 case Constant.API.CHANGE_UNREAD_POST_STATUS -> changeUnreadPostStatus(objectRequest);
                 case Constant.API.DELETE_POST_BY_ADMIN -> deletePost(objectRequest);
+                case Constant.API.UPDATE_POST_BY_ADMIN -> deletePostByAdminV2(objectRequest);
+                case Constant.API.UPDATE_REPORT_POST_BY_ADMIN -> deleteReportPostByAdmin(objectRequest);
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -131,5 +128,15 @@ public class EventPostRunner implements CommandLineRunner {
     private void changeUnreadPostStatus(ObjectRequest objectRequest) {
         String userId = (String) objectRequest.getData();
         unreadPostService.deleteUnreadPost(userId);
+    }
+
+    private void deletePostByAdminV2(ObjectRequest objectRequest) {
+        UpdateReportPostByAdmin request = (UpdateReportPostByAdmin) objectRequest.getData();
+        postService.updatePostByAdmin(request);
+    }
+
+    private void deleteReportPostByAdmin(ObjectRequest objectRequest) {
+        UpdateReportPostByAdmin request = (UpdateReportPostByAdmin) objectRequest.getData();
+        reportPostService.updateStatusAndActionReportPostByAdmin(request);
     }
 }

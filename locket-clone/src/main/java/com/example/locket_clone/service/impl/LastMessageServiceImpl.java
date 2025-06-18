@@ -35,8 +35,8 @@ public class LastMessageServiceImpl implements LastMessageService {
     }
 
     @Override
-    public List<LastMessage> getLastMessages(int skip, int take) {
-        return lastMessageRepository.getLastMessages(skip, take);
+    public List<LastMessage> getLastMessages(List<String> conversationIds, int skip, int take) {
+        return lastMessageRepository.getLastMessages(conversationIds, skip, take);
     }
 
     @Override

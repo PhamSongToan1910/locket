@@ -9,5 +9,6 @@ import java.util.List;
 
 @Repository
 public interface ReportPostRepository  extends MongoRepository<ReportPost,String> {
-    List<ReportPost> findByStatus(Integer status, Pageable pageable);
+    List<ReportPost> findByStatusOrderByCreatedAtDesc(Integer status, Pageable pageable);
+    ReportPost findReportPostByPostId(String postId);
 }

@@ -9,7 +9,7 @@ import java.util.List;
 public interface LastMessageService {
     void updateLastMessage(Message message);
 
-    List<LastMessage> getLastMessages(int skip, int take);
+    List<LastMessage> getLastMessages(List<String> conversationIds, int skip, int take);
 
     LastMessage getLastMessageByConversationId(String conversationId);
 

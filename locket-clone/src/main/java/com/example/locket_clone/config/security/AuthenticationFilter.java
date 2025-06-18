@@ -29,7 +29,9 @@ public class AuthenticationFilter extends GenericFilterBean {
     private final List<String> API_UN_AUTHEN = Arrays.asList("/api/locket-clone/auth/login",
                                                             "/api/locket-clone/auth/get-new-token",
                                                             "/api/locket-clone/user/add-user-admin",
-                                                            "/api/locket-clone/auth/login-admin");
+                                                            "/api/locket-clone/auth/login-admin",
+                                                            "/api/locket-clone/backend/get-report-post",
+                                                            "/api/locket-clone/backend/get-user-info-by-admin");
 
     @Override
     public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain) throws IOException, ServletException {

@@ -53,7 +53,8 @@ public class ConversationController {
                                                                          @RequestParam("skip") int skip,
                                                                          @RequestParam("take") int take) {
         String userId = customUserDetail.getId();
-        List<LastMessage> lastMessageList = lastMessageService.getLastMessages(skip, take);
+        List<String> conversationIds = conversationService.getConversationIdByUserId(userId);
+        List<LastMessage> lastMessageList = lastMessageService.getLastMessages(conversationIds, skip, take);
         List<ListConversationResponse> responseList = lastMessageList.stream().map(lastMessage -> messageService.getMessageById(lastMessage.getMessageId()))
                 .filter(Objects::nonNull)
                 .map(this::convertMessageToListConversationResponse)

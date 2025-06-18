@@ -1,6 +1,7 @@
 package com.example.locket_clone.service.impl;
 
 import com.example.locket_clone.entities.ReportPost;
+import com.example.locket_clone.entities.request.UpdateReportPostByAdmin;
 import com.example.locket_clone.repository.InterfacePackage.ReportPostRepository;
 import com.example.locket_clone.service.ReportPostService;
 import com.example.locket_clone.utils.Constant.Constant;
@@ -21,7 +22,7 @@ public class ReportPostServiceImpl implements ReportPostService {
 
     @Override
     public List<ReportPost> getReportPosts(int kind, Pageable pageable) {
-        return reportPostRepository.findByStatus(kind, pageable).stream().toList();
+        return reportPostRepository.findByStatusOrderByCreatedAtDesc(kind, pageable).stream().toList();
     }
 
     @Override
@@ -29,4 +30,15 @@ public class ReportPostServiceImpl implements ReportPostService {
         ReportPost reportPost = new ReportPost(postId, userId, Constant.STATUS_REPORT_POST.PENDING, false);
         reportPostRepository.save(reportPost);
     }
+
+    @Override
+    public void updateStatusAndActionReportPostByAdmin(UpdateReportPostByAdmin request) {
+        ReportPost reportPost = reportPostRepository.findReportPostByPostId(request.getPostId());
+        reportPost.setStatus(request.getStatus());
+        reportPost.setAction(request.isAction());
+        reportPost.setLastModifiedBy(request.getUserId());
+        reportPostRepository.save(reportPost);
+    }
+
+
 }
