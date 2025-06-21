@@ -89,11 +89,13 @@ public class EventUserRunner implements CommandLineRunner {
                 deviceTokens.addAll(deviceTokensMap.get(userId));
             }
         }
+        System.out.println("size: " + deviceTokens.size());
         deviceTokens.forEach((value) -> {
             Message message = Message.builder()
                     .setToken(value)
                     .putData("new_post_available", "true")
                     .build();
+            System.out.println("token: " + value);
             try {
                 FirebaseMessaging.getInstance().send(message);
             } catch (FirebaseMessagingException e) {
