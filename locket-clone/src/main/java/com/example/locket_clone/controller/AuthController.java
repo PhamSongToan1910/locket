@@ -5,12 +5,7 @@ import com.example.locket_clone.config.CurrentUser;
 import com.example.locket_clone.config.security.CustomUserDetail;
 import com.example.locket_clone.config.security.TokenProvider;
 import com.example.locket_clone.entities.User;
-import com.example.locket_clone.entities.request.AddUserRequest;
-import com.example.locket_clone.entities.request.GetNewTokenFromRefreshToken;
-import com.example.locket_clone.entities.request.LoginAdminRequest;
-import com.example.locket_clone.entities.request.LoginVM;
-import com.example.locket_clone.entities.request.LogoutRequest;
-import com.example.locket_clone.entities.request.ObjectRequest;
+import com.example.locket_clone.entities.request.*;
 import com.example.locket_clone.entities.response.GetNewTokenFromRefreshTokenResponse;
 import com.example.locket_clone.entities.response.LoginResponse;
 import com.example.locket_clone.entities.response.ResponseData;
@@ -71,8 +66,11 @@ public class AuthController {
             if (Objects.isNull(user.getDeviceToken())) {
                 user.setDeviceToken(new HashSet<>());
             }
-            user.getDeviceToken().add(loginVM.getDeviceToken());
-            ObjectRequest request = new ObjectRequest(Constant.API.UPDATE_DEVICE_TOKEN, user);
+            UpdateDeviceTokenRequest updateDeviceTokenRequest = new UpdateDeviceTokenRequest();
+            updateDeviceTokenRequest.setDeviceToken(loginVM.getDeviceToken());
+            updateDeviceTokenRequest.setDeviceId(loginVM.getDeviceId());
+            updateDeviceTokenRequest.setUserId(user.getId().toString());
+            ObjectRequest request = new ObjectRequest(Constant.API.UPDATE_DEVICE_TOKEN, updateDeviceTokenRequest);
             EventUserRunner.eventUserRequests.add(request);
             if(!StringUtils.hasText(user.getFullName())) {
                 return new ResponseData<>(new LoginResponse(jwt, refreshToken, false));
@@ -95,11 +93,11 @@ public class AuthController {
     }
 
     @PostMapping("/logout")
-    public ResponseData<String> logout(@CurrentUser CustomUserDetail customUserDetail, @RequestParam("device_token") String deviceToken) {
+    public ResponseData<String> logout(@CurrentUser CustomUserDetail customUserDetail, @RequestBody LogoutRequest logoutRequest) {
         if (customUserDetail == null) {
             return new ResponseData<>(ResponseCode.UNKNOWN_ERROR, "user is null");
         }
-        ObjectRequest objectRequest = new ObjectRequest(Constant.API.LOGOUT, new LogoutRequest(customUserDetail.getId(), deviceToken));
+        ObjectRequest objectRequest = new ObjectRequest(Constant.API.LOGOUT, new RemoveDeviceRequest(logoutRequest.getDeviceId(), logoutRequest.getDeviceToken(), customUserDetail.getId()));
         EventUserRunner.eventUserRequests.add(objectRequest);
         SecurityContextHolder.clearContext();
         return new ResponseData<>(ResponseCode.SUCCESS, "Logout success!!!");

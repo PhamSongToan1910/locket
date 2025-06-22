@@ -11,10 +11,12 @@ public class LoginVM {
     private String email;
     @JsonProperty("avt")
     private String avt;
+    @JsonProperty("device_id")
+    private String deviceId;
     @JsonProperty("device_token")
     private String deviceToken;
 
     public boolean validateRequest() {
-        return Objects.nonNull(this.email) && Objects.nonNull(this.deviceToken);
+        return Objects.nonNull(this.email) && Objects.nonNull(this.deviceToken) && Objects.nonNull(this.deviceId);
     }
 }

@@ -14,6 +14,7 @@ public class Constant {
         public static final String MESSAGE_COLLECTION = "message";
         public static final String UNREAD_POST_COLLECTION = "unread_post";
         public static final String LAST_MESSAGE_COLLECTION = "last_message";
+        public static final String DEVICE_COLLECTION = "device";
     }
 
     public static class ROLE {
