@@ -5,12 +5,10 @@ import com.example.locket_clone.config.security.CustomUserDetail;
 import com.example.locket_clone.entities.SendRequestFriend;
 import com.example.locket_clone.entities.User;
 import com.example.locket_clone.entities.UserFriends;
-import com.example.locket_clone.entities.request.AddFriendRequest;
-import com.example.locket_clone.entities.request.LoginAdminRequest;
-import com.example.locket_clone.entities.request.UpdateUserInfoRequest;
-import com.example.locket_clone.entities.request.UpdateUserInforV2Request;
+import com.example.locket_clone.entities.request.*;
 import com.example.locket_clone.entities.response.*;
 import com.example.locket_clone.repository.InterfacePackage.ConversationRepository;
+import com.example.locket_clone.runner.EventUserRunner;
 import com.example.locket_clone.service.ConversationService;
 import com.example.locket_clone.service.SendRequestFriendService;
 import com.example.locket_clone.service.UserFriendsService;
@@ -237,6 +235,15 @@ public class UserController {
     @PostMapping("/add-user-admin")
     public ResponseData<?> addUserAdmin(@RequestBody LoginAdminRequest loginAdminRequest) {
         userService.addUserAdmin(loginAdminRequest.getEmail(), loginAdminRequest.getPassword());
+        return new ResponseData<>(ResponseCode.SUCCESS, "success");
+    }
+
+    @PostMapping("/update-device-token")
+    public ResponseData<?> updateDeviceToken(@CurrentUser CustomUserDetail customUserDetail, @RequestBody UpdateDeviceTokenRequest updateDeviceTokenRequest) {
+        String userId = customUserDetail.getId();
+        updateDeviceTokenRequest.setUserId(userId);
+        ObjectRequest request = new ObjectRequest(Constant.API.UPDATE_DEVICE_TOKEN, updateDeviceTokenRequest);
+        EventUserRunner.eventUserRequests.add(request);
         return new ResponseData<>(ResponseCode.SUCCESS, "success");
     }
 }
