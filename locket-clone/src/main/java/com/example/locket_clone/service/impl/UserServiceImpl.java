@@ -5,6 +5,7 @@ import com.example.locket_clone.entities.User;
 import com.example.locket_clone.entities.request.AddUserRequest;
 import com.example.locket_clone.entities.request.UpdateUserInfoRequest;
 import com.example.locket_clone.entities.request.UpdateUserInforV2Request;
+import com.example.locket_clone.entities.response.GetNmberUserOrderByDateResponse;
 import com.example.locket_clone.entities.response.SearchFriendByUsernameResponse;
 import com.example.locket_clone.repository.InterfacePackage.RoleRepository;
 import com.example.locket_clone.repository.InterfacePackage.UserRepository;
@@ -143,7 +144,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public List<User> getUserOrderByCreateAt() {
+    public List<GetNmberUserOrderByDateResponse> getUserOrderByCreateAt() {
         return userRepository.getUserOrderByDay();
     }
 }

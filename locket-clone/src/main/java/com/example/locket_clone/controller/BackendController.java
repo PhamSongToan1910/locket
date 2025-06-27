@@ -12,6 +12,7 @@ import com.example.locket_clone.entities.request.DeletePostByAdminRequest;
 import com.example.locket_clone.entities.request.ObjectRequest;
 import com.example.locket_clone.entities.request.UpdateReportPostByAdmin;
 import com.example.locket_clone.entities.response.GetAllPostResponse;
+import com.example.locket_clone.entities.response.GetNmberUserOrderByDateResponse;
 import com.example.locket_clone.entities.response.GetReportPosts;
 import com.example.locket_clone.entities.response.GetUserInfoBEResponse;
 import com.example.locket_clone.entities.response.ResponseData;
@@ -150,7 +151,7 @@ public class BackendController {
     }
 
     @GetMapping("/get-user-order-by-date")
-    public ResponseData<List<User>> getUserOrderByDate() {
+    public ResponseData<List<GetNmberUserOrderByDateResponse>> getUserOrderByDate() {
         return new ResponseData<>(ResponseCode.SUCCESS, "success", userService.getUserOrderByCreateAt());
     }
 

@@ -1,6 +1,7 @@
 package com.example.locket_clone.repository.impl;
 
 import com.example.locket_clone.entities.User;
+import com.example.locket_clone.entities.response.GetNmberUserOrderByDateResponse;
 import com.example.locket_clone.repository.InterfacePackage.UserCustomRepository;
 import com.mongodb.client.AggregateIterable;
 import com.mongodb.client.MongoClient;
@@ -50,7 +51,7 @@ public class UserRepositoryImpl implements UserCustomRepository {
     }
 
     @Override
-    public List<User> getUserOrderByDay() {
+    public List<GetNmberUserOrderByDateResponse> getUserOrderByDay() {
 //        MongoDatabase db = mongoClient.getDatabase("locket-clone");
 //        MongoCollection<Document> collection = db.getCollection("user");
 //
@@ -66,9 +67,9 @@ public class UserRepositoryImpl implements UserCustomRepository {
 //        return null;
         Aggregation aggregation = Aggregation.newAggregation(
                 Aggregation.project()
-                        .andExpression("dayOfMonth(create_at)").as("day")
-                        .andExpression("month(create_at)").as("month")
-                        .andExpression("year(create_at)").as("year"),
+                        .andExpression("dayOfMonth(" + User.CREATE_AT + ")").as("day")
+                        .andExpression("month(" + User.CREATE_AT + ")").as("month")
+                        .andExpression("year(" + User.CREATE_AT + ")").as("year"),
 
                 Aggregation.group("day", "month", "year")
                         .count().as("count"),
@@ -76,6 +77,6 @@ public class UserRepositoryImpl implements UserCustomRepository {
                 Aggregation.project("count")
                         .andExpression("concat(toString(day), '-', toString(month), '-', toString(year))").as("date")
         );
-        return mongoTemplate.aggregate(aggregation, "user", User.class).getMappedResults();
+        return mongoTemplate.aggregate(aggregation, "user", GetNmberUserOrderByDateResponse.class).getMappedResults();
     }
 }
