@@ -14,6 +14,7 @@ import com.example.locket_clone.utils.ModelMapper.ModelMapperUtils;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -128,8 +129,8 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public List<User> getAllUserNormal() {
-        return userRepository.findUserNormal();
+    public List<User> getAllUserNormal(Pageable pageable) {
+        return userRepository.findUserNormal(pageable);
     }
 
     @Override
@@ -139,5 +140,10 @@ public class UserServiceImpl implements UserService {
         user.setEmail(email);
         user.setPassword(passwordEncoder.encode(password));
         userRepository.save(user);
+    }
+
+    @Override
+    public List<User> getUserOrderByCreateAt() {
+        return userRepository.getUserOrderByDay();
     }
 }

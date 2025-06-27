@@ -1,5 +1,6 @@
 package com.example.locket_clone.config.mongoConfig;
 
+import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoClients;
 import lombok.Getter;
 import org.springframework.beans.factory.annotation.Value;
@@ -27,4 +28,9 @@ public class MongoConfig {
     public MongoTemplate mongoTemplate(MongoDatabaseFactory mongoDbFactory) {
         return new MongoTemplate(mongoDbFactory);
     }
+
+//    @Bean
+//    public MongoClient mongoClient() {
+//        return MongoClients.create(connectionUri);
+//    }
 }

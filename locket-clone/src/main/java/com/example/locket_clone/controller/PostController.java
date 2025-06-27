@@ -15,6 +15,12 @@ import com.example.locket_clone.runner.EventMessageRunner;
 import com.example.locket_clone.runner.EventPostRunner;
 import com.example.locket_clone.runner.EventUserRunner;
 import com.example.locket_clone.runner.NettySocketIOServerRunner;
+import com.example.locket_clone.service.PostService;
+import com.example.locket_clone.service.ReactionService;
+import com.example.locket_clone.service.ReportPostService;
+import com.example.locket_clone.service.UnreadPostService;
+import com.example.locket_clone.service.UserService;
+import com.example.locket_clone.runner.NettySocketIOServerRunner;
 import com.example.locket_clone.service.*;
 import com.example.locket_clone.utils.Constant.Constant;
 import com.example.locket_clone.utils.Constant.ResponseCode;
@@ -58,8 +64,8 @@ public class PostController {
     ReportPostService reportPostService;
     UserService userService;
     UnreadPostService unreadPostService;
-    ConversationService conversationService;
     SocketIOServer server;
+    ConversationService conversationService;
 
     @PostMapping(value = "/upload-image", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseData<String> addPost(@RequestParam("file") MultipartFile multipartFile) throws IOException {
