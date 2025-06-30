@@ -74,8 +74,8 @@ public class BackendController {
             dto.setCaption(post.getCaption());
             dto.setImageURL(post.getImageURL());
             dto.convertCreateAtInstantToString(post.getCreatedAt());
-            dto.setUserIds(reportPost.getUserIds());
-            dto.setCount(reportPost.getUserIds().size());
+            dto.setUserIds(reportPost.getUserTime());
+            dto.setCount(reportPost.getUserTime().size());
 
             if (user != null) {
                 dto.setOnwerId(user.getId().toString());

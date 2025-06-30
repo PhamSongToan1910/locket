@@ -1,5 +1,6 @@
 package com.example.locket_clone.entities.response;
 
+import com.example.locket_clone.entities.Report;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -38,7 +39,7 @@ public class GetReportPosts {
     private String action;
 
     @JsonProperty("user_ids")
-    private Set<String> userIds;
+    private Set<Report> userIds;
 
     @JsonProperty("count")
     private int count;

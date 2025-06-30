@@ -1,5 +1,6 @@
 package com.example.locket_clone.utils;
 
+import java.time.Instant;
 import java.util.Date;
 import java.util.HashMap;
 
@@ -29,4 +30,12 @@ public class DateTimeConvertUtils {
         sb.append(", ").append(date.toString().substring((date.toString().length() - 4)));
         return sb.toString();
     }
+
+    public static String convertCreateAtInstantToString(Instant instant) {
+        String timeString = instant.toString();
+        return timeString.split("T")[0] +
+                " " +
+                timeString.split("T")[1].substring(0,8);
+    }
+
 }

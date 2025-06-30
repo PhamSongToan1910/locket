@@ -24,7 +24,7 @@ public class ReportPost extends BaseEntity {
     private String postId;
 
     @Field(USER_IDS)
-    private Set<String> userIds;
+    private Set<Report> userTime;
 
     @Field(STATUS)
     private Integer status; //1: skip; 2: pending; 3: delete
