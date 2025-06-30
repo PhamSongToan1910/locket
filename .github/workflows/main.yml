@@ -32,17 +32,22 @@ jobs:
               echo "Cloning the repository..."
               rm -rf /home/ec2-user/app
               git clone https://github.com/PhamSongToan1910/locket.git /home/ec2-user/app
-              echo "Repository cloned successfully."
             fi
-            echo "Navigating to app directory and pulling the latest code..."
-            cd /home/ec2-user/app/locket-clone
-            echo "Stopping and removing old containers..."
-            docker-compose down
-            git pull --no-rebase
-            echo "Building the application using Maven..."
-            mvn clean install -DskipTests
+      
+            echo "Pulling latest code..."
+            cd /home/ec2-user/app/locket-clone && git pull --no-rebase
+      
+            echo "Stopping old containers..."
+            cd /home/ec2-user/app/locket-clone && docker-compose down
+      
+            echo "Building the app..."
+            cd /home/ec2-user/app/locket-clone && mvn clean install -DskipTests
+      
             echo "Rebuilding and starting containers..."
-            docker-compose build --no-cache
-            docker-compose up -d
+            cd /home/ec2-user/app/locket-clone && docker-compose build --no-cache
+            cd /home/ec2-user/app/locket-clone && docker-compose up -d
+      
+            echo "Done."
           EOF
+
           echo "Deployment completed successfully."
