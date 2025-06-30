@@ -12,6 +12,7 @@ import com.example.locket_clone.entities.request.DeletePostByAdminRequest;
 import com.example.locket_clone.entities.request.ObjectRequest;
 import com.example.locket_clone.entities.request.UpdateReportPostByAdmin;
 import com.example.locket_clone.entities.response.GetAllPostResponse;
+import com.example.locket_clone.entities.response.GetNmberUserOrderByDateResponse;
 import com.example.locket_clone.entities.response.GetReportPosts;
 import com.example.locket_clone.entities.response.GetUserInfoBEResponse;
 import com.example.locket_clone.entities.response.ResponseData;
@@ -167,5 +168,22 @@ public class BackendController {
         }
     }
 
+    @GetMapping("/get-all-user-by-admin")
+    public ResponseData<List<GetUserInfoBEResponse>> getAllUserByAdmin(@RequestParam("page") int page,
+                                                                       @RequestParam("size") int size) {
+        Pageable pageRequest = PageRequest.of(page, size);
+        List<User> listUser = userService.getAllUserNormal(pageRequest);
+        List<GetUserInfoBEResponse> responseList = listUser.stream().map(user -> {
+            GetUserInfoBEResponse response = new GetUserInfoBEResponse();
+            ModelMapperUtils.toObject(user, response);
+            return response;
+        }).toList();
+        return new ResponseData<>(ResponseCode.SUCCESS, "success", responseList);
+    }
+
+    @GetMapping("/get-user-order-by-date")
+    public ResponseData<List<GetNmberUserOrderByDateResponse>> getUserOrderByDate() {
+        return new ResponseData<>(ResponseCode.SUCCESS, "success", userService.getUserOrderByCreateAt());
+    }
 
 }

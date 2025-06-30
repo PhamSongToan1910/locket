@@ -231,10 +231,10 @@ public class UserController {
         return new ResponseData<>(ResponseCode.SUCCESS, "success", response);
     }
 
-    @GetMapping("/get-all-user-normal")
-    public ResponseData<List<User>> getAllUserNormal() {
-        return new ResponseData<>(ResponseCode.SUCCESS, "success", userService.getAllUserNormal());
-    }
+//    @GetMapping("/get-all-user-normal")
+//    public ResponseData<List<User>> getAllUserNormal() {
+//        return new ResponseData<>(ResponseCode.SUCCESS, "success", userService.getAllUserNormal());
+//    }
 
     @PostMapping("/add-user-admin")
     public ResponseData<?> addUserAdmin(@RequestBody LoginAdminRequest loginAdminRequest) {
