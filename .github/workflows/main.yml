@@ -26,7 +26,7 @@ jobs:
       - name: Deploy using Docker Compose
         run: |
           echo "Connecting to EC2 instance..."
-          ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa ec2-user@${{secrets.EC2_HOST}} << 'EOF'
+          ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa ec2-user@${{secrets.EC2_HOST}} << EOF
             echo "Checking if the app directory is a Git repository..."
             # Kiểm tra thư mục có phải Git repo không
             if [ ! -d "/home/ec2-user/app/.git" ]; then
