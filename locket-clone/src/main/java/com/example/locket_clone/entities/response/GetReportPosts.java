@@ -10,6 +10,7 @@ import java.time.Instant;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.Date;
+import java.util.Set;
 
 @Data
 @NoArgsConstructor
@@ -24,9 +25,6 @@ public class GetReportPosts {
     @JsonProperty("image_url")
     private String imageURL;
 
-    @JsonProperty("user_id")
-    private String userId;
-
     @JsonProperty("owner_id")
     private String onwerId;
 
@@ -38,6 +36,12 @@ public class GetReportPosts {
 
     @JsonProperty("action")
     private String action;
+
+    @JsonProperty("user_ids")
+    private Set<String> userIds;
+
+    @JsonProperty("count")
+    private int count;
 
     public void convertCreateAtInstantToString(Instant instant) {
         String timeString = instant.toString();

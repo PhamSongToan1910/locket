@@ -73,6 +73,8 @@ public class BackendController {
             dto.setCaption(post.getCaption());
             dto.setImageURL(post.getImageURL());
             dto.convertCreateAtInstantToString(post.getCreatedAt());
+            dto.setUserIds(reportPost.getUserIds());
+            dto.setCount(reportPost.getUserIds().size());
 
             if (user != null) {
                 dto.setOnwerId(user.getId().toString());
@@ -101,6 +103,8 @@ public class BackendController {
         Post post = postService.findbyId(updateReportPostByAdmin.getPostId());
         if(updateReportPostByAdmin.getStatus() == Constant.STATUS_REPORT_POST.DELETE) {
             sendMessageToOwnerPostDeleted(userId, post);
+        } else if(updateReportPostByAdmin.getStatus() == Constant.STATUS_REPORT_POST.SKIP) {
+            sendMessageToOwnerPostRestored(userId, post);
         }
         ObjectRequest requestDeletePostByAdminV2 = new ObjectRequest(Constant.API.UPDATE_POST_BY_ADMIN, updateReportPostByAdmin);
         ObjectRequest requestDeleteReportPostByAdmin = new ObjectRequest(Constant.API.UPDATE_REPORT_POST_BY_ADMIN, updateReportPostByAdmin);
@@ -115,6 +119,33 @@ public class BackendController {
             conversation = conversationService.createConversation(userId, post.getUserId());
         }
         Message message = new Message("Your post was deleted by admin for violating community standards.", conversation.getId().toString(), userId, post.getUserId(), false, post.getImageURL());
+        Map<String, Object> map = new HashMap<>();
+        map.put("conversation_id", message.getConversationId());
+        map.put("user_receiver", message.getUserReceiverId());
+        map.put("content", message.getContent());
+        map.put("post_url", message.getPostURL());
+
+        ObjectMapper objectMapper = new ObjectMapper();
+        String json = objectMapper.writeValueAsString(map);
+        EventMessageRunner.eventMessageRequests.add(new ObjectRequest(Constant.API.UPDATE_LAST_MESSAGE, message));
+        Set<UUID> usersOnline = NettySocketIOServerRunner.onlineUsers.get(post.getUserId());
+        System.out.println("usersOnline: " + usersOnline);
+        if(Objects.nonNull(usersOnline)) {
+            usersOnline.forEach(uuid -> {
+                SocketIOClient socketReceiver = server.getClient(uuid);
+                if(socketReceiver != null) {
+                    socketReceiver.sendEvent("receiver_message", json);
+                }
+            });
+        }
+    }
+
+    private void sendMessageToOwnerPostRestored(String userId, Post post) throws JsonProcessingException {
+        Conversation conversation = conversationService.getConversationByUserIdAndFriendId(userId, post.getUserId());
+        if(Objects.isNull(conversation)) {
+            conversation = conversationService.createConversation(userId, post.getUserId());
+        }
+        Message message = new Message("Your post was restored by admin.", conversation.getId().toString(), userId, post.getUserId(), false, post.getImageURL());
         Map<String, Object> map = new HashMap<>();
         map.put("conversation_id", message.getConversationId());
         map.put("user_receiver", message.getUserReceiverId());

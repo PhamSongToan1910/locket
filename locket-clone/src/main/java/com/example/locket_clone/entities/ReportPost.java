@@ -7,6 +7,8 @@ import lombok.NoArgsConstructor;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
 
+import java.util.Set;
+
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -14,15 +16,15 @@ import org.springframework.data.mongodb.core.mapping.Field;
 public class ReportPost extends BaseEntity {
 
     public static final String POST_ID = "post_id";
-    public static final String USER_ID = "user_id";
+    public static final String USER_IDS = "user_ids";
     public static final String STATUS = "status";
     public static final String ACTION = "action";
 
     @Field(POST_ID)
     private String postId;
 
-    @Field(USER_ID)
-    private String userId;
+    @Field(USER_IDS)
+    private Set<String> userIds;
 
     @Field(STATUS)
     private Integer status; //1: skip; 2: pending; 3: delete

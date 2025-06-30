@@ -63,11 +63,11 @@ public class PostController {
 
     @PostMapping(value = "/upload-image", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseData<String> addPost(@RequestParam("file") MultipartFile multipartFile) throws IOException {
-        if (multipartFile.getOriginalFilename() == null || multipartFile.getOriginalFilename().isEmpty() || FileUtils.validateFile(multipartFile)) {
+        if (multipartFile.getOriginalFilename() == null || multipartFile.getOriginalFilename().isEmpty() || !FileUtils.validateFile(multipartFile)) {
             return new ResponseData<>(ResponseCode.WRONG_DATA_FORMAT, "Wrong request format");
         }
         String imageURL = s3Service.uploadFile(multipartFile);
-        return new ResponseData<>(ResponseCode.SUCCESS, "success", imageURL);
+        return new ResponseData <>(ResponseCode.SUCCESS, "success", imageURL);
     }
 
     @PostMapping("/add-post")
@@ -119,6 +119,9 @@ public class PostController {
         ReportPostRequest reportPostRequest = new ReportPostRequest(customUserDetail.getId(), postId);
         ObjectRequest request = new ObjectRequest(Constant.API.REPORT_POST, reportPostRequest);
         EventPostRunner.requests.add(request);
+        HidePostRequest hidePostRequest = new HidePostRequest(customUserDetail.getId(), postId);
+        ObjectRequest hideObjectRequest = new ObjectRequest(Constant.API.HIDE_POST, hidePostRequest);
+        EventPostRunner.requests.add(hideObjectRequest);
         return new ResponseData<>(ResponseCode.SUCCESS, "success");
     }
 

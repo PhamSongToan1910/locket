@@ -11,7 +11,9 @@ import lombok.experimental.FieldDefaults;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Service
 @RequiredArgsConstructor
@@ -27,8 +29,16 @@ public class ReportPostServiceImpl implements ReportPostService {
 
     @Override
     public void addReportPost(String userId, String postId) {
-        ReportPost reportPost = new ReportPost(postId, userId, Constant.STATUS_REPORT_POST.PENDING, false);
-        reportPostRepository.save(reportPost);
+        ReportPost reportPost = reportPostRepository.findReportPostByPostId(postId);
+        if(reportPost != null) {
+            reportPost.getUserIds().add(userId);
+            reportPostRepository.save(reportPost);
+        } else {
+            Set<String> setUserIds = new HashSet<>();
+            setUserIds.add(userId);
+            ReportPost saveRepotrPost = new ReportPost(postId, setUserIds, Constant.STATUS_REPORT_POST.PENDING, false);
+            reportPostRepository.save(saveRepotrPost);
+        }
     }
 
     @Override

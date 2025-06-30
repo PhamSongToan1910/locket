@@ -16,6 +16,7 @@ import com.example.locket_clone.service.UserService;
 import com.example.locket_clone.utils.Constant.Constant;
 import com.example.locket_clone.utils.Constant.ResponseCode;
 import com.example.locket_clone.utils.ModelMapper.ModelMapperUtils;
+import com.example.locket_clone.utils.fileUtils.FileUtils;
 import com.example.locket_clone.utils.s3Utils.S3Service;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -127,6 +128,9 @@ public class UserController {
 
     @PostMapping(value = "/update-avt", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseData<String> updateAvt(@CurrentUser CustomUserDetail customUserDetail, @RequestParam("file") MultipartFile file) throws IOException {
+        if(!FileUtils.validateFile(file)) {
+            return new ResponseData<>(ResponseCode.WRONG_DATA_FORMAT, "Wrong request format");
+        }
         String userId = customUserDetail.getId();
         String avtPath = s3Service.uploadFile(file);
         userService.updateAvt(userId, avtPath);
