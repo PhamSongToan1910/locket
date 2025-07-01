@@ -1,5 +1,7 @@
 package com.example.locket_clone.utils;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.time.Instant;
 import java.util.Date;
 import java.util.HashMap;
@@ -36,6 +38,16 @@ public class DateTimeConvertUtils {
         return timeString.split("T")[0] +
                 " " +
                 timeString.split("T")[1].substring(0,8);
+    }
+
+    public static Instant convertStringToInstant(String timeString) {
+        try{
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
+            Date date = sdf.parse(timeString);
+            return Instant.parse(date.toString());
+        } catch (ParseException e) {
+            throw new RuntimeException(e);
+        }
     }
 
 }

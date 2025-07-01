@@ -3,6 +3,7 @@ package com.example.locket_clone.service.impl;
 import com.example.locket_clone.entities.Role;
 import com.example.locket_clone.entities.User;
 import com.example.locket_clone.entities.request.AddUserRequest;
+import com.example.locket_clone.entities.request.FindUserBeRequest;
 import com.example.locket_clone.entities.request.UpdateUserInfoRequest;
 import com.example.locket_clone.entities.request.UpdateUserInforV2Request;
 import com.example.locket_clone.entities.response.GetNmberUserOrderByDateResponse;
@@ -130,8 +131,8 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public List<User> getAllUserNormal(Pageable pageable) {
-        return userRepository.findUserNormal(pageable);
+    public List<User> getAllUserNormal(Pageable pageable, FindUserBeRequest findUserBeRequest) {
+        return userRepository.findUserNormal(pageable, findUserBeRequest);
     }
 
     @Override
