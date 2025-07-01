@@ -21,6 +21,10 @@ import com.example.locket_clone.utils.s3Utils.S3Service;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.MediaType;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
@@ -250,4 +254,21 @@ public class UserController {
         EventUserRunner.eventUserRequests.add(request);
         return new ResponseData<>(ResponseCode.SUCCESS, "success");
     }
+    @PostMapping("/search")
+    public ResponseData<?> searchUser(@RequestBody SearchUserRequest request) {
+        Sort.Direction direction = Sort.Direction.fromString(request.getSorDir().toUpperCase());
+        Pageable pageable = PageRequest.of(
+                request.getPage(),
+                request.getSize(),
+                Sort.by(direction, request.getSortBy())
+        );
+        Page<GetUserInfoBEResponse> response = userService.searchUser(request, pageable);
+        return new ResponseData<>(ResponseCode.SUCCESS, "success", response);
+    }
+    @PutMapping("/change-active/{userId}")
+    public ResponseData<?> changeActive(@PathVariable("userId") String userId, @RequestParam("isLocked") boolean isActive) {
+        userService.changeActive(userId, isActive);
+        return new ResponseData<>(ResponseCode.SUCCESS, "success");
+    }
+
 }
