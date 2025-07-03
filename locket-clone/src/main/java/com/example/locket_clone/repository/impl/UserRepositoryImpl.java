@@ -1,8 +1,10 @@
 package com.example.locket_clone.repository.impl;
 
 import com.example.locket_clone.entities.User;
+import com.example.locket_clone.entities.request.FindUserBeRequest;
 import com.example.locket_clone.entities.response.GetNmberUserOrderByDateResponse;
 import com.example.locket_clone.repository.InterfacePackage.UserCustomRepository;
+import com.example.locket_clone.utils.DateTimeConvertUtils;
 import com.mongodb.client.AggregateIterable;
 import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoCollection;
@@ -31,6 +33,7 @@ import javax.print.Doc;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 
 import static org.springframework.data.mongodb.core.aggregation.Aggregation.*;
 
@@ -43,9 +46,21 @@ public class UserRepositoryImpl implements UserCustomRepository {
 //    MongoClient mongoClient;
 
     @Override
-    public List<User> findUserNormal(Pageable pageable) {
+    public List<User> findUserNormal(Pageable pageable, FindUserBeRequest findUserBeRequest) {
         Query query = new Query(Criteria.where(User.AUTHORITIES).ne("admin"));
         query.with(Sort.by(Sort.Direction.DESC, User.CREATE_AT));
+        if(Objects.nonNull(findUserBeRequest.getUserId())) {
+            query.addCriteria(Criteria.where(User._ID).is(findUserBeRequest.getUserId()));
+        }
+        if(Objects.nonNull(findUserBeRequest.getUsername())) {
+            query.addCriteria(Criteria.where(User.USERNAME).is(findUserBeRequest.getUsername()));
+        }
+        if(Objects.nonNull(findUserBeRequest.getCreateFrom())) {
+            query.addCriteria(Criteria.where(User.CREATE_AT).gte(DateTimeConvertUtils.convertStringToInstant(findUserBeRequest.getCreateFrom())));
+        }
+        if(Objects.nonNull(findUserBeRequest.getCreateTo())) {
+            query.addCriteria(Criteria.where(User.CREATE_AT).lte(DateTimeConvertUtils.convertStringToInstant(findUserBeRequest.getCreateTo())));
+        }
         query.with(pageable);
         return mongoTemplate.find(query, User.class);
     }

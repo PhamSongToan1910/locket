@@ -3,6 +3,7 @@ package com.example.locket_clone.service;
 import com.example.locket_clone.entities.User;
 import com.example.locket_clone.entities.request.AddUserRequest;
 import com.example.locket_clone.entities.request.SearchUserRequest;
+import com.example.locket_clone.entities.request.FindUserBeRequest;
 import com.example.locket_clone.entities.request.UpdateUserInfoRequest;
 import com.example.locket_clone.entities.request.UpdateUserInforV2Request;
 import com.example.locket_clone.entities.response.GetFriendResponse;
@@ -40,8 +41,7 @@ public interface UserService {
     Set<String> getDeviceTokenByUserID(String userID);
 
     void changeActive(String userId, boolean isActive);
-
-    List<User> getAllUserNormal(Pageable pageable);
+    List<User> getAllUserNormal(Pageable pageable, FindUserBeRequest findUserBeRequest);
 
     void addUserAdmin(String email, String password);
 

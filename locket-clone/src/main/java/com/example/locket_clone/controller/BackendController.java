@@ -9,6 +9,7 @@ import com.example.locket_clone.entities.Message;
 import com.example.locket_clone.entities.Post;
 import com.example.locket_clone.entities.User;
 import com.example.locket_clone.entities.request.DeletePostByAdminRequest;
+import com.example.locket_clone.entities.request.FindUserBeRequest;
 import com.example.locket_clone.entities.request.ObjectRequest;
 import com.example.locket_clone.entities.request.UpdateReportPostByAdmin;
 import com.example.locket_clone.entities.response.GetAllPostResponse;
@@ -170,9 +171,26 @@ public class BackendController {
 
     @GetMapping("/get-all-user-by-admin")
     public ResponseData<List<GetUserInfoBEResponse>> getAllUserByAdmin(@RequestParam("page") int page,
-                                                                       @RequestParam("size") int size) {
+                                                                       @RequestParam("size") int size,
+                                                                       @RequestParam(name = "user_id", required = false) String userId,
+                                                                       @RequestParam(name = "username", required = false) String username,
+                                                                       @RequestParam(name = "create_from", required = false) String createFrom,
+                                                                       @RequestParam(name = "create_to", required = false) String createTo) {
+        FindUserBeRequest findUserBeRequest = new FindUserBeRequest();
+        if(Objects.nonNull(userId)) {
+            findUserBeRequest.setUserId(userId);
+        }
+        if(Objects.nonNull(username)) {
+            findUserBeRequest.setUsername(username);
+        }
+        if(Objects.nonNull(createFrom)) {
+            findUserBeRequest.setCreateFrom(createFrom);
+        }
+        if(Objects.nonNull(createTo)) {
+            findUserBeRequest.setCreateTo(createTo);
+        }
         Pageable pageRequest = PageRequest.of(page, size);
-        List<User> listUser = userService.getAllUserNormal(pageRequest);
+        List<User> listUser = userService.getAllUserNormal(pageRequest, findUserBeRequest);
         List<GetUserInfoBEResponse> responseList = listUser.stream().map(user -> {
             GetUserInfoBEResponse response = new GetUserInfoBEResponse();
             ModelMapperUtils.toObject(user, response);
