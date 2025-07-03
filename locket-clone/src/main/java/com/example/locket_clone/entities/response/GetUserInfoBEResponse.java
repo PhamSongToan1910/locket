@@ -32,6 +32,9 @@ public class GetUserInfoBEResponse {
     @JsonProperty("avt")
     private String avt;
 
+    @JsonProperty("is_delete")
+    private String isDeleted;
+
     public void convertCreateAtInstantToString(Instant instant) {
         String timeString = instant.toString();
         String builder = timeString.split("T")[0] +

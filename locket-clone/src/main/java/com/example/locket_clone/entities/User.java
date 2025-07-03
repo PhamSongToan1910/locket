@@ -60,6 +60,7 @@ public class User extends BaseEntity {
     @Field(PLAYER_ID)
     private String playerId;
 
+
     @Field(DEVICE_TOKEN)
     private Set<String> deviceToken = new HashSet<>();
 

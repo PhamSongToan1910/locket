@@ -3,10 +3,12 @@ package com.example.locket_clone.service.impl;
 import com.example.locket_clone.entities.Role;
 import com.example.locket_clone.entities.User;
 import com.example.locket_clone.entities.request.AddUserRequest;
+import com.example.locket_clone.entities.request.SearchUserRequest;
 import com.example.locket_clone.entities.request.FindUserBeRequest;
 import com.example.locket_clone.entities.request.UpdateUserInfoRequest;
 import com.example.locket_clone.entities.request.UpdateUserInforV2Request;
 import com.example.locket_clone.entities.response.GetNmberUserOrderByDateResponse;
+import com.example.locket_clone.entities.response.GetUserInfoBEResponse;
 import com.example.locket_clone.entities.response.SearchFriendByUsernameResponse;
 import com.example.locket_clone.repository.InterfacePackage.RoleRepository;
 import com.example.locket_clone.repository.InterfacePackage.UserRepository;
@@ -16,14 +18,19 @@ import com.example.locket_clone.utils.ModelMapper.ModelMapperUtils;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import org.modelmapper.ModelMapper;
+import org.modelmapper.TypeToken;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.query.Criteria;
+import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.util.HashSet;
-import java.util.List;
-import java.util.Objects;
-import java.util.Set;
+import java.time.Instant;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -33,6 +40,7 @@ public class UserServiceImpl implements UserService {
     UserRepository userRepository;
     RoleRepository roleRepository;
     PasswordEncoder passwordEncoder;
+    private final MongoTemplate mongoTemplate;
 
     @Override
     public User insertUser(AddUserRequest user) {
@@ -148,4 +156,45 @@ public class UserServiceImpl implements UserService {
     public List<GetNmberUserOrderByDateResponse> getUserOrderByCreateAt() {
         return userRepository.getUserOrderByDay();
     }
+
+
+    public void changeActive(String userId, boolean isActive) {
+        User user = userRepository.findById(userId).orElse(null);
+        if (user != null) {
+            user.setIsDeleted(isActive);
+            userRepository.save(user);
+        }
+    }
+
+    public Page<GetUserInfoBEResponse> searchUser(SearchUserRequest request, Pageable pageable) {
+        List<Criteria> criteriaList = new ArrayList<>();
+
+        if (request.getKeyword() != null && !request.getKeyword().isEmpty() &&
+                request.getValue() != null && !request.getValue().isEmpty()) {
+            criteriaList.add(Criteria.where(request.getKeyword()).regex(request.getValue(), "i"));
+        }
+        if (request.getStartDate() != null && request.getEndDate() != null) {
+            criteriaList.add(Criteria.where("createdAt").gte(request.getStartDate()).lte(request.getEndDate()));
+        }
+
+        Query query = new Query();
+        if (!criteriaList.isEmpty()) {
+            query.addCriteria(new Criteria().andOperator(criteriaList.toArray(new Criteria[0])));
+        }
+
+        long total = mongoTemplate.count(query, User.class);
+        query.with(pageable);
+
+        List<User> users = mongoTemplate.find(query, User.class);
+        // Chuyển sang DTO
+        List<GetUserInfoBEResponse> responseList = users.stream().map(user -> {
+            GetUserInfoBEResponse response = new GetUserInfoBEResponse();
+            ModelMapperUtils.toObject(user, response);
+            response.convertCreateAtInstantToString(user.getCreatedAt());
+            return response;
+        }).toList();
+
+        return new PageImpl<>(responseList, pageable, total);
+    }
+
 }
