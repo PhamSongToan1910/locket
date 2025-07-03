@@ -12,6 +12,8 @@ public class GetUserInfoResponse {
     @JsonProperty("first_name")
     private String firstName;
 
+    private String email;
+
     @JsonProperty("last_name")
     private String lastName;
 
@@ -26,4 +28,8 @@ public class GetUserInfoResponse {
 
     @JsonProperty("is_complete")
     private boolean isComplete;
+
+    @JsonProperty("created_at")
+    private String createdAt;
+
 }
